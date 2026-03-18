@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ResumeForge — Resume Analyser</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
 <style>
 :root {
   --bg: #0C0F1A;
@@ -208,6 +210,50 @@ select:focus { border-color: rgba(240,180,41,0.4); }
   .score-meta { grid-template-columns: 1fr 1fr; }
   .g3 { grid-template-columns: 1fr 1fr; }
 }
+
+/* ── FILE UPLOAD ZONE ── */
+.upload-zone {
+  border: 1.5px dashed var(--border2);
+  border-radius: var(--r);
+  padding: 16px 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: var(--bg3);
+  margin-bottom: 8px;
+  position: relative;
+}
+.upload-zone:hover, .upload-zone.drag-over {
+  border-color: var(--gold);
+  background: rgba(240,180,41,0.05);
+}
+.upload-zone input[type="file"] {
+  position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+}
+.upload-icon { font-size: 22px; margin-bottom: 6px; }
+.upload-main { font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
+.upload-sub { font-size: 11px; color: var(--text3); }
+.upload-file-name {
+  display: none; align-items: center; justify-content: center; gap: 8px;
+  font-size: 12px; color: var(--teal); font-weight: 500; flex-wrap: wrap;
+}
+.upload-file-name.show { display: flex; }
+.upload-remove {
+  background: none; border: none; color: var(--red); cursor: pointer;
+  font-size: 14px; padding: 0 2px; line-height: 1; flex-shrink: 0;
+}
+.upload-divider {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 8px; font-size: 11px; color: var(--text3);
+}
+.upload-divider::before, .upload-divider::after {
+  content: ''; flex: 1; height: 1px; background: var(--border);
+}
+.upload-status {
+  font-size: 11px; color: var(--gold); text-align: center;
+  margin-bottom: 6px; min-height: 16px; display: none;
+}
+.upload-status.show { display: block; }
 </style>
 </head>
 <body>
@@ -238,7 +284,29 @@ select:focus { border-color: rgba(240,180,41,0.4); }
           <span>Your Resume</span>
           <span class="char-count" id="char-count">0 chars</span>
         </div>
-        <textarea id="resume-input" rows="12" placeholder="Paste your resume here — any format, any market.
+
+        <!-- Upload Zone -->
+        <div class="upload-zone" id="upload-zone"
+             ondragover="handleDragOver(event)"
+             ondragleave="handleDragLeave(event)"
+             ondrop="handleDrop(event)">
+          <input type="file" id="file-input" accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" onchange="handleFileSelect(event)">
+          <div id="upload-prompt">
+            <div class="upload-icon">📎</div>
+            <div class="upload-main">Upload PDF or DOCX</div>
+            <div class="upload-sub">Drag & drop or click to browse</div>
+          </div>
+          <div class="upload-file-name" id="upload-file-name">
+            <span id="upload-file-label">file.pdf</span>
+            <button class="upload-remove" onclick="removeFile(event)" title="Remove file">✕</button>
+          </div>
+        </div>
+        <div class="upload-status" id="upload-status">⏳ Extracting text from file...</div>
+
+        <!-- Divider -->
+        <div class="upload-divider">or paste below</div>
+
+        <textarea id="resume-input" rows="9" placeholder="Paste your resume here — any format, any market.
 
 Name, contact, experience, education, skills — just paste it all. The AI reads everything." oninput="updateCount()"></textarea>
       </div>
@@ -471,6 +539,10 @@ function updateCount() {
 function clearAll() {
   document.getElementById('resume-input').value = '';
   document.getElementById('jd-input').value = '';
+  document.getElementById('file-input').value = '';
+  document.getElementById('upload-file-name').classList.remove('show');
+  document.getElementById('upload-prompt').style.display = 'block';
+  document.getElementById('upload-status').classList.remove('show');
   updateCount();
   document.getElementById('empty-state').style.display = 'flex';
   document.getElementById('dashboard').classList.remove('show');
@@ -828,6 +900,100 @@ function renderDashboard(d) {
   document.getElementById('dashboard').classList.add('show');
   document.getElementById('dashboard').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
+// ── FILE UPLOAD ────────────────────────────────────────────────────────
+
+// Set PDF.js worker
+if (typeof pdfjsLib !== 'undefined') {
+  pdfjsLib.GlobalWorkerOptions.workerSrc =
+    'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+}
+
+function handleDragOver(e) {
+  e.preventDefault();
+  document.getElementById('upload-zone').classList.add('drag-over');
+}
+function handleDragLeave(e) {
+  document.getElementById('upload-zone').classList.remove('drag-over');
+}
+function handleDrop(e) {
+  e.preventDefault();
+  document.getElementById('upload-zone').classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if (file) processFile(file);
+}
+function handleFileSelect(e) {
+  const file = e.target.files[0];
+  if (file) processFile(file);
+}
+function removeFile(e) {
+  e.stopPropagation();
+  document.getElementById('resume-input').value = '';
+  document.getElementById('file-input').value = '';
+  document.getElementById('upload-file-name').classList.remove('show');
+  document.getElementById('upload-prompt').style.display = 'block';
+  document.getElementById('upload-status').classList.remove('show');
+  updateCount();
+}
+
+async function processFile(file) {
+  const ext = file.name.split('.').pop().toLowerCase();
+  if (!['pdf', 'docx'].includes(ext)) {
+    alert('Please upload a PDF or DOCX file.');
+    return;
+  }
+
+  // Show file name in zone
+  document.getElementById('upload-prompt').style.display = 'none';
+  document.getElementById('upload-file-label').textContent = file.name;
+  document.getElementById('upload-file-name').classList.add('show');
+
+  // Show extracting status
+  const statusEl = document.getElementById('upload-status');
+  statusEl.textContent = '⏳ Extracting text from file...';
+  statusEl.classList.add('show');
+
+  try {
+    let text = '';
+    if (ext === 'pdf') {
+      text = await extractPDF(file);
+    } else {
+      text = await extractDOCX(file);
+    }
+
+    if (!text.trim()) throw new Error('No text could be extracted from this file.');
+
+    document.getElementById('resume-input').value = text.trim();
+    updateCount();
+    statusEl.textContent = '✅ Text extracted — ready to analyse!';
+    setTimeout(() => statusEl.classList.remove('show'), 3000);
+
+  } catch (err) {
+    statusEl.textContent = '❌ ' + err.message;
+    statusEl.style.color = 'var(--red)';
+    setTimeout(() => {
+      statusEl.classList.remove('show');
+      statusEl.style.color = 'var(--gold)';
+    }, 4000);
+  }
+}
+
+async function extractPDF(file) {
+  const arrayBuffer = await file.arrayBuffer();
+  const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+  let fullText = '';
+  for (let i = 1; i <= pdf.numPages; i++) {
+    const page = await pdf.getPage(i);
+    const content = await page.getTextContent();
+    const pageText = content.items.map(item => item.str).join(' ');
+    fullText += pageText + '\n';
+  }
+  return fullText;
+}
+
+async function extractDOCX(file) {
+  const arrayBuffer = await file.arrayBuffer();
+  const result = await mammoth.extractRawText({ arrayBuffer });
+  return result.value;
+}
 </script>
-</body>
 </html>
