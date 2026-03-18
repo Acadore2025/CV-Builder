@@ -648,8 +648,8 @@ async function runAnalysis() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
-        max_tokens: 4000,
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
         messages: [{ role: 'user', content: buildPrompt(resume, jd, market, level) }]
       })
     });
@@ -661,8 +661,16 @@ async function runAnalysis() {
     for (let i = 1; i <= 7; i++) setCheckDone(i);
 
     let d;
-    try { d = JSON.parse(text.replace(/```json|```/g, '').trim()); }
-    catch(e) { throw new Error('Could not parse AI response. Please try again.'); }
+    try {
+      // Strip markdown fences, leading/trailing whitespace, and find the JSON object
+      let clean = text.replace(/```json/g, '').replace(/```/g, '').trim();
+      // Find first { and last } to extract JSON safely
+      const start = clean.indexOf('{');
+      const end = clean.lastIndexOf('}');
+      if (start === -1 || end === -1) throw new Error('No JSON found');
+      clean = clean.slice(start, end + 1);
+      d = JSON.parse(clean);
+    } catch(e) { throw new Error('Could not parse AI response: ' + e.message); }
 
     renderDashboard(d);
 
