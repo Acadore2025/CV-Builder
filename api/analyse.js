@@ -8,7 +8,7 @@ module.exports = async function handler(req, res) {
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
-    return res.status(500).json({ error: 'ANTHROPIC_API_KEY not configured' });
+    return res.status(500).json({ error: 'ANTHROPIC_API_KEY is not configured in Vercel environment variables.' });
   }
 
   try {
@@ -26,7 +26,15 @@ module.exports = async function handler(req, res) {
       })
     });
 
-    const data = await response.json();
+    // Safely parse — Anthropic may return non-JSON on 5xx errors
+    const text = await response.text();
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch {
+      return res.status(500).json({ error: 'Anthropic returned an unexpected response: ' + text.slice(0, 200) });
+    }
+
     return res.status(response.status).json(data);
 
   } catch (err) {
