@@ -1,1 +1,1174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ResumeForge — AI Resume Builder</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #0F1B2D;
+  --navy2: #162338;
+  --gold: #C9953A;
+  --gold2: #E8B060;
+  --cream: #F8F4EE;
+  --cream2: #F0EAE0;
+  --white: #FFFFFF;
+  --text: #1A1A2E;
+  --text2: #4A5568;
+  --text3: #8A9BB0;
+  --border: #E2D9CE;
+  --green: #1B6B47;
+  --green-bg: #EAF5EE;
+  --red: #B91C1C;
+  --red-bg: #FEF2F2;
+  --blue: #1E40AF;
+  --blue-bg: #EFF6FF;
+  --amber: #92400E;
+  --amber-bg: #FFFBEB;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.06);
+  --shadow-lg: 0 8px 32px rgba(15,27,45,0.12);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--text); min-height: 100vh; }
+
+/* ── TOP NAV ─────────────────────────────────────── */
+.nav { background: var(--navy); padding: 0 2rem; height: 58px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+.nav-logo { font-family: 'Playfair Display', serif; font-size: 20px; color: var(--white); letter-spacing: -0.3px; display: flex; align-items: center; gap: 8px; }
+.nav-logo span { color: var(--gold); }
+.nav-right { display: flex; align-items: center; gap: 12px; }
+.nav-badge { font-size: 11px; background: rgba(201,149,58,0.2); color: var(--gold2); padding: 4px 10px; border-radius: 999px; border: 1px solid rgba(201,149,58,0.3); }
+
+/* ── LAYOUT ──────────────────────────────────────── */
+.layout { display: grid; grid-template-columns: 340px 1fr; min-height: calc(100vh - 58px); }
+.sidebar { background: var(--white); border-right: 1px solid var(--border); overflow-y: auto; }
+.main { overflow-y: auto; }
+
+/* ── SIDEBAR ─────────────────────────────────────── */
+.sidebar-header { padding: 1.5rem; border-bottom: 1px solid var(--border); }
+.sidebar-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 4px; letter-spacing: 0.02em; }
+.sidebar-sub { font-size: 12px; color: var(--text3); }
+
+/* Market selector */
+.market-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding: 1rem 1.5rem; border-bottom: 1px solid var(--border); }
+.market-btn { padding: 8px 6px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); background: var(--white); cursor: pointer; font-size: 11px; font-weight: 500; color: var(--text2); text-align: center; transition: all 0.15s; display: flex; flex-direction: column; align-items: center; gap: 3px; }
+.market-btn .flag { font-size: 18px; }
+.market-btn:hover { border-color: var(--gold); color: var(--gold); }
+.market-btn.active { background: var(--navy); border-color: var(--navy); color: var(--white); }
+
+/* Mode toggle */
+.mode-toggle { padding: 1rem 1.5rem; border-bottom: 1px solid var(--border); }
+.mode-label { font-size: 11px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
+.mode-tabs { display: flex; background: var(--cream); border-radius: var(--radius-sm); padding: 3px; gap: 3px; }
+.mode-tab { flex: 1; padding: 7px; border: none; background: transparent; cursor: pointer; font-size: 12px; font-weight: 500; color: var(--text2); border-radius: 6px; transition: all 0.15s; font-family: 'DM Sans', sans-serif; }
+.mode-tab.active { background: var(--white); color: var(--navy); box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
+
+/* Form sections */
+.form-nav { padding: 0.75rem 1.5rem; border-bottom: 1px solid var(--border); }
+.section-tabs { display: flex; flex-direction: column; gap: 2px; }
+.section-tab { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: var(--radius-sm); cursor: pointer; font-size: 13px; color: var(--text2); transition: all 0.12s; border: none; background: transparent; width: 100%; text-align: left; font-family: 'DM Sans', sans-serif; }
+.section-tab:hover { background: var(--cream); }
+.section-tab.active { background: var(--navy); color: var(--white); font-weight: 500; }
+.section-tab .tab-icon { width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; background: var(--cream); }
+.section-tab.active .tab-icon { background: rgba(255,255,255,0.15); }
+.section-tab .tab-check { margin-left: auto; font-size: 14px; opacity: 0; }
+.section-tab.filled .tab-check { opacity: 1; color: var(--gold2); }
+.section-tab.active .tab-check { opacity: 1; color: rgba(255,255,255,0.7); }
+
+/* Action buttons */
+.sidebar-actions { padding: 1rem 1.5rem; }
+.btn { display: inline-flex; align-items: center; gap: 6px; padding: 10px 16px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 500; cursor: pointer; border: none; transition: all 0.15s; font-family: 'DM Sans', sans-serif; }
+.btn-primary { background: var(--gold); color: var(--white); width: 100%; justify-content: center; font-size: 14px; padding: 12px; }
+.btn-primary:hover { background: var(--gold2); }
+.btn-secondary { background: var(--cream); color: var(--text); border: 1px solid var(--border); }
+.btn-secondary:hover { background: var(--cream2); }
+.btn-outline { background: transparent; color: var(--navy); border: 1.5px solid var(--navy); }
+.btn-outline:hover { background: var(--navy); color: var(--white); }
+.btn-sm { padding: 6px 12px; font-size: 12px; }
+.btn-danger { background: var(--red-bg); color: var(--red); border: 1px solid #fecaca; }
+.export-row { display: flex; gap: 6px; margin-top: 8px; }
+
+/* ── MAIN AREA ───────────────────────────────────── */
+.main-inner { padding: 2rem; max-width: 900px; }
+
+/* Section panels */
+.section-panel { display: none; }
+.section-panel.active { display: block; }
+.panel-title { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 600; color: var(--navy); margin-bottom: 4px; }
+.panel-sub { font-size: 13px; color: var(--text3); margin-bottom: 1.5rem; }
+
+/* Form fields */
+.field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+.field-grid.three { grid-template-columns: 1fr 1fr 1fr; }
+.field-grid.one { grid-template-columns: 1fr; }
+.field { display: flex; flex-direction: column; gap: 5px; }
+.field label { font-size: 12px; font-weight: 600; color: var(--text2); letter-spacing: 0.02em; }
+.field .required { color: var(--red); }
+.field input, .field textarea, .field select {
+  padding: 10px 12px; border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+  font-size: 13px; font-family: 'DM Sans', sans-serif; color: var(--text); background: var(--white);
+  transition: border-color 0.15s; outline: none; resize: vertical;
+}
+.field input:focus, .field textarea:focus, .field select:focus { border-color: var(--navy); }
+.field .hint { font-size: 11px; color: var(--text3); }
+
+/* Market-specific fields */
+.market-field { display: none; }
+.market-field.show { display: flex; }
+
+/* Cards for experience/education */
+.entry-card { background: var(--white); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 1.25rem; margin-bottom: 10px; position: relative; }
+.entry-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.entry-card-title { font-size: 13px; font-weight: 600; color: var(--navy); }
+.add-btn { display: flex; align-items: center; gap: 6px; padding: 9px 14px; border: 1.5px dashed var(--border); border-radius: var(--radius-sm); background: transparent; cursor: pointer; font-size: 13px; color: var(--text3); font-family: 'DM Sans', sans-serif; transition: all 0.15s; width: 100%; justify-content: center; margin-top: 8px; }
+.add-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+/* AI paste mode */
+.paste-zone { background: var(--cream); border: 2px dashed var(--border); border-radius: var(--radius); padding: 1.5rem; margin-bottom: 1rem; }
+.paste-zone textarea { background: var(--white); border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 12px; width: 100%; font-size: 13px; font-family: 'DM Sans', sans-serif; color: var(--text); resize: vertical; outline: none; }
+.paste-zone textarea:focus { border-color: var(--navy); }
+
+/* ── PREVIEW PANEL ───────────────────────────────── */
+.preview-header { background: var(--navy); padding: 1rem 2rem; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 58px; z-index: 50; }
+.preview-title { font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.7); }
+.preview-actions { display: flex; gap: 8px; }
+.preview-btn { padding: 7px 14px; border-radius: var(--radius-sm); font-size: 12px; font-weight: 500; cursor: pointer; border: none; font-family: 'DM Sans', sans-serif; transition: all 0.15s; }
+.preview-btn.pdf { background: var(--gold); color: var(--white); }
+.preview-btn.pdf:hover { background: var(--gold2); }
+.preview-btn.docx { background: rgba(255,255,255,0.1); color: var(--white); border: 1px solid rgba(255,255,255,0.2); }
+.preview-btn.docx:hover { background: rgba(255,255,255,0.2); }
+.preview-btn.ats { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.6); border: 1px solid rgba(255,255,255,0.15); }
+.preview-btn.ats:hover { background: rgba(255,255,255,0.15); }
+
+/* Resume preview */
+#resume-preview { background: var(--white); margin: 1.5rem 2rem; border-radius: var(--radius); box-shadow: var(--shadow-lg); overflow: hidden; min-height: 500px; }
+.resume-loading { display: flex; align-items: center; justify-content: center; height: 300px; flex-direction: column; gap: 12px; color: var(--text3); font-size: 13px; }
+.spinner { width: 28px; height: 28px; border: 2px solid var(--border); border-top-color: var(--navy); border-radius: 50%; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Resume template styles */
+.resume-doc { padding: 40px 48px; font-family: 'DM Sans', sans-serif; font-size: 13px; line-height: 1.6; color: #1a1a1a; }
+.resume-name { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: var(--navy); letter-spacing: -0.5px; }
+.resume-title { font-size: 14px; color: var(--gold); font-weight: 500; margin-top: 2px; margin-bottom: 10px; }
+.resume-contact { display: flex; flex-wrap: wrap; gap: 14px; font-size: 12px; color: var(--text2); padding-bottom: 14px; border-bottom: 2px solid var(--navy); margin-bottom: 16px; }
+.resume-contact span { display: flex; align-items: center; gap: 4px; }
+.resume-section { margin-bottom: 18px; }
+.resume-section-title { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--navy); border-bottom: 1.5px solid var(--cream2); padding-bottom: 4px; margin-bottom: 10px; }
+.resume-entry { margin-bottom: 12px; }
+.resume-entry-header { display: flex; justify-content: space-between; align-items: baseline; }
+.resume-entry-title { font-weight: 600; font-size: 13px; color: var(--text); }
+.resume-entry-meta { font-size: 12px; color: var(--text3); }
+.resume-entry-sub { font-size: 12px; color: var(--gold); font-weight: 500; }
+.resume-entry ul { margin-top: 5px; padding-left: 16px; }
+.resume-entry ul li { font-size: 12px; color: var(--text2); margin-bottom: 3px; }
+.resume-skills { display: flex; flex-wrap: wrap; gap: 6px; }
+.resume-skill { background: var(--cream); color: var(--text2); padding: 4px 10px; border-radius: 999px; font-size: 11px; border: 1px solid var(--border); }
+.resume-summary { font-size: 13px; color: var(--text2); line-height: 1.7; }
+
+/* Gulf-specific */
+.resume-photo-row { display: flex; gap: 20px; align-items: flex-start; }
+.resume-photo { width: 80px; height: 80px; border-radius: 8px; background: var(--cream2); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; color: var(--text3); font-size: 11px; text-align: center; flex-shrink: 0; overflow: hidden; }
+.resume-photo img { width: 100%; height: 100%; object-fit: cover; }
+
+/* ATS Text preview */
+.ats-preview { background: var(--navy); color: #a8c0d6; font-family: 'Courier New', monospace; font-size: 12px; line-height: 1.8; padding: 24px 28px; border-radius: var(--radius); margin: 1.5rem 2rem; white-space: pre-wrap; }
+
+/* Toast */
+.toast { position: fixed; bottom: 24px; right: 24px; background: var(--navy); color: var(--white); padding: 12px 20px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 500; box-shadow: var(--shadow-lg); z-index: 9999; transform: translateY(80px); opacity: 0; transition: all 0.3s; }
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast.success { background: var(--green); }
+
+/* Loading overlay */
+.ai-loading { background: rgba(15,27,45,0.92); position: fixed; inset: 0; z-index: 9998; display: none; align-items: center; justify-content: center; flex-direction: column; gap: 16px; }
+.ai-loading.show { display: flex; }
+.ai-loading-text { color: var(--white); font-size: 16px; font-weight: 500; }
+.ai-loading-sub { color: rgba(255,255,255,0.5); font-size: 13px; }
+.ai-spinner { width: 44px; height: 44px; border: 3px solid rgba(201,149,58,0.3); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.9s linear infinite; }
+
+/* Diff dots */
+.dot-pulse { display: flex; gap: 6px; }
+.dot-pulse span { width: 8px; height: 8px; border-radius: 50%; background: var(--gold); animation: pulse 1.2s ease-in-out infinite; }
+.dot-pulse span:nth-child(2) { animation-delay: 0.2s; }
+.dot-pulse span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes pulse { 0%,100%{opacity:0.3;transform:scale(0.8)} 50%{opacity:1;transform:scale(1)} }
+
+/* Tag chips */
+.chip { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 500; cursor: pointer; }
+.chip-market { background: var(--amber-bg); color: var(--amber); border: 1px solid #fde68a; }
+.chip-mode { background: var(--blue-bg); color: var(--blue); border: 1px solid #bfdbfe; }
+
+/* Responsive */
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; }
+  .sidebar { border-right: none; border-bottom: 1px solid var(--border); }
+  .field-grid { grid-template-columns: 1fr; }
+  .field-grid.three { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-logo">Resume<span>Forge</span></div>
+  <div class="nav-right"><a href="/" style="font-size:12px;color:var(--gold2);text-decoration:none;opacity:0.8;">← Home</a>
+    <span class="nav-badge" id="market-chip">🇮🇳 India Mode</span>
+    <span class="nav-badge" id="mode-chip" style="background:rgba(59,130,246,0.15);color:#93c5fd;border-color:rgba(59,130,246,0.3)">Form Builder</span>
+  </div>
+</nav>
+
+<!-- LAYOUT -->
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-title">Select your target market</div>
+      <div class="sidebar-sub">Format, fields & ATS rules adapt automatically</div>
+    </div>
+
+    <div class="market-grid">
+      <button class="market-btn active" onclick="setMarket('india',this)"><span class="flag">🇮🇳</span>India</button>
+      <button class="market-btn" onclick="setMarket('us',this)"><span class="flag">🇺🇸</span>United States</button>
+      <button class="market-btn" onclick="setMarket('gulf',this)"><span class="flag">🇦🇪</span>Gulf / UAE</button>
+      <button class="market-btn" onclick="setMarket('europe',this)"><span class="flag">🇪🇺</span>Europe</button>
+    </div>
+
+    <div class="mode-toggle">
+      <div class="mode-label">Builder Mode</div>
+      <div class="mode-tabs">
+        <button class="mode-tab active" onclick="setMode('form',this)">📝 Form Builder</button>
+        <button class="mode-tab" onclick="setMode('ai',this)">🤖 AI Rewrite</button>
+      </div>
+    </div>
+
+    <div class="form-nav" id="form-nav">
+      <div class="section-tabs">
+        <button class="section-tab active" onclick="showSection('personal',this)"><span class="tab-icon">👤</span>Personal Info<span class="tab-check">✓</span></button>
+        <button class="section-tab" onclick="showSection('summary',this)"><span class="tab-icon">📝</span>Summary<span class="tab-check">✓</span></button>
+        <button class="section-tab" onclick="showSection('experience',this)"><span class="tab-icon">💼</span>Experience<span class="tab-check">✓</span></button>
+        <button class="section-tab" onclick="showSection('education',this)"><span class="tab-icon">🎓</span>Education<span class="tab-check">✓</span></button>
+        <button class="section-tab" onclick="showSection('skills',this)"><span class="tab-icon">⚡</span>Skills<span class="tab-check">✓</span></button>
+        <button class="section-tab" onclick="showSection('extras',this)"><span class="tab-icon">🏆</span>Extras<span class="tab-check">✓</span></button>
+      </div>
+    </div>
+
+    <div class="sidebar-actions">
+      <button class="btn btn-primary" onclick="generateResume()">✨ Generate Resume</button>
+      <div class="export-row">
+        <button class="btn btn-secondary btn-sm" onclick="exportPDF()" style="flex:1">⬇ PDF</button>
+        <button class="btn btn-secondary btn-sm" onclick="exportDOCX()" style="flex:1">⬇ DOCX</button>
+        <button class="btn btn-secondary btn-sm" onclick="showATS()" style="flex:1">⬇ ATS</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <div class="main">
+
+    <!-- FORM BUILDER MODE -->
+    <div id="form-builder">
+      <div class="main-inner">
+
+        <!-- PERSONAL INFO -->
+        <div class="section-panel active" id="panel-personal">
+          <div class="panel-title">Personal Information</div>
+          <div class="panel-sub">Your contact details — adapts automatically for your selected market</div>
+
+          <!-- Gulf: photo upload -->
+          <div class="market-field gulf-field" id="gulf-photo-section" style="display:none;flex-direction:column;gap:8px;margin-bottom:14px;">
+            <label style="font-size:12px;font-weight:600;color:var(--text2);">Professional Photo <span style="color:var(--red)">*</span> <span style="font-weight:400;color:var(--text3)">(Required for Gulf/UAE applications)</span></label>
+            <div style="display:flex;align-items:center;gap:12px;">
+              <div class="resume-photo" id="photo-preview-sm" style="width:64px;height:64px;cursor:pointer;" onclick="document.getElementById('photo-input').click()">
+                <span style="font-size:10px;text-align:center;padding:4px;">Click to upload</span>
+              </div>
+              <input type="file" id="photo-input" accept="image/*" style="display:none" onchange="handlePhoto(this)">
+              <div>
+                <button class="btn btn-secondary btn-sm" onclick="document.getElementById('photo-input').click()">Upload Photo</button>
+                <div style="font-size:11px;color:var(--text3);margin-top:4px;">Professional headshot, white background recommended</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="field-grid">
+            <div class="field"><label>Full Name <span class="required">*</span></label><input id="f-name" placeholder="Arjun Sharma" oninput="markFilled('personal')"></div>
+            <div class="field"><label>Job Title / Role <span class="required">*</span></label><input id="f-title" placeholder="Senior Software Engineer"></div>
+          </div>
+          <div class="field-grid">
+            <div class="field"><label>Email <span class="required">*</span></label><input id="f-email" type="email" placeholder="arjun@email.com"></div>
+            <div class="field"><label>Phone <span class="required">*</span></label><input id="f-phone" placeholder="+91 9876543210"></div>
+          </div>
+          <div class="field-grid">
+            <div class="field"><label>City / Location</label><input id="f-location" placeholder="Hyderabad, India"></div>
+            <div class="field"><label>LinkedIn URL</label><input id="f-linkedin" placeholder="linkedin.com/in/arjun"></div>
+          </div>
+          <div class="field-grid">
+            <div class="field"><label>Portfolio / Website</label><input id="f-portfolio" placeholder="github.com/arjun or arjun.dev"></div>
+            <div class="field"><label>Years of Experience</label><input id="f-years" placeholder="5"></div>
+          </div>
+
+          <!-- India-specific -->
+          <div class="field-grid market-field india-field" id="india-fields">
+            <div class="field"><label>Current CTC (₹ LPA)</label><input id="f-ctc" placeholder="12 LPA"><div class="hint">Cost to Company — expected on Indian resumes</div></div>
+            <div class="field"><label>Expected CTC (₹ LPA)</label><input id="f-ectc" placeholder="18 LPA"></div>
+          </div>
+
+          <!-- Gulf-specific -->
+          <div class="field-grid market-field gulf-field" style="display:none">
+            <div class="field"><label>Nationality <span class="required">*</span></label><input id="f-nationality" placeholder="Indian"><div class="hint">Required on all UAE/Gulf applications</div></div>
+            <div class="field"><label>Visa Status</label><select id="f-visa"><option value="">Select visa status</option><option>UAE Residence Visa</option><option>Employment Visa</option><option>Visit Visa</option><option>Seeking Employment Visa</option><option>Citizen</option></select></div>
+          </div>
+          <div class="field-grid market-field gulf-field" style="display:none">
+            <div class="field"><label>Date of Birth</label><input id="f-dob" type="date"><div class="hint">Often requested in Gulf applications</div></div>
+            <div class="field"><label>Driving License</label><select id="f-driving"><option value="">Select</option><option>UAE License</option><option>Indian License</option><option>International License</option><option>No License</option></select></div>
+          </div>
+
+          <!-- Europe-specific -->
+          <div class="field-grid market-field europe-field" style="display:none">
+            <div class="field"><label>Nationality</label><input id="f-eu-nationality" placeholder="Indian / British etc."></div>
+            <div class="field"><label>Work Authorization</label><select id="f-work-auth"><option value="">Select</option><option>EU Citizen</option><option>EU Work Permit</option><option>Skilled Worker Visa</option><option>Seeking Sponsorship</option></select></div>
+          </div>
+
+          <button class="btn btn-primary" style="margin-top:1rem;width:auto;padding:10px 24px" onclick="nextSection('summary')">Next: Summary →</button>
+        </div>
+
+        <!-- SUMMARY -->
+        <div class="section-panel" id="panel-summary">
+          <div class="panel-title">Professional Summary</div>
+          <div class="panel-sub">2–3 powerful sentences. AI will enhance this based on your experience.</div>
+          <div class="field field-grid one">
+            <label>Summary / Objective <span class="required">*</span></label>
+            <textarea id="f-summary" rows="5" placeholder="Results-driven software engineer with 5+ years building scalable products. Led teams of 8+ engineers delivering features used by 2M+ users. Passionate about clean architecture and developer experience." oninput="markFilled('summary')"></textarea>
+            <div class="hint">Tip: Include your years of experience, key skills, and one standout achievement</div>
+          </div>
+          <!-- India specific -->
+          <div class="field market-field india-field" id="india-naukri" style="margin-top:12px;">
+            <label>Naukri.com Headline <span style="font-weight:400;color:var(--text3)">(optional but recommended)</span></label>
+            <input id="f-naukri-headline" placeholder="5+ Yrs | Python | React | AWS | Open to Relocation">
+            <div class="hint">This appears as your headline on Naukri profile — keyword-optimized</div>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:1rem;">
+            <button class="btn btn-secondary" onclick="showSection('personal',document.querySelector('.section-tab'))">← Back</button>
+            <button class="btn btn-primary" style="width:auto;padding:10px 24px" onclick="nextSection('experience')">Next: Experience →</button>
+          </div>
+        </div>
+
+        <!-- EXPERIENCE -->
+        <div class="section-panel" id="panel-experience">
+          <div class="panel-title">Work Experience</div>
+          <div class="panel-sub">Start with your most recent role. Use specific numbers and metrics for impact.</div>
+          <div id="experience-list">
+            <div class="entry-card" id="exp-0">
+              <div class="entry-card-header"><div class="entry-card-title">Experience 1</div><button class="btn btn-danger btn-sm" onclick="removeEntry('exp-0')">Remove</button></div>
+              <div class="field-grid">
+                <div class="field"><label>Job Title <span class="required">*</span></label><input class="exp-title" placeholder="Senior Software Engineer" oninput="markFilled('experience')"></div>
+                <div class="field"><label>Company Name <span class="required">*</span></label><input class="exp-company" placeholder="Google India"></div>
+              </div>
+              <div class="field-grid three">
+                <div class="field"><label>Start Date</label><input class="exp-start" placeholder="Jan 2021"></div>
+                <div class="field"><label>End Date</label><input class="exp-end" placeholder="Present"></div>
+                <div class="field"><label>Location</label><input class="exp-location" placeholder="Hyderabad / Remote"></div>
+              </div>
+              <div class="field field-grid one">
+                <label>Key Achievements <span class="required">*</span></label>
+                <textarea class="exp-bullets" rows="5" placeholder="• Led migration of monolith to microservices, reducing deployment time by 70%&#10;• Built real-time analytics dashboard used by 500K+ users&#10;• Mentored team of 4 junior engineers, improving sprint velocity by 35%&#10;• Reduced API latency from 800ms to 120ms through query optimization"></textarea>
+                <div class="hint">Use bullet points starting with action verbs. Add metrics (%, $, users, time saved).</div>
+              </div>
+            </div>
+          </div>
+          <button class="add-btn" onclick="addExperience()">+ Add Another Experience</button>
+          <div style="display:flex;gap:8px;margin-top:1rem;">
+            <button class="btn btn-secondary" onclick="prevSection('summary')">← Back</button>
+            <button class="btn btn-primary" style="width:auto;padding:10px 24px" onclick="nextSection('education')">Next: Education →</button>
+          </div>
+        </div>
+
+        <!-- EDUCATION -->
+        <div class="section-panel" id="panel-education">
+          <div class="panel-title">Education</div>
+          <div class="panel-sub">Your academic qualifications. For India, CGPA is shown. For US, GPA. Gulf shows both.</div>
+          <div id="education-list">
+            <div class="entry-card" id="edu-0">
+              <div class="entry-card-header"><div class="entry-card-title">Education 1</div><button class="btn btn-danger btn-sm" onclick="removeEntry('edu-0')">Remove</button></div>
+              <div class="field-grid">
+                <div class="field"><label>Degree <span class="required">*</span></label><input class="edu-degree" placeholder="B.Tech Computer Science" oninput="markFilled('education')"></div>
+                <div class="field"><label>Institution <span class="required">*</span></label><input class="edu-institution" placeholder="IIT Hyderabad"></div>
+              </div>
+              <div class="field-grid three">
+                <div class="field"><label>Graduation Year</label><input class="edu-year" placeholder="2019"></div>
+                <!-- India/Gulf -->
+                <div class="field india-field europe-field gulf-field edu-cgpa-field"><label id="cgpa-label">CGPA / Percentage</label><input class="edu-cgpa" placeholder="8.4 / 10 or 84%"></div>
+                <!-- US -->
+                <div class="field us-field edu-gpa-field" style="display:none"><label>GPA</label><input class="edu-gpa" placeholder="3.8 / 4.0"></div>
+                <div class="field"><label>Location</label><input class="edu-location" placeholder="Hyderabad, India"></div>
+              </div>
+            </div>
+          </div>
+          <button class="add-btn" onclick="addEducation()">+ Add Another Education</button>
+          <div style="display:flex;gap:8px;margin-top:1rem;">
+            <button class="btn btn-secondary" onclick="prevSection('experience')">← Back</button>
+            <button class="btn btn-primary" style="width:auto;padding:10px 24px" onclick="nextSection('skills')">Next: Skills →</button>
+          </div>
+        </div>
+
+        <!-- SKILLS -->
+        <div class="section-panel" id="panel-skills">
+          <div class="panel-title">Skills</div>
+          <div class="panel-sub">Technical skills, tools, languages. Separate by comma.</div>
+          <div class="field-grid one field"><label>Technical Skills <span class="required">*</span></label><input id="f-tech-skills" placeholder="Python, React, Node.js, AWS, PostgreSQL, Docker, Kubernetes" oninput="markFilled('skills')"></div>
+          <div class="field-grid one field" style="margin-top:12px;"><label>Soft Skills</label><input id="f-soft-skills" placeholder="Team Leadership, Agile/Scrum, Cross-functional Collaboration, Problem Solving"></div>
+          <div class="field-grid one field" style="margin-top:12px;"><label>Tools & Platforms</label><input id="f-tools" placeholder="Jira, Figma, GitHub, Postman, Datadog, NewRelic"></div>
+          <div class="field-grid one field market-field india-field" style="margin-top:12px;">
+            <label>AI Tools Used <span style="font-weight:400;color:var(--text3)">(2026 must-have)</span></label>
+            <input id="f-ai-tools" placeholder="Claude, ChatGPT, GitHub Copilot, Midjourney">
+            <div class="hint">Explicitly listing AI tools shows modern fluency — highly valued in 2026</div>
+          </div>
+          <div class="field-grid one field market-field gulf-field" style="display:none;margin-top:12px;">
+            <label>Languages</label>
+            <input id="f-languages" placeholder="English (Fluent), Arabic (Basic), Hindi (Native)">
+            <div class="hint">Language skills are critical for Gulf/MENA applications</div>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:1rem;">
+            <button class="btn btn-secondary" onclick="prevSection('education')">← Back</button>
+            <button class="btn btn-primary" style="width:auto;padding:10px 24px" onclick="nextSection('extras')">Next: Extras →</button>
+          </div>
+        </div>
+
+        <!-- EXTRAS -->
+        <div class="section-panel" id="panel-extras">
+          <div class="panel-title">Extra Sections</div>
+          <div class="panel-sub">Certifications, projects, awards — these differentiate you from other candidates.</div>
+          <div class="field-grid one field"><label>Certifications</label><textarea id="f-certs" rows="3" placeholder="AWS Solutions Architect (2023)&#10;Google Professional Data Engineer (2022)&#10;PMP Certified (2021)" oninput="markFilled('extras')"></textarea></div>
+          <div class="field-grid one field" style="margin-top:12px;"><label>Key Projects</label><textarea id="f-projects" rows="4" placeholder="Project Name | Tech Stack | Link&#10;E-commerce Platform | React, Node.js, AWS | github.com/project&#10;ML Fraud Detection | Python, TensorFlow | 98% accuracy, saved $2M annually"></textarea></div>
+          <div class="field-grid one field" style="margin-top:12px;"><label>Awards & Achievements</label><textarea id="f-awards" rows="3" placeholder="Employee of the Year 2023 — TCS&#10;Hackathon Winner — Microsoft Build 2022&#10;Speaker — PyCon India 2023"></textarea></div>
+          <!-- India specific -->
+          <div class="field-grid one field market-field india-field" style="margin-top:12px;">
+            <label>Notice Period <span style="font-weight:400;color:var(--text3)">(expected on Indian resumes)</span></label>
+            <select id="f-notice"><option value="">Select notice period</option><option>Immediate</option><option>15 days</option><option>30 days</option><option>60 days</option><option>90 days</option></select>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:1.5rem;">
+            <button class="btn btn-secondary" onclick="prevSection('skills')">← Back</button>
+            <button class="btn btn-primary" onclick="generateResume()" style="width:auto;padding:10px 28px">✨ Generate Resume</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- AI REWRITE MODE -->
+    <div id="ai-builder" style="display:none;">
+      <div class="main-inner">
+        <div class="panel-title">AI Resume Rewriter</div>
+        <div class="panel-sub">Paste your existing resume or raw notes — AI will transform it into a polished, market-optimized resume.</div>
+
+        <div class="paste-zone">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+            <span style="font-size:12px;font-weight:600;color:var(--text2);">Your Existing Resume / Raw Notes</span>
+            <span style="font-size:11px;color:var(--text3);">Paste anything — old resume, notes, LinkedIn profile</span>
+          </div>
+          <textarea id="ai-paste-input" rows="14" placeholder="Paste your existing resume here, OR just dump your raw experience notes...
+
+Example:
+Name: Priya Sharma
+Job: Software developer at Infosys for 3 years
+Before that: internship at startup
+Education: B.Tech from JNTU 2020, 7.8 CGPA
+Skills: Java, Spring Boot, MySQL, basic React
+Did some microservices work, helped migrate legacy system
+Looking for senior dev roles in product companies"></textarea>
+        </div>
+
+        <div class="field-grid">
+          <div class="field">
+            <label>Target Role / Job Title</label>
+            <input id="ai-target-role" placeholder="Senior Software Engineer, Product Manager...">
+          </div>
+          <div class="field">
+            <label>Job Description (optional — for tailoring)</label>
+            <input id="ai-job-desc" placeholder="Paste JD keywords or company name...">
+          </div>
+        </div>
+
+        <div class="field-grid" style="margin-top:12px;">
+          <div class="field">
+            <label>Tone / Style</label>
+            <select id="ai-tone">
+              <option value="professional">Professional & Formal</option>
+              <option value="achievement">Achievement-focused (metrics-heavy)</option>
+              <option value="technical">Technical & Precise</option>
+              <option value="leadership">Leadership-oriented</option>
+              <option value="creative">Creative & Dynamic</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Career Transition?</label>
+            <select id="ai-transition">
+              <option value="none">No — same field</option>
+              <option value="industry">Yes — changing industry</option>
+              <option value="role">Yes — changing role type</option>
+              <option value="gap">Yes — returning after gap</option>
+              <option value="freelance">Yes — freelance to full-time</option>
+              <option value="startup">Yes — startup to corporate</option>
+            </select>
+          </div>
+        </div>
+
+        <button class="btn btn-primary" style="margin-top:1.5rem;width:auto;padding:12px 32px;font-size:15px;" onclick="runAIRewrite()">🤖 Rewrite with AI →</button>
+        <div style="font-size:12px;color:var(--text3);margin-top:8px;">AI will optimize for your selected market (currently: <span id="ai-market-label">India</span>) and preserve your authentic voice.</div>
+      </div>
+    </div>
+
+    <!-- PREVIEW -->
+    <div class="preview-header">
+      <span class="preview-title">Live Preview</span>
+      <div class="preview-actions">
+        <button class="preview-btn pdf" onclick="exportPDF()">⬇ PDF</button>
+        <button class="preview-btn docx" onclick="exportDOCX()">⬇ DOCX</button>
+        <button class="preview-btn ats" onclick="showATS()">⬇ ATS Text</button>
+      </div>
+    </div>
+
+    <div id="resume-preview">
+      <div class="resume-loading">
+        <div style="font-size:32px;">📄</div>
+        <div style="font-size:14px;font-weight:500;color:var(--text);">Your resume will appear here</div>
+        <div style="font-size:12px;color:var(--text3);">Fill the form and click Generate Resume</div>
+      </div>
+    </div>
+
+    <div id="ats-preview-box" style="display:none;"></div>
+
+  </div>
+</div>
+
+<!-- AI LOADING OVERLAY -->
+<div class="ai-loading" id="ai-loading">
+  <div class="ai-spinner"></div>
+  <div class="ai-loading-text" id="ai-loading-text">Generating your resume...</div>
+  <div class="ai-loading-sub" id="ai-loading-sub">AI is crafting your content</div>
+  <div class="dot-pulse" style="margin-top:8px;"><span></span><span></span><span></span></div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── STATE ──────────────────────────────────────────────────────────────
+let currentMarket = 'india';
+let currentMode = 'form';
+let photoDataUrl = null;
+let expCount = 1;
+let eduCount = 1;
+let generatedHTML = '';
+let generatedATS = '';
+
+// ── MARKET SWITCHER ────────────────────────────────────────────────────
+function setMarket(market, btn) {
+  currentMarket = market;
+  document.querySelectorAll('.market-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const labels = { india:'🇮🇳 India Mode', us:'🇺🇸 US Mode', gulf:'🇦🇪 Gulf Mode', europe:'🇪🇺 Europe Mode' };
+  document.getElementById('market-chip').textContent = labels[market];
+  document.getElementById('ai-market-label').textContent = labels[market].replace(' Mode','');
+
+  // Show/hide market-specific fields
+  ['india','us','gulf','europe'].forEach(m => {
+    document.querySelectorAll('.'+m+'-field').forEach(el => {
+      el.style.display = (m === market) ? 'flex' : 'none';
+    });
+  });
+
+  // CGPA vs GPA
+  document.querySelectorAll('.edu-cgpa-field').forEach(el => el.style.display = market !== 'us' ? 'flex' : 'none');
+  document.querySelectorAll('.edu-gpa-field').forEach(el => el.style.display = market === 'us' ? 'flex' : 'none');
+  document.getElementById('cgpa-label').textContent = market === 'india' ? 'CGPA / Percentage' : 'CGPA / GPA';
+
+  // Phone placeholder
+  const phones = { india:'+91 9876543210', us:'+1 (555) 123-4567', gulf:'+971 50 123 4567', europe:'+44 7911 123456' };
+  document.getElementById('f-phone').placeholder = phones[market];
+}
+
+// ── MODE SWITCHER ──────────────────────────────────────────────────────
+function setMode(mode, btn) {
+  currentMode = mode;
+  document.querySelectorAll('.mode-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('form-builder').style.display = mode === 'form' ? 'block' : 'none';
+  document.getElementById('ai-builder').style.display = mode === 'ai' ? 'block' : 'none';
+  document.getElementById('form-nav').style.display = mode === 'form' ? 'block' : 'none';
+  document.getElementById('mode-chip').textContent = mode === 'form' ? 'Form Builder' : 'AI Rewrite';
+}
+
+// ── SECTION NAV ────────────────────────────────────────────────────────
+function showSection(id, btn) {
+  document.querySelectorAll('.section-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');
+  document.querySelectorAll('.section-tab').forEach(b => b.classList.remove('active'));
+  // find correct tab
+  document.querySelectorAll('.section-tab').forEach(b => {
+    if (b.getAttribute('onclick') && b.getAttribute('onclick').includes("'"+id+"'")) b.classList.add('active');
+  });
+}
+function nextSection(id) { showSection(id, null); }
+function prevSection(id) { showSection(id, null); }
+function markFilled(section) {
+  document.querySelectorAll('.section-tab').forEach(b => {
+    if (b.getAttribute('onclick') && b.getAttribute('onclick').includes("'"+section+"'")) b.classList.add('filled');
+  });
+}
+
+// ── DYNAMIC ENTRIES ────────────────────────────────────────────────────
+function addExperience() {
+  const id = 'exp-' + expCount++;
+  const div = document.createElement('div');
+  div.className = 'entry-card';
+  div.id = id;
+  div.innerHTML = `
+    <div class="entry-card-header"><div class="entry-card-title">Experience ${expCount}</div><button class="btn btn-danger btn-sm" onclick="removeEntry('${id}')">Remove</button></div>
+    <div class="field-grid">
+      <div class="field"><label>Job Title</label><input class="exp-title" placeholder="Software Engineer" oninput="markFilled('experience')"></div>
+      <div class="field"><label>Company Name</label><input class="exp-company" placeholder="Company Name"></div>
+    </div>
+    <div class="field-grid three">
+      <div class="field"><label>Start Date</label><input class="exp-start" placeholder="Jan 2021"></div>
+      <div class="field"><label>End Date</label><input class="exp-end" placeholder="Present"></div>
+      <div class="field"><label>Location</label><input class="exp-location" placeholder="City / Remote"></div>
+    </div>
+    <div class="field field-grid one">
+      <label>Key Achievements</label>
+      <textarea class="exp-bullets" rows="4" placeholder="• Achievement with metrics&#10;• Another achievement"></textarea>
+    </div>`;
+  document.getElementById('experience-list').appendChild(div);
+}
+
+function addEducation() {
+  const id = 'edu-' + eduCount++;
+  const div = document.createElement('div');
+  div.className = 'entry-card';
+  div.id = id;
+  div.innerHTML = `
+    <div class="entry-card-header"><div class="entry-card-title">Education ${eduCount}</div><button class="btn btn-danger btn-sm" onclick="removeEntry('${id}')">Remove</button></div>
+    <div class="field-grid">
+      <div class="field"><label>Degree</label><input class="edu-degree" placeholder="M.Tech / MBA" oninput="markFilled('education')"></div>
+      <div class="field"><label>Institution</label><input class="edu-institution" placeholder="University Name"></div>
+    </div>
+    <div class="field-grid three">
+      <div class="field"><label>Graduation Year</label><input class="edu-year" placeholder="2021"></div>
+      <div class="field"><label>${currentMarket === 'us' ? 'GPA' : 'CGPA / Percentage'}</label><input class="edu-cgpa" placeholder="${currentMarket === 'us' ? '3.8 / 4.0' : '8.0 / 10'}"></div>
+      <div class="field"><label>Location</label><input class="edu-location" placeholder="City, Country"></div>
+    </div>`;
+  document.getElementById('education-list').appendChild(div);
+}
+
+function removeEntry(id) {
+  const el = document.getElementById(id);
+  if (el) el.remove();
+}
+
+// ── PHOTO HANDLER ──────────────────────────────────────────────────────
+function handlePhoto(input) {
+  if (!input.files[0]) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    photoDataUrl = e.target.result;
+    const prev = document.getElementById('photo-preview-sm');
+    prev.innerHTML = `<img src="${photoDataUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:6px;">`;
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+
+// ── COLLECT FORM DATA ──────────────────────────────────────────────────
+function collectFormData() {
+  const data = {
+    market: currentMarket,
+    name: v('f-name'), title: v('f-title'), email: v('f-email'), phone: v('f-phone'),
+    location: v('f-location'), linkedin: v('f-linkedin'), portfolio: v('f-portfolio'),
+    years: v('f-years'), summary: v('f-summary'), techSkills: v('f-tech-skills'),
+    softSkills: v('f-soft-skills'), tools: v('f-tools'), certs: v('f-certs'),
+    projects: v('f-projects'), awards: v('f-awards'),
+    // market-specific
+    ctc: v('f-ctc'), ectc: v('f-ectc'), naukri: v('f-naukri-headline'),
+    notice: v('f-notice'), aiTools: v('f-ai-tools'),
+    nationality: v('f-nationality'), visa: v('f-visa'), dob: v('f-dob'),
+    driving: v('f-driving'), languages: v('f-languages'),
+    photo: photoDataUrl,
+    experience: [], education: []
+  };
+
+  document.querySelectorAll('#experience-list .entry-card').forEach(card => {
+    data.experience.push({
+      title: card.querySelector('.exp-title')?.value || '',
+      company: card.querySelector('.exp-company')?.value || '',
+      start: card.querySelector('.exp-start')?.value || '',
+      end: card.querySelector('.exp-end')?.value || '',
+      location: card.querySelector('.exp-location')?.value || '',
+      bullets: card.querySelector('.exp-bullets')?.value || ''
+    });
+  });
+
+  document.querySelectorAll('#education-list .entry-card').forEach(card => {
+    data.education.push({
+      degree: card.querySelector('.edu-degree')?.value || '',
+      institution: card.querySelector('.edu-institution')?.value || '',
+      year: card.querySelector('.edu-year')?.value || '',
+      cgpa: card.querySelector('.edu-cgpa')?.value || '',
+      gpa: card.querySelector('.edu-gpa')?.value || '',
+      location: card.querySelector('.edu-location')?.value || ''
+    });
+  });
+  return data;
+}
+function v(id) { return document.getElementById(id)?.value || ''; }
+
+// ── BUILD PROMPT ───────────────────────────────────────────────────────
+function buildPrompt(data) {
+  const marketInstructions = {
+    india: `TARGET MARKET: India. Rules: (1) Show CGPA not GPA, (2) Include CTC/Expected CTC if provided, (3) Show Notice Period if provided, (4) 2-page format is acceptable, (5) Optimize for Naukri.com keyword density, (6) Include Naukri headline if provided, (7) Use Indian date format.`,
+    us: `TARGET MARKET: United States. Rules: (1) STRICT 1-page format (experienced professionals max 2 pages), (2) Show GPA only if above 3.5, (3) No photo, no age, no nationality, (4) Optimize for Workday/Greenhouse/Taleo ATS systems, (5) Use strong action verbs, (6) Every bullet must have a metric or number.`,
+    gulf: `TARGET MARKET: UAE / Gulf. Rules: (1) Include photo section placeholder, (2) Show nationality, visa status, date of birth, driving license if provided, (3) Include languages section prominently, (4) Optimize for Bayt.com and GulfTalent.com, (5) 2-3 page format acceptable, (6) Include expected salary if provided.`,
+    europe: `TARGET MARKET: Europe. Rules: (1) Follow Europass-inspired structure, (2) Include nationality and work authorization, (3) 2-page format standard, (4) No photo recommended unless creative role, (5) Include language proficiency levels, (6) EU date format DD/MM/YYYY.`
+  };
+
+  return `You are a world-class resume writer with 35 years of experience creating winning resumes. Generate a COMPLETE, polished resume for the following person.
+
+${marketInstructions[data.market]}
+
+CANDIDATE DATA:
+Name: ${data.name || 'Not provided'}
+Title: ${data.title || 'Not provided'}
+Email: ${data.email} | Phone: ${data.phone}
+Location: ${data.location} | LinkedIn: ${data.linkedin} | Portfolio: ${data.portfolio}
+Years of Experience: ${data.years}
+${data.nationality ? 'Nationality: ' + data.nationality : ''}
+${data.visa ? 'Visa Status: ' + data.visa : ''}
+${data.dob ? 'Date of Birth: ' + data.dob : ''}
+${data.driving ? 'Driving License: ' + data.driving : ''}
+${data.ctc ? 'Current CTC: ' + data.ctc : ''}
+${data.ectc ? 'Expected CTC: ' + data.ectc : ''}
+${data.notice ? 'Notice Period: ' + data.notice : ''}
+
+PROFESSIONAL SUMMARY:
+${data.summary || 'Not provided'}
+
+EXPERIENCE:
+${data.experience.map((e,i) => `${i+1}. ${e.title} at ${e.company} | ${e.start} - ${e.end} | ${e.location}\n${e.bullets}`).join('\n\n')}
+
+EDUCATION:
+${data.education.map(e => `${e.degree} | ${e.institution} | ${e.year} | ${e.cgpa || e.gpa} | ${e.location}`).join('\n')}
+
+SKILLS:
+Technical: ${data.techSkills}
+Soft Skills: ${data.softSkills}
+Tools: ${data.tools}
+${data.aiTools ? 'AI Tools: ' + data.aiTools : ''}
+${data.languages ? 'Languages: ' + data.languages : ''}
+
+CERTIFICATIONS: ${data.certs || 'None'}
+PROJECTS: ${data.projects || 'None'}
+AWARDS: ${data.awards || 'None'}
+${data.naukri ? 'Naukri Headline: ' + data.naukri : ''}
+
+INSTRUCTIONS:
+1. Enhance bullet points with stronger action verbs and quantified metrics where plausible
+2. Rewrite the summary to be compelling and market-specific
+3. Ensure ATS-safe language with relevant keywords
+4. Preserve the candidate's authentic voice — don't make it sound generic
+5. Return ONLY a JSON object (no markdown, no backticks) with this exact structure:
+{
+  "summary": "enhanced summary text",
+  "experience": [{"title":"","company":"","start":"","end":"","location":"","bullets":["bullet1","bullet2","bullet3","bullet4"]}],
+  "education": [{"degree":"","institution":"","year":"","cgpa":"","location":""}],
+  "skills": {"technical":["skill1"],"soft":["skill1"],"tools":["tool1"],"ai":["tool1"],"languages":["lang1"]},
+  "certs": ["cert1"],
+  "projects": [{"name":"","description":"","impact":""}],
+  "awards": ["award1"],
+  "ats_keywords": ["keyword1","keyword2","keyword3","keyword4","keyword5","keyword6","keyword7","keyword8"]
+}`;
+}
+
+// ── GENERATE RESUME ────────────────────────────────────────────────────
+async function generateResume() {
+  const data = currentMode === 'form' ? collectFormData() : null;
+
+  if (currentMode === 'form') {
+    if (!data.name || !data.email) { showToast('Please fill in at least your name and email', 'error'); return; }
+  }
+
+  showAILoading('Analyzing your data...', 'AI is crafting your resume');
+
+  try {
+    let prompt;
+    if (currentMode === 'form') {
+      prompt = buildPrompt(data);
+    } else {
+      const paste = document.getElementById('ai-paste-input').value.trim();
+      if (!paste) { hideAILoading(); showToast('Please paste your resume or notes', 'error'); return; }
+      prompt = buildAIRewritePrompt(paste);
+    }
+
+    updateAILoading('Crafting your content...', 'Enhancing bullet points with AI');
+
+    const response = await fetch('/api/analyse', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    const result = await response.json();
+    const text = result.content?.[0]?.text || '';
+
+    updateAILoading('Building preview...', 'Rendering your resume');
+
+    let aiData;
+    try {
+      aiData = JSON.parse(text.replace(/```json|```/g, '').trim());
+    } catch(e) {
+      aiData = null;
+    }
+
+    const displayData = currentMode === 'form' ? data : { market: currentMarket, name: 'Candidate', title: '', email: '', phone: '', location: '' };
+    renderResume(displayData, aiData, text);
+    hideAILoading();
+    showToast('Resume generated successfully!', 'success');
+
+  } catch(err) {
+    hideAILoading();
+    showToast('Generation failed. Please try again.', 'error');
+    console.error(err);
+  }
+}
+
+// ── AI REWRITE PROMPT ──────────────────────────────────────────────────
+function buildAIRewritePrompt(paste) {
+  const role = document.getElementById('ai-target-role').value;
+  const jd = document.getElementById('ai-job-desc').value;
+  const tone = document.getElementById('ai-tone').value;
+  const transition = document.getElementById('ai-transition').value;
+  const marketInstructions = {
+    india: 'Format for Indian job market: include CGPA, CTC expectations, notice period, optimize for Naukri.com.',
+    us: 'Format for US job market: strict 1-page, strong metrics, no personal info, Workday/Greenhouse ATS-safe.',
+    gulf: 'Format for Gulf/UAE market: include nationality, visa status fields, optimize for Bayt.com.',
+    europe: 'Format for European job market: Europass-inspired, include language proficiency, work authorization.'
+  };
+  const transitionNote = transition !== 'none' ? `CAREER TRANSITION NOTE: User is ${transition.replace('-',' ')}. Highlight transferable skills, normalize any gaps, reframe experience for the new direction.` : '';
+
+  return `You are a world-class resume writer. Transform this raw resume/notes into a polished, professional resume.
+
+INPUT:
+${paste}
+
+TARGET ROLE: ${role || 'Not specified'}
+JD KEYWORDS: ${jd || 'None'}
+TONE: ${tone}
+MARKET: ${marketInstructions[currentMarket]}
+${transitionNote}
+
+Rules:
+1. Extract all info from the pasted text
+2. Enhance every bullet with stronger verbs and add plausible metrics
+3. Rewrite summary to be compelling and market-targeted
+4. Preserve authentic voice — no generic AI language
+5. Return ONLY a JSON object with this structure (no markdown):
+{
+  "name": "", "title": "", "email": "", "phone": "", "location": "", "linkedin": "",
+  "summary": "",
+  "experience": [{"title":"","company":"","start":"","end":"","location":"","bullets":["b1","b2","b3"]}],
+  "education": [{"degree":"","institution":"","year":"","cgpa":"","location":""}],
+  "skills": {"technical":["s1"],"soft":["s1"],"tools":["t1"],"ai":[],"languages":[]},
+  "certs": [], "projects": [], "awards": [],
+  "ats_keywords": ["k1","k2","k3","k4","k5","k6"]
+}`;
+}
+
+async function runAIRewrite() { await generateResume(); }
+
+// ── RENDER RESUME ──────────────────────────────────────────────────────
+function renderResume(data, aiData, rawText) {
+  const name = aiData?.name || data.name || 'Your Name';
+  const title = aiData?.title || data.title || '';
+  const email = aiData?.email || data.email || '';
+  const phone = aiData?.phone || data.phone || '';
+  const location = aiData?.location || data.location || '';
+  const linkedin = aiData?.linkedin || data.linkedin || '';
+  const portfolio = data.portfolio || '';
+  const summary = aiData?.summary || data.summary || '';
+  const experience = aiData?.experience || [];
+  const education = aiData?.education || [];
+  const skills = aiData?.skills || {};
+  const certs = aiData?.certs || [];
+  const projects = aiData?.projects || [];
+  const awards = aiData?.awards || [];
+  const atsKeywords = aiData?.ats_keywords || [];
+
+  let html = `<div class="resume-doc">`;
+
+  // Header
+  if (data.market === 'gulf' && data.photo) {
+    html += `<div class="resume-photo-row">
+      <div class="resume-photo"><img src="${data.photo}" alt="Photo"></div>
+      <div style="flex:1">`;
+  }
+
+  html += `<div class="resume-name">${name}</div>`;
+  if (title) html += `<div class="resume-title">${title}</div>`;
+
+  // Contact
+  html += `<div class="resume-contact">`;
+  if (email) html += `<span>✉ ${email}</span>`;
+  if (phone) html += `<span>📱 ${phone}</span>`;
+  if (location) html += `<span>📍 ${location}</span>`;
+  if (linkedin) html += `<span>🔗 ${linkedin.replace('https://','').replace('http://','')}</span>`;
+  if (portfolio) html += `<span>🌐 ${portfolio.replace('https://','').replace('http://','')}</span>`;
+  // Gulf specific
+  if (data.market === 'gulf' && data.nationality) html += `<span>🌍 ${data.nationality}</span>`;
+  if (data.market === 'gulf' && data.visa) html += `<span>📋 ${data.visa}</span>`;
+  if (data.market === 'india' && data.ctc) html += `<span>💰 CTC: ${data.ctc}</span>`;
+  if (data.market === 'india' && data.notice) html += `<span>⏱ Notice: ${data.notice}</span>`;
+  html += `</div>`;
+
+  if (data.market === 'gulf' && data.photo) { html += `</div></div>`; }
+
+  // Summary
+  if (summary) {
+    html += `<div class="resume-section"><div class="resume-section-title">Professional Summary</div>
+      <div class="resume-summary">${summary}</div></div>`;
+  }
+
+  // Experience
+  if (experience.length > 0) {
+    html += `<div class="resume-section"><div class="resume-section-title">Work Experience</div>`;
+    experience.forEach(exp => {
+      if (!exp.title && !exp.company) return;
+      html += `<div class="resume-entry">
+        <div class="resume-entry-header">
+          <div class="resume-entry-title">${exp.title || ''}</div>
+          <div class="resume-entry-meta">${[exp.start, exp.end].filter(Boolean).join(' – ')} ${exp.location ? '| '+exp.location : ''}</div>
+        </div>
+        <div class="resume-entry-sub">${exp.company || ''}</div>`;
+      if (exp.bullets && exp.bullets.length) {
+        html += `<ul>`;
+        (Array.isArray(exp.bullets) ? exp.bullets : exp.bullets.split('\n').filter(b=>b.trim())).forEach(b => {
+          const clean = b.replace(/^[•\-\*]\s*/,'').trim();
+          if (clean) html += `<li>${clean}</li>`;
+        });
+        html += `</ul>`;
+      }
+      html += `</div>`;
+    });
+    html += `</div>`;
+  }
+
+  // Education
+  if (education.length > 0) {
+    html += `<div class="resume-section"><div class="resume-section-title">Education</div>`;
+    education.forEach(edu => {
+      if (!edu.degree && !edu.institution) return;
+      const gradeLabel = data.market === 'us' ? 'GPA' : 'CGPA';
+      html += `<div class="resume-entry">
+        <div class="resume-entry-header">
+          <div class="resume-entry-title">${edu.degree || ''}</div>
+          <div class="resume-entry-meta">${edu.year || ''} ${edu.location ? '| '+edu.location : ''}</div>
+        </div>
+        <div class="resume-entry-sub">${edu.institution || ''}</div>
+        ${edu.cgpa ? `<div style="font-size:12px;color:var(--text2);margin-top:2px;">${gradeLabel}: ${edu.cgpa}</div>` : ''}
+      </div>`;
+    });
+    html += `</div>`;
+  }
+
+  // Skills
+  const allSkills = [
+    ...(skills.technical || (data.techSkills ? data.techSkills.split(',') : [])),
+    ...(skills.tools || (data.tools ? data.tools.split(',') : [])),
+    ...(skills.ai || (data.aiTools ? data.aiTools.split(',') : []))
+  ].map(s => s.trim()).filter(Boolean);
+
+  if (allSkills.length > 0) {
+    html += `<div class="resume-section"><div class="resume-section-title">Technical Skills</div>
+      <div class="resume-skills">`;
+    allSkills.forEach(s => { html += `<span class="resume-skill">${s}</span>`; });
+    html += `</div></div>`;
+  }
+
+  const softSkills = skills.soft || (data.softSkills ? data.softSkills.split(',') : []);
+  if (softSkills.length > 0) {
+    html += `<div class="resume-section"><div class="resume-section-title">Core Competencies</div>
+      <div class="resume-skills">`;
+    softSkills.map(s=>s.trim()).filter(Boolean).forEach(s => { html += `<span class="resume-skill">${s}</span>`; });
+    html += `</div></div>`;
+  }
+
+  // Languages (Gulf/Europe)
+  const langs = skills.languages || (data.languages ? data.languages.split(',') : []);
+  if (langs.length > 0 && (data.market === 'gulf' || data.market === 'europe')) {
+    html += `<div class="resume-section"><div class="resume-section-title">Languages</div>
+      <div class="resume-skills">`;
+    langs.map(l=>l.trim()).filter(Boolean).forEach(l => { html += `<span class="resume-skill">${l}</span>`; });
+    html += `</div></div>`;
+  }
+
+  // Certifications
+  const certsArr = certs.length > 0 ? certs : (data.certs ? data.certs.split('\n').filter(c=>c.trim()) : []);
+  if (certsArr.length > 0) {
+    html += `<div class="resume-section"><div class="resume-section-title">Certifications</div><ul>`;
+    certsArr.forEach(c => { if(c.trim()) html += `<li style="font-size:12px;color:var(--text2);margin-bottom:3px;">${c.trim()}</li>`; });
+    html += `</ul></div>`;
+  }
+
+  // Projects
+  if (projects.length > 0) {
+    html += `<div class="resume-section"><div class="resume-section-title">Key Projects</div>`;
+    projects.forEach(p => {
+      const proj = typeof p === 'string' ? { name: p, description: '', impact: '' } : p;
+      html += `<div class="resume-entry">
+        <div class="resume-entry-title">${proj.name || ''}</div>
+        ${proj.description ? `<div style="font-size:12px;color:var(--text2);margin-top:2px;">${proj.description}</div>` : ''}
+        ${proj.impact ? `<div style="font-size:12px;color:var(--green);margin-top:2px;">Impact: ${proj.impact}</div>` : ''}
+      </div>`;
+    });
+    html += `</div>`;
+  }
+
+  // Awards
+  const awardsArr = awards.length > 0 ? awards : (data.awards ? data.awards.split('\n').filter(a=>a.trim()) : []);
+  if (awardsArr.length > 0) {
+    html += `<div class="resume-section"><div class="resume-section-title">Awards & Achievements</div><ul>`;
+    awardsArr.forEach(a => { if(a.trim()) html += `<li style="font-size:12px;color:var(--text2);margin-bottom:3px;">${a.trim()}</li>`; });
+    html += `</ul></div>`;
+  }
+
+  // ATS keywords footer
+  if (atsKeywords.length > 0) {
+    html += `<div style="margin-top:20px;padding-top:12px;border-top:1px solid var(--cream2);">
+      <div style="font-size:10px;color:var(--text3);margin-bottom:6px;">ATS OPTIMIZED FOR:</div>
+      <div class="resume-skills">`;
+    atsKeywords.forEach(k => { html += `<span class="resume-skill" style="background:var(--blue-bg);color:var(--blue);border-color:#bfdbfe;">${k}</span>`; });
+    html += `</div></div>`;
+  }
+
+  html += `</div>`;
+  generatedHTML = html;
+
+  // Build ATS text version
+  generatedATS = buildATSText(aiData || {}, data);
+
+  document.getElementById('resume-preview').innerHTML = html;
+  document.getElementById('ats-preview-box').style.display = 'none';
+}
+
+// ── ATS TEXT VERSION ───────────────────────────────────────────────────
+function buildATSText(aiData, data) {
+  const name = aiData.name || data.name || '';
+  const lines = [];
+  lines.push(name.toUpperCase());
+  lines.push(`${data.email} | ${data.phone} | ${data.location}`);
+  if (data.linkedin) lines.push(data.linkedin);
+  lines.push('');
+  if (aiData.summary || data.summary) {
+    lines.push('PROFESSIONAL SUMMARY');
+    lines.push('---');
+    lines.push(aiData.summary || data.summary);
+    lines.push('');
+  }
+  if (aiData.experience?.length) {
+    lines.push('WORK EXPERIENCE');
+    lines.push('---');
+    aiData.experience.forEach(exp => {
+      lines.push(`${exp.title} | ${exp.company} | ${exp.start} - ${exp.end}`);
+      (exp.bullets || []).forEach(b => lines.push(`• ${b}`));
+      lines.push('');
+    });
+  }
+  if (aiData.education?.length) {
+    lines.push('EDUCATION');
+    lines.push('---');
+    aiData.education.forEach(edu => {
+      lines.push(`${edu.degree} | ${edu.institution} | ${edu.year}`);
+      if (edu.cgpa) lines.push(`CGPA: ${edu.cgpa}`);
+    });
+    lines.push('');
+  }
+  if (aiData.skills) {
+    lines.push('SKILLS');
+    lines.push('---');
+    if (aiData.skills.technical?.length) lines.push('Technical: ' + aiData.skills.technical.join(', '));
+    if (aiData.skills.tools?.length) lines.push('Tools: ' + aiData.skills.tools.join(', '));
+    if (aiData.skills.soft?.length) lines.push('Soft Skills: ' + aiData.skills.soft.join(', '));
+    lines.push('');
+  }
+  return lines.join('\n');
+}
+
+function showATS() {
+  if (!generatedATS) { showToast('Generate your resume first', 'error'); return; }
+  const box = document.getElementById('ats-preview-box');
+  box.innerHTML = `<div class="ats-preview">${generatedATS}</div>`;
+  box.style.display = 'block';
+  document.getElementById('resume-preview').style.display = 'none';
+  setTimeout(() => {
+    box.style.display = 'none';
+    document.getElementById('resume-preview').style.display = 'block';
+  }, 8000);
+  showToast('ATS plain text shown for 8 seconds', 'success');
+}
+
+// ── EXPORT FUNCTIONS ───────────────────────────────────────────────────
+function exportPDF() {
+  if (!generatedHTML) { showToast('Generate your resume first', 'error'); return; }
+  const win = window.open('', '_blank');
+  win.document.write(`<!DOCTYPE html><html><head>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+      :root { --navy:#0F1B2D; --gold:#C9953A; --cream:#F8F4EE; --cream2:#F0EAE0; --text:#1A1A2E; --text2:#4A5568; --text3:#8A9BB0; --border:#E2D9CE; --green:#1B6B47; --blue:#1E40AF; --blue-bg:#EFF6FF; }
+      * { box-sizing:border-box; margin:0; padding:0; }
+      body { font-family:'DM Sans',sans-serif; }
+      @media print { @page { margin: 0; } body { margin: 1.6cm; } }
+      ${document.querySelector('style').textContent.split('/* ── TOP NAV')[0]}
+    </style>
+  </head><body>${generatedHTML}<script>window.onload=()=>window.print()<\/script></body></html>`);
+  win.document.close();
+  showToast('PDF export opened — use browser Print → Save as PDF', 'success');
+}
+
+function exportDOCX() {
+  if (!generatedHTML) { showToast('Generate your resume first', 'error'); return; }
+  const text = generatedATS || 'Please generate resume first';
+  const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'resume_' + currentMarket + '.txt';
+  a.click();
+  showToast('Resume exported as ATS-safe text — open in Word and format as needed', 'success');
+}
+
+// ── UI HELPERS ─────────────────────────────────────────────────────────
+function showAILoading(text, sub) {
+  document.getElementById('ai-loading').classList.add('show');
+  document.getElementById('ai-loading-text').textContent = text;
+  document.getElementById('ai-loading-sub').textContent = sub;
+}
+function updateAILoading(text, sub) {
+  document.getElementById('ai-loading-text').textContent = text;
+  document.getElementById('ai-loading-sub').textContent = sub;
+}
+function hideAILoading() { document.getElementById('ai-loading').classList.remove('show'); }
+
+function showToast(msg, type) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (type === 'success' ? ' success' : '');
+  setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+// Initialize — show India fields by default
+document.querySelectorAll('.india-field').forEach(el => el.style.display = 'flex');
+</script>
+</body>
+</html>
 
