@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ResumeForge — AI Resume Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', sans-serif; background: #0C0F1A; color: #F0F2FF; min-height: 100vh; }
+.nav { height: 58px; border-bottom: 1px solid rgba(255,255,255,0.07); display: flex; align-items: center; padding: 0 2rem; }
+.logo { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; color: #F0F2FF; }
+.logo span { color: #F0B429; }
+.hero { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 5rem 2rem 3rem; text-align: center; }
+.hero-tag { font-size: 12px; font-weight: 500; background: rgba(240,180,41,0.1); color: #F0B429; border: 1px solid rgba(240,180,41,0.25); padding: 5px 14px; border-radius: 999px; margin-bottom: 1.5rem; letter-spacing: 0.06em; text-transform: uppercase; }
+.hero h1 { font-family: 'Syne', sans-serif; font-size: clamp(36px, 6vw, 64px); font-weight: 800; line-height: 1.1; letter-spacing: -2px; margin-bottom: 1.25rem; }
+.hero h1 span { color: #F0B429; }
+.hero p { font-size: 17px; color: #8B93B8; max-width: 520px; line-height: 1.7; margin-bottom: 3rem; }
+.market-badges { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-bottom: 3rem; }
+.mbadge { font-size: 13px; padding: 6px 14px; border-radius: 999px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #8B93B8; }
+.tools-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 800px; width: 100%; padding: 0 1rem; }
+.tool-card { background: #131729; border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; padding: 2rem; text-align: left; text-decoration: none; color: inherit; transition: all 0.2s; display: block; }
+.tool-card:hover { border-color: rgba(240,180,41,0.4); transform: translateY(-3px); background: #1A1F35; }
+.tool-icon { width: 52px; height: 52px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 24px; margin-bottom: 1.25rem; }
+.tool-icon-gold { background: rgba(240,180,41,0.15); }
+.tool-icon-blue { background: rgba(79,195,247,0.15); }
+.tool-name { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; margin-bottom: 8px; }
+.tool-desc { font-size: 13px; color: #8B93B8; line-height: 1.6; margin-bottom: 1.25rem; }
+.tool-features { display: flex; flex-direction: column; gap: 6px; margin-bottom: 1.5rem; }
+.tool-feature { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #8B93B8; }
+.feat-dot { width: 5px; height: 5px; border-radius: 50%; background: #F0B429; flex-shrink: 0; }
+.tool-btn { display: inline-flex; align-items: center; gap: 6px; padding: 10px 20px; border-radius: 10px; font-size: 13px; font-weight: 600; font-family: 'DM Sans', sans-serif; transition: all 0.15s; }
+.tool-btn-gold { background: #F0B429; color: #0C0F1A; }
+.tool-btn-gold:hover { background: #FFD166; }
+.tool-btn-blue { background: rgba(79,195,247,0.15); color: #4FC3F7; border: 1px solid rgba(79,195,247,0.25); }
+.tool-btn-blue:hover { background: rgba(79,195,247,0.25); }
+.stats { display: flex; gap: 2rem; justify-content: center; margin-top: 4rem; padding: 2rem; border-top: 1px solid rgba(255,255,255,0.06); flex-wrap: wrap; }
+.stat { text-align: center; }
+.stat-val { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 700; color: #F0B429; }
+.stat-lbl { font-size: 12px; color: #555E80; margin-top: 3px; }
+.footer { text-align: center; padding: 2rem; color: #555E80; font-size: 12px; border-top: 1px solid rgba(255,255,255,0.05); }
+@media (max-width: 600px) {
+  .tools-grid { grid-template-columns: 1fr; }
+  .hero h1 { font-size: 32px; }
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="logo">Resume<span>Forge</span></div>
+</nav>
+
+<section class="hero">
+  <div class="hero-tag">AI-Powered · 4 Markets · Free to Use</div>
+  <h1>Build & Analyse Resumes<br>That <span>Get You Hired</span></h1>
+  <p>The only AI resume platform built for India, US, Gulf/UAE, and Europe — with honest ATS scoring, real career transition support, and zero paywalls on export.</p>
+
+  <div class="market-badges">
+    <span class="mbadge">🇮🇳 India — CGPA, CTC, Naukri</span>
+    <span class="mbadge">🇺🇸 United States — ATS, 1-page</span>
+    <span class="mbadge">🇦🇪 Gulf / UAE — Photo, Visa, Arabic</span>
+    <span class="mbadge">🇪🇺 Europe — Europass, Work Auth</span>
+  </div>
+
+  <div class="tools-grid">
+
+    <a href="/builder/" class="tool-card">
+      <div class="tool-icon tool-icon-gold">📝</div>
+      <div class="tool-name">Resume Builder</div>
+      <div class="tool-desc">Build a professional, ATS-optimised resume from scratch or let AI rewrite your existing one.</div>
+      <div class="tool-features">
+        <div class="tool-feature"><span class="feat-dot"></span>Form builder — fill step by step</div>
+        <div class="tool-feature"><span class="feat-dot"></span>AI rewrite — paste old resume</div>
+        <div class="tool-feature"><span class="feat-dot"></span>Export PDF, DOCX, ATS text</div>
+        <div class="tool-feature"><span class="feat-dot"></span>Career transition support</div>
+        <div class="tool-feature"><span class="feat-dot"></span>All 4 markets supported</div>
+      </div>
+      <span class="tool-btn tool-btn-gold">Build My Resume →</span>
+    </a>
+
+    <a href="/analyser/" class="tool-card">
+      <div class="tool-icon tool-icon-blue">📊</div>
+      <div class="tool-name">Resume Analyser</div>
+      <div class="tool-desc">Get a full 7-dimension analysis — ATS score, skills gap, competitor benchmark, and why HR ignores you.</div>
+      <div class="tool-features">
+        <div class="tool-feature"><span class="feat-dot"></span>ATS score & keyword matching</div>
+        <div class="tool-feature"><span class="feat-dot"></span>Section-by-section feedback</div>
+        <div class="tool-feature"><span class="feat-dot"></span>Competitor benchmark</div>
+        <div class="tool-feature"><span class="feat-dot"></span>Why HR is not picking up</div>
+        <div class="tool-feature"><span class="feat-dot"></span>Before & after rewrites</div>
+      </div>
+      <span class="tool-btn tool-btn-blue">Analyse My Resume →</span>
+    </a>
+
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="stat-val">4</div><div class="stat-lbl">Global Markets</div></div>
+    <div class="stat"><div class="stat-val">7</div><div class="stat-lbl">Analysis Dimensions</div></div>
+    <div class="stat"><div class="stat-val">100+</div><div class="stat-lbl">Resume Templates</div></div>
+    <div class="stat"><div class="stat-val">Free</div><div class="stat-lbl">PDF + DOCX Export</div></div>
+  </div>
+</section>
+
+<footer class="footer">
+  Built with ❤️ for job seekers across India · US · Gulf · Europe &nbsp;|&nbsp; ResumeForge 2026
+</footer>
+
+</body>
+</html>

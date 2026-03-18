@@ -1,0 +1,8 @@
+{
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "rewrites": [
+    { "source": "/builder", "destination": "/builder/index.html" },
+    { "source": "/analyser", "destination": "/analyser/index.html" }
+  ]
+}
