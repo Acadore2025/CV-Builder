@@ -221,34 +221,157 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg0); 
 .date-current-check input[type=checkbox] { width: 14px; height: 14px; accent-color: var(--purple); cursor: pointer; }
 
 
-/* ── TEMPLATE SELECTOR ─────────────────────────── */
-.template-section { padding: 14px 18px; border-bottom: 1px solid var(--border); }
-.template-section-label { font-size: 10px; font-weight: 600; color: var(--dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
-.template-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-.tpl-card {
-  cursor: pointer; border-radius: 8px;
-  border: 2px solid var(--border);
-  overflow: hidden; transition: all 0.15s;
-  background: rgba(255,255,255,0.03);
+
+
+
+
+/* ── TEMPLATE PICKER SCREEN ─────────────────────── */
+.tpl-picker {
+  position: fixed; inset: 0; z-index: 200;
+  background: var(--bg0);
+  background-image: radial-gradient(ellipse 80% 60% at 0% 0%, rgba(108,92,231,0.18) 0%, transparent 50%),
+                    radial-gradient(ellipse 60% 50% at 100% 100%, rgba(0,200,150,0.05) 0%, transparent 50%);
+  display: flex; flex-direction: column;
+  overflow: hidden;
+}
+.tpl-picker.hidden { display: none; }
+.tpl-picker-nav {
+  height: 60px; background: rgba(255,255,255,0.97);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(0,0,0,0.07);
+  display: flex; align-items: center;
+  padding: 0 40px; gap: 14px;
+  flex-shrink: 0;
+}
+.tpl-picker-logo { font-family:'Cormorant Garamond',serif; font-size:20px; font-weight:700; color:#1A1917; letter-spacing:-0.3px; }
+.tpl-picker-logo span { color: var(--purple); }
+.tpl-picker-step { font-size:12px; color:#6B6860; margin-left:8px; }
+.tpl-picker-body {
+  flex: 1; overflow-y: auto;
+  padding: 36px 48px;
+}
+.tpl-picker-headline {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(28px,3vw,44px);
+  font-weight: 700; color: var(--off);
+  letter-spacing: -1px; margin-bottom: 8px;
+}
+.tpl-picker-sub {
+  font-size: 14px; color: var(--muted);
+  margin-bottom: 40px;
+}
+.tpl-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+  max-width: 1280px;
+}
+.tpl-option {
+  cursor: pointer;
+  border-radius: 14px;
+  border: 2px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.04);
+  overflow: hidden;
+  transition: all 0.2s;
   position: relative;
 }
-.tpl-card:hover { border-color: var(--purple2); }
-.tpl-card.active { border-color: var(--purple); box-shadow: 0 0 0 2px rgba(108,92,231,0.25); }
-.tpl-card.active::after {
-  content: '✓'; position: absolute; top: 4px; right: 5px;
-  font-size: 9px; font-weight: 700;
-  background: var(--purple); color: #fff;
-  width: 14px; height: 14px; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  line-height: 14px; text-align: center;
+.tpl-option:hover {
+  border-color: var(--purple2);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 40px rgba(108,92,231,0.2);
 }
-.tpl-thumb { width: 100%; aspect-ratio: 3/4; display: block; }
-.tpl-name {
-  font-size: 9px; font-weight: 500; color: var(--muted);
-  text-align: center; padding: 4px 2px;
+.tpl-option.selected {
+  border-color: var(--purple);
+  box-shadow: 0 0 0 4px rgba(108,92,231,0.2);
+}
+.tpl-option.selected::after {
+  content: '✓';
+  position: absolute; top: 12px; right: 12px;
+  width: 24px; height: 24px;
+  background: var(--purple); color: #fff;
+  border-radius: 50%; font-size: 12px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  line-height: 24px; text-align: center;
+}
+.tpl-preview-frame {
+  width: 100%;
+  height: 420px;
+  background: #fff;
+  overflow: hidden;
+  pointer-events: none;
+  position: relative;
+  border-radius: 4px;
+}
+.tpl-preview-inner {
+  width: 210%;
+  transform: scale(0.476);
+  transform-origin: top left;
+  position: absolute;
+  top: 0; left: 0;
+  box-shadow: none;
+  min-height: 900px;
+}
+.tpl-meta {
+  padding: 12px 16px 14px;
+  background: var(--bg2);
   border-top: 1px solid var(--border);
-  background: rgba(0,0,0,0.2);
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.tpl-meta-name {
+  font-size: 13px; font-weight: 600;
+  color: var(--off); margin-bottom: 2px;
+}
+.tpl-meta-desc { font-size: 11px; color: var(--muted); }
+.tpl-meta-badge {
+  display: inline-block; font-size: 10px; font-weight: 600;
+  padding: 2px 8px; border-radius: 999px; margin-top: 6px;
+  background: rgba(108,92,231,0.12); color: var(--purple2);
+  border: 1px solid rgba(108,92,231,0.2);
+}
+.tpl-picker-footer {
+  height: 80px; flex-shrink: 0;
+  background: var(--bg1);
+  border-top: 1px solid var(--border);
+  display: flex; align-items: center;
+  justify-content: space-between;
+  padding: 0 60px;
+}
+.tpl-selected-label { font-size: 13px; color: var(--muted); }
+.tpl-selected-name  { font-size: 15px; font-weight: 600; color: var(--off); }
+.btn-use-template {
+  display: inline-flex; align-items: center; gap: 10px;
+  background: var(--purple); color: #fff;
+  font-size: 14px; font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  padding: 13px 28px; border: none;
+  border-radius: 10px; cursor: pointer;
+  transition: all 0.15s;
+}
+.btn-use-template:hover { background: var(--purple2); transform: translateY(-1px); }
+.btn-use-template .arrow { font-size: 16px; }
+
+/* Also add a change-template button in the builder */
+.change-tpl-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 11px; color: var(--purple2);
+  background: rgba(108,92,231,0.1);
+  border: 1px solid rgba(108,92,231,0.2);
+  border-radius: 5px; padding: 3px 9px;
+  cursor: pointer; transition: all 0.15s;
+  margin-left: auto;
+}
+.change-tpl-btn:hover { background: rgba(108,92,231,0.18); }
+
+@media (max-width: 1100px) {
+  .tpl-picker-grid { grid-template-columns: repeat(3,1fr); }
+}
+@media (max-width: 900px) {
+  .tpl-picker-grid { grid-template-columns: repeat(2,1fr); }
+  .tpl-picker-body { padding: 32px 24px; }
+  .tpl-picker-footer { padding: 0 24px; }
+}
+@media (max-width: 600px) {
+  .tpl-picker-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+  .tpl-preview-frame { height: 280px; }
 }
 
 /* end resume doc styles */
@@ -257,10 +380,124 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg0); 
 <body>
 
 <!-- NAV -->
+
+<!-- ── TEMPLATE PICKER SCREEN ──────────────────────────────────────── -->
+<div class="tpl-picker" id="tpl-picker">
+  <div class="tpl-picker-nav">
+    <div class="tpl-picker-logo">Resume<span>Forge</span></div>
+    <div class="tpl-picker-step">Step 1 of 2 — Choose your template</div>
+  </div>
+
+  <div class="tpl-picker-body">
+    <div class="tpl-picker-headline">Choose your resume style</div>
+    <div class="tpl-picker-sub">All templates are ATS-optimised and built for the Indian market. Click any to preview with a real sample.</div>
+
+    <div class="tpl-picker-grid" id="tpl-picker-grid">
+
+      <!-- T1: Classic Naukri -->
+      <div class="tpl-option selected" data-id="classic" onclick="pickerSelect('classic',this)">
+        <div class="tpl-preview-frame">
+          <div class="tpl-preview-inner" id="tpl-pre-classic"></div>
+        </div>
+        <div class="tpl-meta">
+          <div class="tpl-meta-name">Classic Naukri</div>
+          <div class="tpl-meta-desc">Single column · Navy headings · Gold accents</div>
+          <span class="tpl-meta-badge">Most Used · 70% of India</span>
+        </div>
+      </div>
+
+      <!-- T2: Modern IT -->
+      <div class="tpl-option" data-id="modern" onclick="pickerSelect('modern',this)">
+        <div class="tpl-preview-frame">
+          <div class="tpl-preview-inner" id="tpl-pre-modern"></div>
+        </div>
+        <div class="tpl-meta">
+          <div class="tpl-meta-name">Modern IT</div>
+          <div class="tpl-meta-desc">Dark sidebar · Skills on left · Experience on right</div>
+          <span class="tpl-meta-badge">FAANG · Product Companies</span>
+        </div>
+      </div>
+
+      <!-- T3: Corporate BFSI -->
+      <div class="tpl-option" data-id="corporate" onclick="pickerSelect('corporate',this)">
+        <div class="tpl-preview-frame">
+          <div class="tpl-preview-inner" id="tpl-pre-corporate"></div>
+        </div>
+        <div class="tpl-meta">
+          <div class="tpl-meta-name">Corporate / BFSI</div>
+          <div class="tpl-meta-desc">Deep blue · Left accent borders · Formal tone</div>
+          <span class="tpl-meta-badge">Consulting · Banking · Finance</span>
+        </div>
+      </div>
+
+      <!-- T4: Executive -->
+      <div class="tpl-option" data-id="executive" onclick="pickerSelect('executive',this)">
+        <div class="tpl-preview-frame">
+          <div class="tpl-preview-inner" id="tpl-pre-executive"></div>
+        </div>
+        <div class="tpl-meta">
+          <div class="tpl-meta-name">Executive</div>
+          <div class="tpl-meta-desc">Dark header · Gold timeline · Leadership focus</div>
+          <span class="tpl-meta-badge">8+ Years · Director · VP</span>
+        </div>
+      </div>
+
+      <!-- T5: Fresh Graduate -->
+      <div class="tpl-option" data-id="fresher" onclick="pickerSelect('fresher',this)">
+        <div class="tpl-preview-frame">
+          <div class="tpl-preview-inner" id="tpl-pre-fresher"></div>
+        </div>
+        <div class="tpl-meta">
+          <div class="tpl-meta-name">Fresh Graduate</div>
+          <div class="tpl-meta-desc">Education first · CGPA badge · Projects prominent</div>
+          <span class="tpl-meta-badge">0–2 Years · Campus · IIT/NIT</span>
+        </div>
+      </div>
+
+      <!-- T6: Creative -->
+      <div class="tpl-option" data-id="creative" onclick="pickerSelect('creative',this)">
+        <div class="tpl-preview-frame">
+          <div class="tpl-preview-inner" id="tpl-pre-creative"></div>
+        </div>
+        <div class="tpl-meta">
+          <div class="tpl-meta-name">Creative</div>
+          <div class="tpl-meta-desc">Purple gradient header · Pill skills · Modern feel</div>
+          <span class="tpl-meta-badge">Marketing · Brand · Product</span>
+        </div>
+      </div>
+
+
+      <!-- T7: IIT / Premier Institute -->
+      <div class="tpl-option" data-id="iit" onclick="pickerSelect('iit',this)">
+        <div class="tpl-preview-frame">
+          <div class="tpl-preview-inner" id="tpl-pre-iit"></div>
+        </div>
+        <div class="tpl-meta">
+          <div class="tpl-meta-name">IIT / Premier Institute</div>
+          <div class="tpl-meta-desc">B&W · Times New Roman · Education first</div>
+          <span class="tpl-meta-badge">IIT · NIT · BITS · Top Campus</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="tpl-picker-footer">
+    <div>
+      <div class="tpl-selected-label">Selected template</div>
+      <div class="tpl-selected-name" id="tpl-selected-name">Classic Naukri</div>
+    </div>
+    <button class="btn-use-template" onclick="confirmTemplate()">
+      Use This Template <span class="arrow">→</span>
+    </button>
+  </div>
+</div>
+
 <nav class="nav">
   <div class="nav-logo">Resume<span>Forge</span></div>
   <div class="nav-right">
     <a href="/" class="nav-home">← Home</a>
+    <button class="change-tpl-btn" onclick="showTemplatePicker()" id="change-tpl-btn" style="display:none;">✦ Change Template</button>
     <span class="nav-badge" id="market-chip">🇮🇳 India Mode</span>
     <span class="nav-badge-blue" id="mode-chip">Form Builder</span>
   </div>
@@ -274,232 +511,6 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg0); 
     <div class="sidebar-header">
       <div class="sidebar-title">Select your target market</div>
       <div class="sidebar-sub">Format, fields & ATS rules adapt automatically</div>
-    </div>
-
-
-    <div class="template-section">
-      <div class="template-section-label">Resume Template</div>
-      <div class="template-grid" id="template-grid">
-
-        <!-- T1: Classic Naukri -->
-        <div class="tpl-card active" onclick="selectTemplate('classic',this)" title="Classic Naukri">
-          <svg class="tpl-thumb" viewBox="0 0 90 120" xmlns="http://www.w3.org/2000/svg">
-            <rect width="90" height="120" fill="#fff"/>
-            <rect x="8" y="8" width="74" height="6" rx="1" fill="#1a1a2e"/>
-            <rect x="8" y="16" width="40" height="2.5" rx="1" fill="#C9953A"/>
-            <rect x="8" y="21" width="74" height="0.8" fill="#1a1a2e"/>
-            <rect x="8" y="25" width="30" height="1.5" rx="0.5" fill="#ccc"/>
-            <rect x="45" y="25" width="22" height="1.5" rx="0.5" fill="#ccc"/>
-            <rect x="8" y="32" width="20" height="1.8" rx="0.5" fill="#1a1a2e"/>
-            <rect x="8" y="35" width="74" height="0.6" fill="#e8e0d0"/>
-            <rect x="8" y="38" width="70" height="1.5" rx="0.5" fill="#ddd"/>
-            <rect x="8" y="41" width="60" height="1.5" rx="0.5" fill="#ddd"/>
-            <rect x="8" y="50" width="22" height="1.8" rx="0.5" fill="#1a1a2e"/>
-            <rect x="8" y="53" width="74" height="0.6" fill="#e8e0d0"/>
-            <rect x="8" y="57" width="50" height="1.5" rx="0.5" fill="#C9953A"/>
-            <rect x="8" y="60" width="70" height="1.2" rx="0.5" fill="#ddd"/>
-            <rect x="8" y="63" width="65" height="1.2" rx="0.5" fill="#ddd"/>
-            <rect x="8" y="66" width="68" height="1.2" rx="0.5" fill="#ddd"/>
-            <rect x="8" y="73" width="50" height="1.5" rx="0.5" fill="#C9953A"/>
-            <rect x="8" y="76" width="70" height="1.2" rx="0.5" fill="#ddd"/>
-            <rect x="8" y="79" width="60" height="1.2" rx="0.5" fill="#ddd"/>
-            <rect x="8" y="87" width="22" height="1.8" rx="0.5" fill="#1a1a2e"/>
-            <rect x="8" y="90" width="74" height="0.6" fill="#e8e0d0"/>
-            <rect x="8" y="93" width="55" height="1.5" rx="0.5" fill="#ddd"/>
-            <rect x="8" y="96" width="45" height="1.5" rx="0.5" fill="#ddd"/>
-            <rect x="8" y="104" width="22" height="1.8" rx="0.5" fill="#1a1a2e"/>
-            <rect x="8" y="107" width="74" height="0.6" fill="#e8e0d0"/>
-            <rect x="8" y="110" width="18" height="4" rx="2" fill="#f0eae0"/>
-            <rect x="28" y="110" width="18" height="4" rx="2" fill="#f0eae0"/>
-            <rect x="48" y="110" width="18" height="4" rx="2" fill="#f0eae0"/>
-          </svg>
-          <div class="tpl-name">Classic Naukri</div>
-        </div>
-
-        <!-- T2: Modern IT -->
-        <div class="tpl-card" onclick="selectTemplate('modern',this)" title="Modern IT">
-          <svg class="tpl-thumb" viewBox="0 0 90 120" xmlns="http://www.w3.org/2000/svg">
-            <rect width="90" height="120" fill="#fff"/>
-            <rect width="28" height="120" fill="#1a1a2e"/>
-            <rect x="3" y="10" width="22" height="6" rx="1" fill="#fff"/>
-            <rect x="3" y="18" width="22" height="1.5" rx="0.5" fill="rgba(255,255,255,0.4)"/>
-            <rect x="3" y="21" width="18" height="1.2" rx="0.5" fill="rgba(255,255,255,0.3)"/>
-            <rect x="3" y="24" width="20" height="1.2" rx="0.5" fill="rgba(255,255,255,0.3)"/>
-            <rect x="3" y="32" width="15" height="1.5" rx="0.5" fill="#C9953A"/>
-            <rect x="3" y="36" width="22" height="0.5" fill="rgba(255,255,255,0.2)"/>
-            <rect x="3" y="39" width="18" height="2" rx="1" fill="rgba(255,255,255,0.15)"/>
-            <rect x="3" y="43" width="18" height="2" rx="1" fill="rgba(255,255,255,0.15)"/>
-            <rect x="3" y="47" width="18" height="2" rx="1" fill="rgba(255,255,255,0.15)"/>
-            <rect x="3" y="53" width="15" height="1.5" rx="0.5" fill="#C9953A"/>
-            <rect x="3" y="56" width="22" height="0.5" fill="rgba(255,255,255,0.2)"/>
-            <rect x="3" y="59" width="18" height="2" rx="1" fill="rgba(255,255,255,0.15)"/>
-            <rect x="3" y="63" width="14" height="2" rx="1" fill="rgba(255,255,255,0.15)"/>
-            <rect x="3" y="67" width="16" height="2" rx="1" fill="rgba(255,255,255,0.15)"/>
-            <rect x="32" y="8" width="52" height="5" rx="1" fill="#1a1a2e"/>
-            <rect x="32" y="15" width="35" height="2" rx="0.5" fill="#C9953A"/>
-            <rect x="32" y="22" width="20" height="1.8" rx="0.5" fill="#333"/>
-            <rect x="32" y="25" width="52" height="0.6" fill="#e8e0d0"/>
-            <rect x="32" y="28" width="50" height="1.5" rx="0.5" fill="#C9953A"/>
-            <rect x="32" y="31" width="48" height="1.2" rx="0.5" fill="#ddd"/>
-            <rect x="32" y="34" width="45" height="1.2" rx="0.5" fill="#ddd"/>
-            <rect x="32" y="37" width="50" height="1.2" rx="0.5" fill="#ddd"/>
-            <rect x="32" y="43" width="20" height="1.8" rx="0.5" fill="#333"/>
-            <rect x="32" y="46" width="52" height="0.6" fill="#e8e0d0"/>
-            <rect x="32" y="49" width="50" height="1.5" rx="0.5" fill="#C9953A"/>
-            <rect x="32" y="52" width="48" height="1.2" rx="0.5" fill="#ddd"/>
-            <rect x="32" y="55" width="45" height="1.2" rx="0.5" fill="#ddd"/>
-            <rect x="32" y="58" width="52" height="1.2" rx="0.5" fill="#ddd"/>
-            <rect x="32" y="64" width="20" height="1.8" rx="0.5" fill="#333"/>
-            <rect x="32" y="67" width="52" height="0.6" fill="#e8e0d0"/>
-            <rect x="32" y="70" width="48" height="1.2" rx="0.5" fill="#ddd"/>
-            <rect x="32" y="73" width="40" height="1.2" rx="0.5" fill="#ddd"/>
-          </svg>
-          <div class="tpl-name">Modern IT</div>
-        </div>
-
-        <!-- T3: Corporate BFSI -->
-        <div class="tpl-card" onclick="selectTemplate('corporate',this)" title="Corporate / BFSI">
-          <svg class="tpl-thumb" viewBox="0 0 90 120" xmlns="http://www.w3.org/2000/svg">
-            <rect width="90" height="120" fill="#fff"/>
-            <rect x="8" y="8" width="74" height="5" rx="0.5" fill="#1E3A5F"/>
-            <rect x="8" y="15" width="48" height="2.5" rx="0.5" fill="#1E3A5F"/>
-            <rect x="8" y="19" width="74" height="1.2" fill="#1E3A5F"/>
-            <rect x="8" y="22" width="28" height="1.2" rx="0.5" fill="#aaa"/>
-            <rect x="42" y="22" width="28" height="1.2" rx="0.5" fill="#aaa"/>
-            <rect x="8" y="29" width="16" height="1.6" rx="0.3" fill="#1E3A5F"/>
-            <rect x="8" y="33" width="74" height="0.5" fill="#c0ccd8"/>
-            <rect x="8" y="36" width="70" height="1.2" rx="0.5" fill="#ccc"/>
-            <rect x="8" y="39" width="65" height="1.2" rx="0.5" fill="#ccc"/>
-            <rect x="8" y="47" width="16" height="1.6" rx="0.3" fill="#1E3A5F"/>
-            <rect x="8" y="51" width="74" height="0.5" fill="#c0ccd8"/>
-            <rect x="8" y="54" width="44" height="1.3" rx="0.5" fill="#1E3A5F"/>
-            <rect x="8" y="57" width="70" height="1.1" rx="0.5" fill="#ccc"/>
-            <rect x="8" y="60" width="66" height="1.1" rx="0.5" fill="#ccc"/>
-            <rect x="8" y="63" width="68" height="1.1" rx="0.5" fill="#ccc"/>
-            <rect x="8" y="70" width="44" height="1.3" rx="0.5" fill="#1E3A5F"/>
-            <rect x="8" y="73" width="70" height="1.1" rx="0.5" fill="#ccc"/>
-            <rect x="8" y="76" width="60" height="1.1" rx="0.5" fill="#ccc"/>
-            <rect x="8" y="79" width="65" height="1.1" rx="0.5" fill="#ccc"/>
-            <rect x="8" y="86" width="16" height="1.6" rx="0.3" fill="#1E3A5F"/>
-            <rect x="8" y="90" width="74" height="0.5" fill="#c0ccd8"/>
-            <rect x="8" y="93" width="50" height="1.2" rx="0.5" fill="#ccc"/>
-            <rect x="8" y="96" width="42" height="1.2" rx="0.5" fill="#ccc"/>
-            <rect x="8" y="103" width="16" height="1.6" rx="0.3" fill="#1E3A5F"/>
-            <rect x="8" y="107" width="74" height="0.5" fill="#c0ccd8"/>
-            <rect x="8" y="110" width="15" height="3" rx="1.5" fill="#e8eef5"/>
-            <rect x="26" y="110" width="15" height="3" rx="1.5" fill="#e8eef5"/>
-            <rect x="44" y="110" width="15" height="3" rx="1.5" fill="#e8eef5"/>
-          </svg>
-          <div class="tpl-name">Corporate / BFSI</div>
-        </div>
-
-        <!-- T4: Executive -->
-        <div class="tpl-card" onclick="selectTemplate('executive',this)" title="Executive">
-          <svg class="tpl-thumb" viewBox="0 0 90 120" xmlns="http://www.w3.org/2000/svg">
-            <rect width="90" height="120" fill="#fff"/>
-            <rect x="0" y="0" width="90" height="24" fill="#1a1a2e"/>
-            <rect x="8" y="5" width="55" height="7" rx="1" fill="#fff"/>
-            <rect x="8" y="14" width="35" height="2.5" rx="0.5" fill="#C9953A"/>
-            <rect x="8" y="28" width="74" height="1.2" rx="0.5" fill="#ccc"/>
-            <rect x="8" y="31" width="60" height="1.2" rx="0.5" fill="#ccc"/>
-            <rect x="8" y="38" width="20" height="1.8" rx="0.5" fill="#1a1a2e"/>
-            <rect x="8" y="41" width="74" height="0.6" fill="#e8e0d0"/>
-            <rect x="8" y="44" width="3" height="10" rx="1" fill="#C9953A"/>
-            <rect x="14" y="44" width="40" height="1.5" rx="0.5" fill="#1a1a2e"/>
-            <rect x="14" y="48" width="55" height="1.2" rx="0.5" fill="#ddd"/>
-            <rect x="14" y="51" width="50" height="1.2" rx="0.5" fill="#ddd"/>
-            <rect x="8" y="57" width="3" height="10" rx="1" fill="#C9953A"/>
-            <rect x="14" y="57" width="38" height="1.5" rx="0.5" fill="#1a1a2e"/>
-            <rect x="14" y="61" width="52" height="1.2" rx="0.5" fill="#ddd"/>
-            <rect x="14" y="64" width="48" height="1.2" rx="0.5" fill="#ddd"/>
-            <rect x="8" y="72" width="20" height="1.8" rx="0.5" fill="#1a1a2e"/>
-            <rect x="8" y="75" width="74" height="0.6" fill="#e8e0d0"/>
-            <rect x="8" y="78" width="50" height="1.2" rx="0.5" fill="#ddd"/>
-            <rect x="8" y="81" width="42" height="1.2" rx="0.5" fill="#ddd"/>
-            <rect x="8" y="88" width="20" height="1.8" rx="0.5" fill="#1a1a2e"/>
-            <rect x="8" y="91" width="74" height="0.6" fill="#e8e0d0"/>
-            <rect x="8" y="94" width="15" height="3.5" rx="1" fill="#f5f0e8"/>
-            <rect x="26" y="94" width="15" height="3.5" rx="1" fill="#f5f0e8"/>
-            <rect x="44" y="94" width="15" height="3.5" rx="1" fill="#f5f0e8"/>
-            <rect x="62" y="94" width="15" height="3.5" rx="1" fill="#f5f0e8"/>
-          </svg>
-          <div class="tpl-name">Executive</div>
-        </div>
-
-        <!-- T5: Fresh Graduate -->
-        <div class="tpl-card" onclick="selectTemplate('fresher',this)" title="Fresh Graduate">
-          <svg class="tpl-thumb" viewBox="0 0 90 120" xmlns="http://www.w3.org/2000/svg">
-            <rect width="90" height="120" fill="#fff"/>
-            <rect x="0" y="0" width="90" height="4" fill="#4CAF82"/>
-            <rect x="8" y="8" width="52" height="5.5" rx="0.8" fill="#1a1a2e"/>
-            <rect x="8" y="15" width="32" height="2" rx="0.5" fill="#4CAF82"/>
-            <rect x="8" y="19" width="25" height="1.2" rx="0.5" fill="#bbb"/>
-            <rect x="38" y="19" width="22" height="1.2" rx="0.5" fill="#bbb"/>
-            <rect x="8" y="27" width="20" height="1.8" rx="0.5" fill="#1a1a2e"/>
-            <rect x="8" y="30" width="74" height="0.6" fill="#d0ead8"/>
-            <rect x="8" y="33" width="50" height="1.3" rx="0.5" fill="#1a1a2e"/>
-            <rect x="8" y="36" width="35" height="1.2" rx="0.5" fill="#4CAF82"/>
-            <rect x="8" y="39" width="20" height="1.2" rx="0.5" fill="#ccc"/>
-            <rect x="8" y="46" width="20" height="1.8" rx="0.5" fill="#1a1a2e"/>
-            <rect x="8" y="49" width="74" height="0.6" fill="#d0ead8"/>
-            <rect x="8" y="52" width="60" height="1.2" rx="0.5" fill="#ccc"/>
-            <rect x="8" y="55" width="55" height="1.2" rx="0.5" fill="#ccc"/>
-            <rect x="8" y="58" width="50" height="1.2" rx="0.5" fill="#ccc"/>
-            <rect x="8" y="65" width="20" height="1.8" rx="0.5" fill="#1a1a2e"/>
-            <rect x="8" y="68" width="74" height="0.6" fill="#d0ead8"/>
-            <rect x="8" y="71" width="48" height="1.3" rx="0.5" fill="#1a1a2e"/>
-            <rect x="8" y="74" width="60" height="1.2" rx="0.5" fill="#ccc"/>
-            <rect x="8" y="77" width="52" height="1.2" rx="0.5" fill="#ccc"/>
-            <rect x="8" y="84" width="20" height="1.8" rx="0.5" fill="#1a1a2e"/>
-            <rect x="8" y="87" width="74" height="0.6" fill="#d0ead8"/>
-            <rect x="8" y="90" width="13" height="3" rx="1.5" fill="#e6f5ec"/>
-            <rect x="24" y="90" width="13" height="3" rx="1.5" fill="#e6f5ec"/>
-            <rect x="40" y="90" width="13" height="3" rx="1.5" fill="#e6f5ec"/>
-            <rect x="56" y="90" width="13" height="3" rx="1.5" fill="#e6f5ec"/>
-            <rect x="8" y="98" width="20" height="1.8" rx="0.5" fill="#1a1a2e"/>
-            <rect x="8" y="101" width="74" height="0.6" fill="#d0ead8"/>
-            <rect x="8" y="104" width="60" height="1.2" rx="0.5" fill="#ccc"/>
-            <rect x="8" y="107" width="50" height="1.2" rx="0.5" fill="#ccc"/>
-          </svg>
-          <div class="tpl-name">Fresh Graduate</div>
-        </div>
-
-        <!-- T6: Creative/Marketing -->
-        <div class="tpl-card" onclick="selectTemplate('creative',this)" title="Creative / Marketing">
-          <svg class="tpl-thumb" viewBox="0 0 90 120" xmlns="http://www.w3.org/2000/svg">
-            <rect width="90" height="120" fill="#fff"/>
-            <rect x="0" y="0" width="90" height="28" fill="#5B3E8F"/>
-            <rect x="8" y="6" width="50" height="6" rx="1" fill="#fff"/>
-            <rect x="8" y="14" width="30" height="2" rx="0.5" fill="rgba(255,210,140,0.9)"/>
-            <rect x="8" y="18" width="22" height="1.5" rx="0.5" fill="rgba(255,255,255,0.5)"/>
-            <rect x="38" y="18" width="20" height="1.5" rx="0.5" fill="rgba(255,255,255,0.5)"/>
-            <rect x="8" y="32" width="20" height="1.8" rx="0.5" fill="#5B3E8F"/>
-            <rect x="8" y="35" width="74" height="0.6" fill="#e0d5f0"/>
-            <rect x="8" y="38" width="70" height="1.2" rx="0.5" fill="#ccc"/>
-            <rect x="8" y="41" width="62" height="1.2" rx="0.5" fill="#ccc"/>
-            <rect x="8" y="48" width="20" height="1.8" rx="0.5" fill="#5B3E8F"/>
-            <rect x="8" y="51" width="74" height="0.6" fill="#e0d5f0"/>
-            <rect x="8" y="54" width="46" height="1.3" rx="0.5" fill="#5B3E8F"/>
-            <rect x="8" y="57" width="30" height="1.2" rx="0.5" fill="rgba(91,62,143,0.5)"/>
-            <rect x="8" y="60" width="65" height="1.1" rx="0.5" fill="#ddd"/>
-            <rect x="8" y="63" width="60" height="1.1" rx="0.5" fill="#ddd"/>
-            <rect x="8" y="66" width="58" height="1.1" rx="0.5" fill="#ddd"/>
-            <rect x="8" y="73" width="20" height="1.8" rx="0.5" fill="#5B3E8F"/>
-            <rect x="8" y="76" width="74" height="0.6" fill="#e0d5f0"/>
-            <rect x="8" y="79" width="46" height="1.3" rx="0.5" fill="#5B3E8F"/>
-            <rect x="8" y="82" width="62" height="1.1" rx="0.5" fill="#ddd"/>
-            <rect x="8" y="85" width="55" height="1.1" rx="0.5" fill="#ddd"/>
-            <rect x="8" y="92" width="20" height="1.8" rx="0.5" fill="#5B3E8F"/>
-            <rect x="8" y="95" width="74" height="0.6" fill="#e0d5f0"/>
-            <rect x="8" y="98" width="14" height="3" rx="1.5" fill="#ece6f8"/>
-            <rect x="25" y="98" width="14" height="3" rx="1.5" fill="#ece6f8"/>
-            <rect x="42" y="98" width="14" height="3" rx="1.5" fill="#ece6f8"/>
-            <rect x="59" y="98" width="14" height="3" rx="1.5" fill="#ece6f8"/>
-          </svg>
-          <div class="tpl-name">Creative</div>
-        </div>
-
-      </div>
     </div>
 
     <div class="market-grid">
@@ -887,6 +898,125 @@ Looking for senior dev roles in product companies"></textarea>
 
 <script>
 // ── STATE ──────────────────────────────────────────────────────────────
+
+// ── TEMPLATE PICKER ────────────────────────────────────────────────────
+const SAMPLE_DATA = {
+  market: 'india',
+  name: 'Priya Gautam',
+  title: 'Business Analyst',
+  email: 'priyagautam@acadoreskills.com',
+  phone: '+91 80560 03204',
+  location: 'Hyderabad, India',
+  linkedin: 'linkedin.com/in/priyagautam',
+  portfolio: '',
+  ctc: '12 LPA',
+  techSkills: 'Python, C++, SQL, Data Analytics, Machine Learning, Power BI, Excel, JIRA, SQL Server, Claude',
+  softSkills: 'Stakeholder Management, Strategic Planning, Problem Solving, Communication, Project Management',
+  tools: 'Power BI, Excel, JIRA, SQL Server',
+  aiTools: 'Claude, RAG',
+  languages: '',
+  certs: '', projects: '', awards: '', naukri: '',
+  photo: null, nationality: '', visa: '',
+  summary: 'HIPAA-certified Business Analyst with 3+ years of experience in healthcare data analytics, KPI design, and stakeholder management. Proficient in Python, SQL and Power BI — delivered ₹2.4Cr cost-saving initiative and reduced reporting time by 65% through automated dashboards.',
+  experience: [
+    {
+      title: 'Business Analyst', company: 'AcadoreSkills', start: 'Jun 2023', end: 'Present', location: 'Hyderabad',
+      bullets: [
+        'Built real-time Power BI dashboards tracking 10+ healthcare KPIs, reducing reporting time by 65%',
+        'Analysed 500K+ patient records using Python and SQL to forecast demand with 92% accuracy',
+        'Led cross-functional team of 8 to deliver ₹2.4Cr cost-saving initiative across 3 business units',
+        'Developed KPI framework (Schedule Utilisation, Revenue per Provider) improving patient throughput by 12%',
+        'Automated Excel reporting via VBA macros, eliminating 15+ hours/week of manual effort'
+      ]
+    },
+    {
+      title: 'Data Analyst Intern', company: 'Infosys', start: 'Jun 2021', end: 'Dec 2021', location: 'Bangalore',
+      bullets: [
+        'Developed predictive churn model improving customer retention by 18%',
+        'Automated MIS reports saving 12 hours/week of manual effort'
+      ]
+    }
+  ],
+  education: [
+    { degree: 'B.Tech Civil Engineering', institution: 'Indian Institute of Technology, Madras', year: '2016', cgpa: '6.7/10', location: 'Chennai' }
+  ],
+  skills: {
+    technical: ['Python','SQL','MySQL','Power BI','C++','VBA','Machine Learning','Tableau','Git','Claude','ChatGPT','RAG'],
+    soft: ['Stakeholder Management','Strategic Planning','Problem Solving','Communication','Project Management'],
+    tools: ['Advanced Excel','Power BI','Tableau','Snowflake','Azure Databricks','Jupyter Notebook'],
+    ai: ['Claude','ChatGPT','RAG'],
+    languages: []
+  },
+  certs: [
+    'IBM Data Analyst Professional Certificate (2023)',
+    'HIPAA Compliance Certificate (2022)'
+  ],
+  projects: [
+    { name: 'Time Series Demand Forecasting', description: 'Built SARIMA & Prophet models to forecast product demand; evaluated using MAE and RMSE.', impact: 'Improved forecast accuracy by 23%, reducing inventory overstock by ₹40L annually' },
+    { name: 'Credit Risk Analysis', description: 'Developed ML model to assess loan default probability using Python and Scikit-learn.', impact: 'Achieved 85% accuracy in risk prediction; reduced manual assessment time by 60%' }
+  ],
+  awards: [
+    'Top Performer Q3 2023 — AcadoreSkills',
+    'Best Analytics Project — IIT Madras Techfest 2016'
+  ]
+};
+
+const TPL_NAMES = { classic:'Classic Naukri', modern:'Modern IT', corporate:'Corporate / BFSI', executive:'Executive', fresher:'Fresh Graduate', creative:'Creative', iit:'IIT / Premier Institute' };
+
+function renderPickerPreviews() {
+  const renderers = { classic:renderClassic, modern:renderModern, corporate:renderCorporate, executive:renderExecutive, fresher:renderFresher, creative:renderCreative, iit:renderIIT };
+  // Build data — use aiData path to get structured skills/certs/projects/awards
+  const aiLike = {
+    name: SAMPLE_DATA.name,
+    title: SAMPLE_DATA.title,
+    email: SAMPLE_DATA.email,
+    phone: SAMPLE_DATA.phone,
+    location: SAMPLE_DATA.location,
+    linkedin: SAMPLE_DATA.linkedin,
+    summary: SAMPLE_DATA.summary,
+    experience: SAMPLE_DATA.experience,
+    education: SAMPLE_DATA.education,
+    skills: SAMPLE_DATA.skills,
+    certs: SAMPLE_DATA.certs,
+    projects: SAMPLE_DATA.projects,
+    awards: SAMPLE_DATA.awards,
+  };
+  const d = buildResumeData(SAMPLE_DATA, aiLike);
+  Object.keys(renderers).forEach(key => {
+    const el = document.getElementById('tpl-pre-' + key);
+    if (el) el.innerHTML = renderers[key](d);
+  });
+}
+
+function pickerSelect(id, card) {
+  document.querySelectorAll('.tpl-option').forEach(c => c.classList.remove('selected'));
+  card.classList.add('selected');
+  currentTemplate = id;
+  document.getElementById('tpl-selected-name').textContent = TPL_NAMES[id] || id;
+}
+
+function confirmTemplate() {
+  // Hide picker, show builder
+  document.getElementById('tpl-picker').classList.add('hidden');
+  document.getElementById('change-tpl-btn').style.display = 'inline-flex';
+  // If resume already generated, apply template immediately
+  if (Object.keys(lastRenderedHTML).length > 0 && lastRenderedHTML[currentTemplate]) {
+    document.getElementById('resume-preview').innerHTML = lastRenderedHTML[currentTemplate];
+    generatedHTML = lastRenderedHTML[currentTemplate];
+  }
+}
+
+function showTemplatePicker() {
+  document.getElementById('tpl-picker').classList.remove('hidden');
+}
+
+// Render previews once templates are defined (after page load)
+window.addEventListener('DOMContentLoaded', () => {
+  // Small delay to ensure render functions are ready
+  setTimeout(renderPickerPreviews, 100);
+});
+
+
 let currentMarket = 'india';
 let currentMode = 'form';
 let currentTemplate = 'classic';
@@ -896,7 +1026,7 @@ let lastRenderedHTML = {};
 function selectTemplate(id, btn) {
   currentTemplate = id;
   document.querySelectorAll('.tpl-card').forEach(c => c.classList.remove('active'));
-  btn.classList.add('active');
+  if (btn) btn.classList.add('active');
   if (lastRenderedHTML[id]) {
     document.getElementById('resume-preview').innerHTML = lastRenderedHTML[id];
     generatedHTML = lastRenderedHTML[id];
@@ -1247,31 +1377,32 @@ Rules:
 async function runAIRewrite() { await generateResume(); }
 
 
+
 // ── TEMPLATE RENDER FUNCTIONS ──────────────────────────────────────────
 function buildResumeData(data, aiData) {
   return {
-    name:       aiData?.name      || data.name      || 'Your Name',
-    title:      aiData?.title     || data.title     || '',
-    email:      aiData?.email     || data.email     || '',
-    phone:      aiData?.phone     || data.phone     || '',
-    location:   aiData?.location  || data.location  || '',
-    linkedin:   aiData?.linkedin  || data.linkedin  || '',
-    portfolio:  data.portfolio || '',
-    summary:    aiData?.summary   || data.summary   || '',
-    experience: aiData?.experience || [],
-    education:  aiData?.education  || [],
-    skills:     aiData?.skills     || {},
-    certs:      aiData?.certs      || [],
-    projects:   aiData?.projects   || [],
-    awards:     aiData?.awards     || [],
-    techSkills: data.techSkills || '',
-    softSkills: data.softSkills || '',
-    tools:      data.tools      || '',
-    aiTools:    data.aiTools    || '',
-    languages:  data.languages  || '',
-    ctc:        data.ctc        || '',
-    market:     data.market,
-    photo:      data.photo,
+    name:        aiData?.name       || data.name       || 'Your Name',
+    title:       aiData?.title      || data.title      || '',
+    email:       aiData?.email      || data.email      || '',
+    phone:       aiData?.phone      || data.phone      || '',
+    location:    aiData?.location   || data.location   || '',
+    linkedin:    aiData?.linkedin   || data.linkedin   || '',
+    portfolio:   data.portfolio  || '',
+    summary:     aiData?.summary    || data.summary    || '',
+    experience:  aiData?.experience || [],
+    education:   aiData?.education  || [],
+    skills:      aiData?.skills     || {},
+    certs:       aiData?.certs      || [],
+    projects:    aiData?.projects   || [],
+    awards:      aiData?.awards     || [],
+    techSkills:  data.techSkills || '',
+    softSkills:  data.softSkills || '',
+    tools:       data.tools      || '',
+    aiTools:     data.aiTools    || '',
+    languages:   data.languages  || '',
+    ctc:         data.ctc        || '',
+    market:      data.market,
+    photo:       data.photo,
     nationality: data.nationality || '',
     visa:        data.visa        || '',
     naukri:      data.naukri      || '',
@@ -1283,7 +1414,7 @@ function expHTML(exp) {
     ? (Array.isArray(exp.bullets) ? exp.bullets : exp.bullets.split('\n').filter(b=>b.trim()))
     : [];
   const bHTML = bullets.length
-    ? '<ul>' + bullets.map(b=>`<li>${b.replace(/^[•\-\*]\s*/,'').trim()}</li>`).join('') + '</ul>'
+    ? '<ul>' + bullets.map(b=>`<li>${b.replace(/^[•\-\*o]\s*/,'').trim()}</li>`).join('') + '</ul>'
     : '';
   const dates = [exp.start, exp.end].filter(Boolean).join(' – ');
   return `<div class="resume-entry">
@@ -1312,118 +1443,156 @@ function softSkillsArr(skills, data) {
   return (skills.soft || (data.softSkills ? data.softSkills.split(',') : [])).map(s=>s.trim()).filter(Boolean);
 }
 
+function langsArr(skills, data) {
+  return (skills.languages || (data.languages ? data.languages.split(',') : [])).map(s=>s.trim()).filter(Boolean);
+}
+
+function certsArr(d) {
+  return d.certs.length > 0 ? d.certs
+    : (d.certs_raw ? d.certs_raw.split('\n').filter(c=>c.trim()) : []);
+}
+
+function projectsArr(d) { return d.projects || []; }
+function awardsArr(d)   { return d.awards   || []; }
+
 // ── T1: CLASSIC NAUKRI ────────────────────────────────────────────────
 function renderClassic(d) {
-  const tech = allTechSkills(d.skills, d);
-  const soft = softSkillsArr(d.skills, d);
-  let h = `<div style="padding:40px 48px;font-family:'Inter',sans-serif;font-size:13px;line-height:1.6;color:#1a1a1a;">
-  <div style="font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:700;color:#0F1B2D;letter-spacing:-0.5px;">${d.name}</div>
-  ${d.title?`<div style="font-size:14px;color:#C9953A;font-weight:500;margin-top:2px;">${d.title}</div>`:''}
-  <div style="display:flex;flex-wrap:wrap;gap:14px;font-size:12px;color:#4A5568;padding:10px 0 12px;border-bottom:2px solid #0F1B2D;margin-bottom:16px;">
-    ${d.email?`<span>✉ ${d.email}</span>`:''}
-    ${d.phone?`<span>📱 ${d.phone}</span>`:''}
-    ${d.location?`<span>📍 ${d.location}</span>`:''}
-    ${d.linkedin?`<span>🔗 ${d.linkedin.replace(/https?:\/\//,'')}</span>`:''}
-    ${d.ctc?`<span>💰 CTC: ${d.ctc}</span>`:''}
-  </div>`;
+  const tech  = allTechSkills(d.skills, d);
+  const soft  = softSkillsArr(d.skills, d);
+  const langs = langsArr(d.skills, d);
+  const certs = certsArr(d);
+  const projs = projectsArr(d);
+  const awds  = awardsArr(d);
 
   const sec = (title, body) => `<div style="margin-bottom:16px;">
     <div style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#0F1B2D;border-bottom:1.5px solid #F0EAE0;padding-bottom:4px;margin-bottom:10px;">${title}</div>
     ${body}
   </div>`;
 
-  if (d.summary) h += sec('Professional Summary', `<div style="font-size:13px;color:#4A5568;line-height:1.7;">${d.summary}</div>`);
+  const eduHTML = d.education.map(e=>`<div class="resume-entry">
+    <div class="resume-entry-header">
+      <div class="resume-entry-title">${e.degree||''}</div>
+      <div class="resume-entry-meta">${e.year||''}${e.location?' | '+e.location:''}</div>
+    </div>
+    <div class="resume-entry-sub">${e.institution||''}</div>
+    ${e.cgpa?`<div style="font-size:12px;color:#4A5568;">CGPA: ${e.cgpa}</div>`:''}
+  </div>`).join('');
+
+  let h = `<div style="padding:40px 48px;font-family:'Inter',sans-serif;font-size:13px;line-height:1.6;color:#1a1a1a;">
+  <div style="font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:700;color:#0F1B2D;letter-spacing:-0.5px;">${d.name}</div>
+  ${d.title?`<div style="font-size:14px;color:#C9953A;font-weight:500;margin-top:2px;">${d.title}</div>`:''}
+  <div style="display:flex;flex-wrap:wrap;gap:14px;font-size:12px;color:#4A5568;padding:10px 0 12px;border-bottom:2px solid #0F1B2D;margin-bottom:16px;">
+    ${d.email?`<span>✉ ${d.email}</span>`:''}${d.phone?`<span>📱 ${d.phone}</span>`:''}${d.location?`<span>📍 ${d.location}</span>`:''}${d.linkedin?`<span>🔗 ${d.linkedin.replace(/https?:\/\//,'')}</span>`:''}${d.ctc?`<span>💰 CTC: ${d.ctc}</span>`:''}
+  </div>`;
+
+  if (d.summary)     h += sec('Professional Summary', `<div style="font-size:13px;color:#4A5568;line-height:1.7;">${d.summary}</div>`);
   if (d.experience.length) h += sec('Work Experience', d.experience.map(expHTML).join(''));
-  if (d.education.length)  h += sec('Education', d.education.map(e=>`<div class="resume-entry"><div class="resume-entry-header"><div class="resume-entry-title">${e.degree||''}</div><div class="resume-entry-meta">${e.year||''}${e.location?' | '+e.location:''}</div></div><div class="resume-entry-sub">${e.institution||''}</div>${e.cgpa?`<div style="font-size:12px;color:#4A5568;">CGPA: ${e.cgpa}</div>`:''}</div>`).join(''));
-  if (tech.length) h += sec('Technical Skills', `<div style="font-size:12.5px;color:#4A5568;line-height:2;">${skillsLine(tech)}</div>`);
-  if (soft.length) h += sec('Core Competencies', `<div style="font-size:12.5px;color:#4A5568;line-height:2;">${skillsLine(soft)}</div>`);
-  if (d.certs.length) h += sec('Certifications', '<ul>'+d.certs.map(c=>`<li style="font-size:12px;color:#4A5568;margin-bottom:3px;">${c}</li>`).join('')+'</ul>');
-  if (d.projects.length) h += sec('Key Projects', d.projects.map(p=>`<div style="margin-bottom:10px;"><div style="font-weight:600;font-size:13px;">${p.name||p}</div>${p.description?`<div style="font-size:12px;color:#4A5568;">${p.description}</div>`:''}</div>`).join(''));
-  if (d.awards.length) h += sec('Awards & Achievements', '<ul>'+d.awards.map(a=>`<li style="font-size:12px;color:#4A5568;margin-bottom:3px;">${a}</li>`).join('')+'</ul>');
+  if (d.education.length)  h += sec('Education', eduHTML);
+  if (tech.length)   h += sec('Technical Skills',   `<div style="font-size:12.5px;color:#4A5568;line-height:2;">${skillsLine(tech)}</div>`);
+  if (soft.length)   h += sec('Core Competencies',  `<div style="font-size:12.5px;color:#4A5568;line-height:2;">${skillsLine(soft)}</div>`);
+  if (langs.length && (d.market==='gulf'||d.market==='europe')) h += sec('Languages', `<div style="font-size:12.5px;color:#4A5568;line-height:2;">${skillsLine(langs)}</div>`);
+  if (certs.length)  h += sec('Certifications', '<ul>'+certs.map(c=>`<li style="font-size:12px;color:#4A5568;margin-bottom:3px;">${c}</li>`).join('')+'</ul>');
+  if (projs.length)  h += sec('Key Projects', projs.map(p=>`<div style="margin-bottom:10px;"><div style="font-weight:600;font-size:13px;">${p.name||p}</div>${p.description?`<div style="font-size:12px;color:#4A5568;">${p.description}</div>`:''}${p.impact?`<div style="font-size:12px;color:#1B6B47;">Impact: ${p.impact}</div>`:''}</div>`).join(''));
+  if (awds.length)   h += sec('Awards & Achievements', '<ul>'+awds.map(a=>`<li style="font-size:12px;color:#4A5568;margin-bottom:3px;">${a}</li>`).join('')+'</ul>');
   h += '</div>';
   return h;
 }
 
-// ── T2: MODERN IT (Left dark sidebar) ────────────────────────────────
+// ── T2: MODERN IT (dark sidebar) ─────────────────────────────────────
 function renderModern(d) {
-  const tech = allTechSkills(d.skills, d);
-  const soft = softSkillsArr(d.skills, d);
-  const sidebar = `
-    <div style="width:200px;min-width:200px;background:#1a1a2e;padding:28px 20px;color:#fff;flex-shrink:0;">
-      <div style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:700;color:#fff;line-height:1.2;margin-bottom:4px;">${d.name}</div>
-      ${d.title?`<div style="font-size:12px;color:#C9953A;font-weight:500;margin-bottom:16px;">${d.title}</div>`:''}
-      <div style="font-size:11px;color:rgba(255,255,255,0.6);margin-bottom:4px;border-bottom:1px solid rgba(255,255,255,0.15);padding-bottom:12px;margin-bottom:12px;">
-        ${d.email?`<div style="margin-bottom:4px;word-break:break-all;">✉ ${d.email}</div>`:''}
-        ${d.phone?`<div style="margin-bottom:4px;">📱 ${d.phone}</div>`:''}
-        ${d.location?`<div style="margin-bottom:4px;">📍 ${d.location}</div>`:''}
-        ${d.linkedin?`<div style="word-break:break-all;">🔗 ${d.linkedin.replace(/https?:\/\//,'')}</div>`:''}
-      </div>
-      ${tech.length?`<div style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#C9953A;margin-bottom:8px;">Technical Skills</div><div style="font-size:11px;color:rgba(255,255,255,0.75);line-height:1.9;">${tech.join('<br>')}</div>`:''}
-      ${soft.length?`<div style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#C9953A;margin-top:14px;margin-bottom:8px;">Competencies</div><div style="font-size:11px;color:rgba(255,255,255,0.75);line-height:1.9;">${soft.join('<br>')}</div>`:''}
-      ${d.certs.length?`<div style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#C9953A;margin-top:14px;margin-bottom:8px;">Certifications</div><div style="font-size:11px;color:rgba(255,255,255,0.75);line-height:1.9;">${d.certs.join('<br>')}</div>`:''}
-    </div>`;
+  const tech  = allTechSkills(d.skills, d);
+  const soft  = softSkillsArr(d.skills, d);
+  const langs = langsArr(d.skills, d);
+  const certs = certsArr(d);
+  const projs = projectsArr(d);
+  const awds  = awardsArr(d);
+
+  const sidebar = `<div style="width:210px;min-width:210px;background:#1a1a2e;padding:28px 20px;color:#fff;flex-shrink:0;">
+    <div style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:700;color:#fff;line-height:1.2;margin-bottom:4px;">${d.name}</div>
+    ${d.title?`<div style="font-size:12px;color:#C9953A;font-weight:500;margin-bottom:14px;">${d.title}</div>`:''}
+    <div style="font-size:11px;color:rgba(255,255,255,0.6);border-bottom:1px solid rgba(255,255,255,0.15);padding-bottom:12px;margin-bottom:14px;">
+      ${d.email?`<div style="margin-bottom:4px;word-break:break-all;">✉ ${d.email}</div>`:''}
+      ${d.phone?`<div style="margin-bottom:4px;">📱 ${d.phone}</div>`:''}
+      ${d.location?`<div style="margin-bottom:4px;">📍 ${d.location}</div>`:''}
+      ${d.linkedin?`<div style="word-break:break-all;">🔗 ${d.linkedin.replace(/https?:\/\//,'')}</div>`:''}
+      ${d.ctc?`<div style="margin-top:4px;">💰 CTC: ${d.ctc}</div>`:''}
+    </div>
+    ${tech.length?`<div style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#C9953A;margin-bottom:8px;">Technical Skills</div><div style="font-size:11px;color:rgba(255,255,255,0.75);line-height:1.9;">${tech.join('<br>')}</div>`:''}
+    ${soft.length?`<div style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#C9953A;margin-top:14px;margin-bottom:8px;">Competencies</div><div style="font-size:11px;color:rgba(255,255,255,0.75);line-height:1.9;">${soft.join('<br>')}</div>`:''}
+    ${langs.length?`<div style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#C9953A;margin-top:14px;margin-bottom:8px;">Languages</div><div style="font-size:11px;color:rgba(255,255,255,0.75);line-height:1.9;">${langs.join('<br>')}</div>`:''}
+    ${certs.length?`<div style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#C9953A;margin-top:14px;margin-bottom:8px;">Certifications</div><div style="font-size:11px;color:rgba(255,255,255,0.75);line-height:1.7;">${certs.join('<br>')}</div>`:''}
+  </div>`;
 
   const sec = (title, body) => `<div style="margin-bottom:16px;">
     <div style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#0F1B2D;border-bottom:1.5px solid #F0EAE0;padding-bottom:4px;margin-bottom:10px;">${title}</div>
     ${body}
   </div>`;
 
+  const eduHTML = d.education.map(e=>`<div class="resume-entry">
+    <div class="resume-entry-header"><div class="resume-entry-title">${e.degree||''}</div><div class="resume-entry-meta">${e.year||''}${e.location?' | '+e.location:''}</div></div>
+    <div class="resume-entry-sub">${e.institution||''}</div>
+    ${e.cgpa?`<div style="font-size:12px;color:#4A5568;">CGPA: ${e.cgpa}</div>`:''}
+  </div>`).join('');
+
   let main = `<div style="flex:1;padding:28px 32px;font-size:13px;color:#1a1a1a;line-height:1.6;">`;
-  if (d.summary) main += sec('Professional Summary', `<div style="font-size:13px;color:#4A5568;line-height:1.7;">${d.summary}</div>`);
+  if (d.summary)           main += sec('Professional Summary', `<div style="font-size:13px;color:#4A5568;line-height:1.7;">${d.summary}</div>`);
   if (d.experience.length) main += sec('Work Experience', d.experience.map(expHTML).join(''));
-  if (d.education.length)  main += sec('Education', d.education.map(e=>`<div class="resume-entry"><div class="resume-entry-header"><div class="resume-entry-title">${e.degree||''}</div><div class="resume-entry-meta">${e.year||''}</div></div><div class="resume-entry-sub">${e.institution||''}</div>${e.cgpa?`<div style="font-size:12px;color:#4A5568;">CGPA: ${e.cgpa}</div>`:''}</div>`).join(''));
-  if (d.projects.length) main += sec('Key Projects', d.projects.map(p=>`<div style="margin-bottom:8px;"><div style="font-weight:600;">${p.name||p}</div>${p.description?`<div style="font-size:12px;color:#4A5568;">${p.description}</div>`:''}</div>`).join(''));
+  if (d.education.length)  main += sec('Education', eduHTML);
+  if (projs.length)        main += sec('Key Projects', projs.map(p=>`<div style="margin-bottom:8px;"><div style="font-weight:600;">${p.name||p}</div>${p.description?`<div style="font-size:12px;color:#4A5568;">${p.description}</div>`:''}${p.impact?`<div style="font-size:12px;color:#1B6B47;">Impact: ${p.impact}</div>`:''}</div>`).join(''));
+  if (awds.length)         main += sec('Awards & Achievements', '<ul>'+awds.map(a=>`<li style="font-size:12px;color:#4A5568;margin-bottom:3px;">${a}</li>`).join('')+'</ul>');
   main += '</div>';
   return `<div style="display:flex;font-family:'Inter',sans-serif;min-height:600px;">${sidebar}${main}</div>`;
 }
 
 // ── T3: CORPORATE / BFSI ─────────────────────────────────────────────
 function renderCorporate(d) {
-  const tech = allTechSkills(d.skills, d);
-  const soft = softSkillsArr(d.skills, d);
-  let h = `<div style="padding:40px 48px;font-family:'Inter',sans-serif;font-size:13px;line-height:1.6;color:#1a1a1a;">
-  <div style="border-bottom:3px solid #1E3A5F;padding-bottom:14px;margin-bottom:18px;">
-    <div style="font-family:'Inter',sans-serif;font-size:26px;font-weight:700;color:#1E3A5F;letter-spacing:-0.3px;">${d.name}</div>
-    ${d.title?`<div style="font-size:13px;color:#1E3A5F;font-weight:500;margin-top:3px;opacity:0.7;">${d.title}</div>`:''}
-    <div style="display:flex;flex-wrap:wrap;gap:16px;font-size:11.5px;color:#4A5568;margin-top:8px;">
-      ${d.email?`<span>${d.email}</span>`:''}
-      ${d.phone?`<span>${d.phone}</span>`:''}
-      ${d.location?`<span>${d.location}</span>`:''}
-      ${d.linkedin?`<span>${d.linkedin.replace(/https?:\/\//,'')}</span>`:''}
-      ${d.ctc?`<span>CTC: ${d.ctc}</span>`:''}
-    </div>
-  </div>`;
+  const tech  = allTechSkills(d.skills, d);
+  const soft  = softSkillsArr(d.skills, d);
+  const langs = langsArr(d.skills, d);
+  const certs = certsArr(d);
+  const projs = projectsArr(d);
+  const awds  = awardsArr(d);
 
   const sec = (title, body) => `<div style="margin-bottom:18px;">
     <div style="font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#1E3A5F;margin-bottom:6px;">${title}</div>
     <div style="border-left:3px solid #1E3A5F;padding-left:12px;">${body}</div>
   </div>`;
 
-  if (d.summary) h += sec('Executive Summary', `<div style="font-size:13px;color:#4A5568;line-height:1.75;">${d.summary}</div>`);
+  const eduHTML = d.education.map(e=>`<div style="margin-bottom:8px;">
+    <div style="font-weight:600;">${e.degree||''} — ${e.institution||''}</div>
+    <div style="font-size:12px;color:#4A5568;">${e.year||''}${e.cgpa?' · CGPA: '+e.cgpa:''}${e.location?' · '+e.location:''}</div>
+  </div>`).join('');
+
+  let h = `<div style="padding:40px 48px;font-family:'Inter',sans-serif;font-size:13px;line-height:1.6;color:#1a1a1a;">
+  <div style="border-bottom:3px solid #1E3A5F;padding-bottom:14px;margin-bottom:20px;">
+    <div style="font-size:26px;font-weight:700;color:#1E3A5F;letter-spacing:-0.3px;">${d.name}</div>
+    ${d.title?`<div style="font-size:13px;color:#1E3A5F;font-weight:500;margin-top:3px;opacity:0.7;">${d.title}</div>`:''}
+    <div style="display:flex;flex-wrap:wrap;gap:16px;font-size:11.5px;color:#4A5568;margin-top:8px;">
+      ${d.email?`<span>${d.email}</span>`:''}${d.phone?`<span>${d.phone}</span>`:''}${d.location?`<span>${d.location}</span>`:''}${d.linkedin?`<span>${d.linkedin.replace(/https?:\/\//,'')}</span>`:''}${d.ctc?`<span>CTC: ${d.ctc}</span>`:''}
+    </div>
+  </div>`;
+
+  if (d.summary)           h += sec('Executive Summary',       `<div style="font-size:13px;color:#4A5568;line-height:1.75;">${d.summary}</div>`);
   if (d.experience.length) h += sec('Professional Experience', d.experience.map(expHTML).join(''));
-  if (d.education.length)  h += sec('Education', d.education.map(e=>`<div style="margin-bottom:8px;"><div style="font-weight:600;">${e.degree||''} — ${e.institution||''}</div><div style="font-size:12px;color:#4A5568;">${e.year||''}${e.cgpa?' · CGPA: '+e.cgpa:''}</div></div>`).join(''));
-  if (tech.length) h += sec('Core Competencies', `<div style="font-size:12.5px;color:#4A5568;line-height:2;">${skillsLine([...tech,...soft])}</div>`);
-  if (d.certs.length) h += sec('Certifications', '<ul>'+d.certs.map(c=>`<li style="font-size:12px;color:#4A5568;margin-bottom:3px;">${c}</li>`).join('')+'</ul>');
+  if (d.education.length)  h += sec('Education',               eduHTML);
+  if (tech.length)         h += sec('Technical Skills',        `<div style="font-size:12.5px;color:#4A5568;line-height:2;">${skillsLine(tech)}</div>`);
+  if (soft.length)         h += sec('Core Competencies',       `<div style="font-size:12.5px;color:#4A5568;line-height:2;">${skillsLine(soft)}</div>`);
+  if (langs.length)        h += sec('Languages',               `<div style="font-size:12.5px;color:#4A5568;line-height:2;">${skillsLine(langs)}</div>`);
+  if (certs.length)        h += sec('Certifications',          '<ul>'+certs.map(c=>`<li style="font-size:12px;color:#4A5568;margin-bottom:3px;">${c}</li>`).join('')+'</ul>');
+  if (projs.length)        h += sec('Key Projects',            projs.map(p=>`<div style="margin-bottom:8px;"><div style="font-weight:600;">${p.name||p}</div>${p.description?`<div style="font-size:12px;color:#4A5568;">${p.description}</div>`:''}${p.impact?`<div style="font-size:12px;color:#1B6B47;">Impact: ${p.impact}</div>`:''}</div>`).join(''));
+  if (awds.length)         h += sec('Awards & Achievements',   '<ul>'+awds.map(a=>`<li style="font-size:12px;color:#4A5568;margin-bottom:3px;">${a}</li>`).join('')+'</ul>');
   h += '</div>';
   return h;
 }
 
 // ── T4: EXECUTIVE ─────────────────────────────────────────────────────
 function renderExecutive(d) {
-  const tech = allTechSkills(d.skills, d);
-  const soft = softSkillsArr(d.skills, d);
-  let h = `<div style="font-family:'Inter',sans-serif;font-size:13px;line-height:1.6;color:#1a1a1a;">
-  <div style="background:#1a1a2e;padding:28px 48px 24px;">
-    <div style="font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:700;color:#fff;letter-spacing:-1px;">${d.name}</div>
-    ${d.title?`<div style="font-size:15px;color:#C9953A;font-weight:500;margin-top:4px;">${d.title}</div>`:''}
-    <div style="display:flex;flex-wrap:wrap;gap:18px;font-size:12px;color:rgba(255,255,255,0.65);margin-top:12px;">
-      ${d.email?`<span>${d.email}</span>`:''}
-      ${d.phone?`<span>${d.phone}</span>`:''}
-      ${d.location?`<span>${d.location}</span>`:''}
-      ${d.linkedin?`<span>${d.linkedin.replace(/https?:\/\//,'')}</span>`:''}
-    </div>
-  </div>
-  <div style="padding:32px 48px;">`;
+  const tech  = allTechSkills(d.skills, d);
+  const soft  = softSkillsArr(d.skills, d);
+  const langs = langsArr(d.skills, d);
+  const certs = certsArr(d);
+  const projs = projectsArr(d);
+  const awds  = awardsArr(d);
 
   const sec = (title, body) => `<div style="margin-bottom:20px;">
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
@@ -1433,84 +1602,179 @@ function renderExecutive(d) {
     ${body}
   </div>`;
 
-  if (d.summary) h += sec('Executive Profile', `<div style="font-size:13.5px;color:#4A5568;line-height:1.8;">${d.summary}</div>`);
-  if (d.experience.length) h += sec('Career History', d.experience.map(e=>`
-    <div style="border-left:2px solid #F0EAE0;padding-left:14px;margin-bottom:14px;">${expHTML(e)}</div>`).join(''));
-  if (d.education.length)  h += sec('Education', d.education.map(e=>`<div style="margin-bottom:8px;"><span style="font-weight:600;">${e.degree||''}</span> — ${e.institution||''} <span style="color:#8A9BB0;">(${e.year||''}${e.cgpa?' · CGPA '+e.cgpa:''})</span></div>`).join(''));
-  if (tech.length || soft.length) h += sec('Core Competencies', `<div style="display:flex;flex-wrap:wrap;gap:6px;">${[...tech,...soft].map(s=>`<span style="background:#f5f0e8;color:#4A5568;padding:4px 10px;border-radius:4px;font-size:12px;border:1px solid #e8e0d0;">${s}</span>`).join('')}</div>`);
-  if (d.certs.length) h += sec('Certifications', '<ul>'+d.certs.map(c=>`<li style="font-size:12px;color:#4A5568;margin-bottom:4px;">${c}</li>`).join('')+'</ul>');
+  const eduHTML = d.education.map(e=>`<div style="margin-bottom:8px;">
+    <span style="font-weight:600;">${e.degree||''}</span> — ${e.institution||''}
+    <span style="color:#8A9BB0;font-size:12px;"> (${e.year||''}${e.cgpa?' · CGPA '+e.cgpa:''}${e.location?' · '+e.location:''})</span>
+  </div>`).join('');
+
+  let h = `<div style="font-family:'Inter',sans-serif;font-size:13px;line-height:1.6;color:#1a1a1a;">
+  <div style="background:#1a1a2e;padding:28px 48px 24px;">
+    <div style="font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:700;color:#fff;letter-spacing:-1px;">${d.name}</div>
+    ${d.title?`<div style="font-size:15px;color:#C9953A;font-weight:500;margin-top:4px;">${d.title}</div>`:''}
+    <div style="display:flex;flex-wrap:wrap;gap:18px;font-size:12px;color:rgba(255,255,255,0.65);margin-top:12px;">
+      ${d.email?`<span>${d.email}</span>`:''}${d.phone?`<span>${d.phone}</span>`:''}${d.location?`<span>${d.location}</span>`:''}${d.linkedin?`<span>${d.linkedin.replace(/https?:\/\//,'')}</span>`:''}${d.ctc?`<span>CTC: ${d.ctc}</span>`:''}
+    </div>
+  </div>
+  <div style="padding:32px 48px;">`;
+
+  if (d.summary)           h += sec('Executive Profile',   `<div style="font-size:13.5px;color:#4A5568;line-height:1.8;">${d.summary}</div>`);
+  if (d.experience.length) h += sec('Career History',      d.experience.map(e=>`<div style="border-left:2px solid #F0EAE0;padding-left:14px;margin-bottom:14px;">${expHTML(e)}</div>`).join(''));
+  if (d.education.length)  h += sec('Education',           eduHTML);
+  if (tech.length)         h += sec('Technical Skills',    `<div style="font-size:12.5px;color:#4A5568;line-height:2;">${skillsLine(tech)}</div>`);
+  if (soft.length)         h += sec('Core Competencies',   `<div style="display:flex;flex-wrap:wrap;gap:6px;">${soft.map(s=>`<span style="background:#f5f0e8;color:#4A5568;padding:4px 10px;border-radius:4px;font-size:12px;border:1px solid #e8e0d0;">${s}</span>`).join('')}</div>`);
+  if (langs.length)        h += sec('Languages',           `<div style="font-size:12.5px;color:#4A5568;line-height:2;">${skillsLine(langs)}</div>`);
+  if (certs.length)        h += sec('Certifications',      '<ul>'+certs.map(c=>`<li style="font-size:12px;color:#4A5568;margin-bottom:4px;">${c}</li>`).join('')+'</ul>');
+  if (projs.length)        h += sec('Key Projects',        projs.map(p=>`<div style="margin-bottom:10px;"><div style="font-weight:600;">${p.name||p}</div>${p.description?`<div style="font-size:12px;color:#4A5568;">${p.description}</div>`:''}${p.impact?`<div style="font-size:12px;color:#1B6B47;">Impact: ${p.impact}</div>`:''}</div>`).join(''));
+  if (awds.length)         h += sec('Awards & Achievements','<ul>'+awds.map(a=>`<li style="font-size:12px;color:#4A5568;margin-bottom:4px;">${a}</li>`).join('')+'</ul>');
   h += '</div></div>';
   return h;
 }
 
 // ── T5: FRESH GRADUATE ───────────────────────────────────────────────
 function renderFresher(d) {
-  const tech = allTechSkills(d.skills, d);
-  const soft = softSkillsArr(d.skills, d);
-  let h = `<div style="padding:36px 44px;font-family:'Inter',sans-serif;font-size:13px;line-height:1.6;color:#1a1a1a;">
-  <div style="border-left:4px solid #4CAF82;padding-left:16px;margin-bottom:18px;">
-    <div style="font-size:28px;font-weight:700;color:#1a1a2e;letter-spacing:-0.3px;">${d.name}</div>
-    ${d.title?`<div style="font-size:13px;color:#4CAF82;font-weight:500;margin-top:2px;">${d.title}</div>`:''}
-    <div style="display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:#4A5568;margin-top:8px;">
-      ${d.email?`<span>✉ ${d.email}</span>`:''}
-      ${d.phone?`<span>📱 ${d.phone}</span>`:''}
-      ${d.location?`<span>📍 ${d.location}</span>`:''}
-      ${d.linkedin?`<span>🔗 ${d.linkedin.replace(/https?:\/\//,'')}</span>`:''}
-    </div>
-  </div>`;
+  const tech  = allTechSkills(d.skills, d);
+  const soft  = softSkillsArr(d.skills, d);
+  const langs = langsArr(d.skills, d);
+  const certs = certsArr(d);
+  const projs = projectsArr(d);
+  const awds  = awardsArr(d);
 
   const sec = (title, body) => `<div style="margin-bottom:16px;">
     <div style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#1a1a2e;border-bottom:1.5px solid #d0ead8;padding-bottom:4px;margin-bottom:10px;">${title}</div>
     ${body}
   </div>`;
 
-  // Education FIRST for fresher
-  if (d.education.length) h += sec('Education', d.education.map(e=>`<div style="margin-bottom:10px;"><div style="display:flex;justify-content:space-between;"><div style="font-weight:600;">${e.degree||''}</div><div style="font-size:12px;color:#8A9BB0;">${e.year||''}</div></div><div style="color:#4CAF82;font-size:12px;font-weight:500;">${e.institution||''}</div>${e.cgpa?`<div style="font-size:12px;color:#4A5568;background:#e6f5ec;display:inline-block;padding:1px 8px;border-radius:999px;margin-top:2px;">CGPA: ${e.cgpa}</div>`:''}</div>`).join(''));
-  if (d.summary) h += sec('Career Objective', `<div style="font-size:13px;color:#4A5568;line-height:1.7;">${d.summary}</div>`);
-  if (d.projects.length) h += sec('Projects', d.projects.map(p=>`<div style="margin-bottom:10px;"><div style="font-weight:600;">${p.name||p}</div>${p.description?`<div style="font-size:12px;color:#4A5568;">${p.description}</div>`:''}</div>`).join(''));
-  if (d.experience.length) h += sec('Internship / Experience', d.experience.map(expHTML).join(''));
-  if (tech.length) h += sec('Technical Skills', `<div style="font-size:12.5px;color:#4A5568;line-height:2;">${skillsLine(tech)}</div>`);
-  if (soft.length) h += sec('Soft Skills', `<div style="font-size:12.5px;color:#4A5568;line-height:2;">${skillsLine(soft)}</div>`);
-  if (d.certs.length) h += sec('Certifications', '<ul>'+d.certs.map(c=>`<li style="font-size:12px;color:#4A5568;margin-bottom:3px;">${c}</li>`).join('')+'</ul>');
-  if (d.awards.length) h += sec('Achievements', '<ul>'+d.awards.map(a=>`<li style="font-size:12px;color:#4A5568;margin-bottom:3px;">${a}</li>`).join('')+'</ul>');
+  const eduHTML = d.education.map(e=>`<div style="margin-bottom:10px;">
+    <div style="display:flex;justify-content:space-between;"><div style="font-weight:600;">${e.degree||''}</div><div style="font-size:12px;color:#8A9BB0;">${e.year||''}</div></div>
+    <div style="color:#4CAF82;font-size:12px;font-weight:500;">${e.institution||''}</div>
+    ${e.cgpa?`<div style="font-size:12px;color:#4A5568;background:#e6f5ec;display:inline-block;padding:1px 8px;border-radius:999px;margin-top:2px;">CGPA: ${e.cgpa}</div>`:''}
+  </div>`).join('');
+
+  let h = `<div style="padding:36px 44px;font-family:'Inter',sans-serif;font-size:13px;line-height:1.6;color:#1a1a1a;">
+  <div style="border-left:4px solid #4CAF82;padding-left:16px;margin-bottom:18px;">
+    <div style="font-size:28px;font-weight:700;color:#1a1a2e;letter-spacing:-0.3px;">${d.name}</div>
+    ${d.title?`<div style="font-size:13px;color:#4CAF82;font-weight:500;margin-top:2px;">${d.title}</div>`:''}
+    <div style="display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:#4A5568;margin-top:8px;">
+      ${d.email?`<span>✉ ${d.email}</span>`:''}${d.phone?`<span>📱 ${d.phone}</span>`:''}${d.location?`<span>📍 ${d.location}</span>`:''}${d.linkedin?`<span>🔗 ${d.linkedin.replace(/https?:\/\//,'')}</span>`:''}
+    </div>
+  </div>`;
+
+  // Fresher order: Education first, then summary as "Objective"
+  if (d.education.length)  h += sec('Education',              eduHTML);
+  if (d.summary)           h += sec('Career Objective',       `<div style="font-size:13px;color:#4A5568;line-height:1.7;">${d.summary}</div>`);
+  if (d.experience.length) h += sec('Internship / Experience',d.experience.map(expHTML).join(''));
+  if (tech.length)         h += sec('Technical Skills',       `<div style="font-size:12.5px;color:#4A5568;line-height:2;">${skillsLine(tech)}</div>`);
+  if (soft.length)         h += sec('Core Competencies',      `<div style="font-size:12.5px;color:#4A5568;line-height:2;">${skillsLine(soft)}</div>`);
+  if (langs.length)        h += sec('Languages',              `<div style="font-size:12.5px;color:#4A5568;line-height:2;">${skillsLine(langs)}</div>`);
+  if (certs.length)        h += sec('Certifications',         '<ul>'+certs.map(c=>`<li style="font-size:12px;color:#4A5568;margin-bottom:3px;">${c}</li>`).join('')+'</ul>');
+  if (projs.length)        h += sec('Key Projects',           projs.map(p=>`<div style="margin-bottom:10px;"><div style="font-weight:600;">${p.name||p}</div>${p.description?`<div style="font-size:12px;color:#4A5568;">${p.description}</div>`:''}${p.impact?`<div style="font-size:12px;color:#1B6B47;">Impact: ${p.impact}</div>`:''}</div>`).join(''));
+  if (awds.length)         h += sec('Awards & Achievements',  '<ul>'+awds.map(a=>`<li style="font-size:12px;color:#4A5568;margin-bottom:3px;">${a}</li>`).join('')+'</ul>');
   h += '</div>';
   return h;
 }
 
 // ── T6: CREATIVE / MARKETING ─────────────────────────────────────────
 function renderCreative(d) {
-  const tech = allTechSkills(d.skills, d);
-  const soft = softSkillsArr(d.skills, d);
-  let h = `<div style="font-family:'Inter',sans-serif;font-size:13px;line-height:1.6;color:#1a1a1a;">
-  <div style="background:linear-gradient(135deg,#5B3E8F,#7B5EA7);padding:28px 44px 24px;">
-    <div style="font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:700;color:#fff;letter-spacing:-0.5px;">${d.name}</div>
-    ${d.title?`<div style="font-size:13px;color:rgba(255,210,140,0.95);font-weight:500;margin-top:4px;">${d.title}</div>`:''}
-    <div style="display:flex;flex-wrap:wrap;gap:16px;font-size:11.5px;color:rgba(255,255,255,0.7);margin-top:10px;">
-      ${d.email?`<span>${d.email}</span>`:''}
-      ${d.phone?`<span>${d.phone}</span>`:''}
-      ${d.location?`<span>${d.location}</span>`:''}
-      ${d.linkedin?`<span>${d.linkedin.replace(/https?:\/\//,'')}</span>`:''}
-    </div>
-  </div>
-  <div style="padding:30px 44px;">`;
+  const tech  = allTechSkills(d.skills, d);
+  const soft  = softSkillsArr(d.skills, d);
+  const langs = langsArr(d.skills, d);
+  const certs = certsArr(d);
+  const projs = projectsArr(d);
+  const awds  = awardsArr(d);
 
   const sec = (title, body) => `<div style="margin-bottom:18px;">
     <div style="font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#5B3E8F;border-bottom:2px solid #e0d5f0;padding-bottom:5px;margin-bottom:10px;">${title}</div>
     ${body}
   </div>`;
 
-  if (d.summary) h += sec('Profile', `<div style="font-size:13px;color:#4A5568;line-height:1.75;">${d.summary}</div>`);
-  if (d.experience.length) h += sec('Experience', d.experience.map(expHTML).join(''));
-  if (d.education.length)  h += sec('Education', d.education.map(e=>`<div style="margin-bottom:8px;"><div style="font-weight:600;">${e.degree||''}</div><div style="font-size:12px;color:#5B3E8F;">${e.institution||''}</div><div style="font-size:12px;color:#8A9BB0;">${e.year||''}${e.cgpa?' · CGPA: '+e.cgpa:''}</div></div>`).join(''));
-  if (tech.length) h += sec('Skills & Tools', `<div style="display:flex;flex-wrap:wrap;gap:5px;">${tech.map(s=>`<span style="background:#ece6f8;color:#5B3E8F;padding:3px 9px;border-radius:999px;font-size:11.5px;">${s}</span>`).join('')}</div>`);
-  if (soft.length) h += sec('Core Competencies', `<div style="font-size:12.5px;color:#4A5568;line-height:2;">${skillsLine(soft)}</div>`);
-  if (d.certs.length) h += sec('Certifications', '<ul>'+d.certs.map(c=>`<li style="font-size:12px;color:#4A5568;margin-bottom:3px;">${c}</li>`).join('')+'</ul>');
-  if (d.projects.length) h += sec('Key Projects', d.projects.map(p=>`<div style="margin-bottom:8px;"><div style="font-weight:600;">${p.name||p}</div>${p.description?`<div style="font-size:12px;color:#4A5568;">${p.description}</div>`:''}</div>`).join(''));
+  const eduHTML = d.education.map(e=>`<div style="margin-bottom:8px;">
+    <div style="font-weight:600;">${e.degree||''}</div>
+    <div style="font-size:12px;color:#5B3E8F;">${e.institution||''}</div>
+    <div style="font-size:12px;color:#8A9BB0;">${e.year||''}${e.cgpa?' · CGPA: '+e.cgpa:''}${e.location?' · '+e.location:''}</div>
+  </div>`).join('');
+
+  let h = `<div style="font-family:'Inter',sans-serif;font-size:13px;line-height:1.6;color:#1a1a1a;">
+  <div style="background:linear-gradient(135deg,#5B3E8F,#7B5EA7);padding:28px 44px 24px;">
+    <div style="font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:700;color:#fff;letter-spacing:-0.5px;">${d.name}</div>
+    ${d.title?`<div style="font-size:13px;color:rgba(255,210,140,0.95);font-weight:500;margin-top:4px;">${d.title}</div>`:''}
+    <div style="display:flex;flex-wrap:wrap;gap:16px;font-size:11.5px;color:rgba(255,255,255,0.7);margin-top:10px;">
+      ${d.email?`<span>${d.email}</span>`:''}${d.phone?`<span>${d.phone}</span>`:''}${d.location?`<span>${d.location}</span>`:''}${d.linkedin?`<span>${d.linkedin.replace(/https?:\/\//,'')}</span>`:''}
+    </div>
+  </div>
+  <div style="padding:30px 44px;">`;
+
+  if (d.summary)           h += sec('Profile',              `<div style="font-size:13px;color:#4A5568;line-height:1.75;">${d.summary}</div>`);
+  if (d.experience.length) h += sec('Experience',           d.experience.map(expHTML).join(''));
+  if (d.education.length)  h += sec('Education',            eduHTML);
+  if (tech.length)         h += sec('Skills & Tools',       `<div style="display:flex;flex-wrap:wrap;gap:5px;">${tech.map(s=>`<span style="background:#ece6f8;color:#5B3E8F;padding:3px 9px;border-radius:999px;font-size:11.5px;">${s}</span>`).join('')}</div>`);
+  if (soft.length)         h += sec('Core Competencies',    `<div style="font-size:12.5px;color:#4A5568;line-height:2;">${skillsLine(soft)}</div>`);
+  if (langs.length)        h += sec('Languages',            `<div style="font-size:12.5px;color:#4A5568;line-height:2;">${skillsLine(langs)}</div>`);
+  if (certs.length)        h += sec('Certifications',       '<ul>'+certs.map(c=>`<li style="font-size:12px;color:#4A5568;margin-bottom:3px;">${c}</li>`).join('')+'</ul>');
+  if (projs.length)        h += sec('Key Projects',         projs.map(p=>`<div style="margin-bottom:8px;"><div style="font-weight:600;">${p.name||p}</div>${p.description?`<div style="font-size:12px;color:#4A5568;">${p.description}</div>`:''}${p.impact?`<div style="font-size:12px;color:#1B6B47;">Impact: ${p.impact}</div>`:''}</div>`).join(''));
+  if (awds.length)         h += sec('Awards & Achievements','<ul>'+awds.map(a=>`<li style="font-size:12px;color:#4A5568;margin-bottom:3px;">${a}</li>`).join('')+'</ul>');
   h += '</div></div>';
   return h;
 }
 
-// ── DISPATCH ──────────────────────────────────────────────────────────
+// ── T7: IIT / PREMIER INSTITUTE ──────────────────────────────────────
+function renderIIT(d) {
+  const tech  = allTechSkills(d.skills, d);
+  const soft  = softSkillsArr(d.skills, d);
+  const langs = langsArr(d.skills, d);
+  const certs = certsArr(d);
+  const projs = projectsArr(d);
+  const awds  = awardsArr(d);
+
+  const sec = (title, body) => `<div style="margin-bottom:14px;">
+    <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:#000;border-bottom:1px solid #000;padding-bottom:2px;margin-bottom:8px;">${title}</div>
+    ${body}
+  </div>`;
+
+  const expItem = (e) => {
+    const bullets = e.bullets
+      ? (Array.isArray(e.bullets) ? e.bullets : e.bullets.split('\n').filter(b=>b.trim()))
+      : [];
+    const dates = [e.start, e.end].filter(Boolean).join(' - ');
+    return `<div style="margin-bottom:10px;">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;">
+        <div style="font-weight:700;font-size:13px;color:#000;">${e.title||''} | ${e.company||''}</div>
+        <div style="font-size:12px;color:#000;white-space:nowrap;">${dates}${e.location?' | '+e.location:''}</div>
+      </div>
+      ${bullets.length?'<ul style="margin-top:4px;padding-left:18px;">'+bullets.map(b=>`<li style="font-size:12px;color:#1a1a1a;margin-bottom:3px;line-height:1.5;">${b.replace(/^[o•\-\*]\s*/,'').trim()}</li>`).join('')+'</ul>':''}
+    </div>`;
+  };
+
+  const eduItem = (e) => `<div style="margin-bottom:8px;">
+    <div style="display:flex;justify-content:space-between;align-items:baseline;">
+      <span style="font-weight:700;font-size:13px;">${e.institution||''}${e.location?' | '+e.location:''}</span>
+      <span style="font-size:12px;">${e.year||''}</span>
+    </div>
+    <div style="font-size:12px;color:#1a1a1a;">${e.degree||''}${e.cgpa?' | CGPA: '+e.cgpa:''}</div>
+  </div>`;
+
+  let h = `<div style="padding:36px 44px;font-family:'Times New Roman',serif;font-size:13px;line-height:1.55;color:#000;background:#fff;">
+  <div style="text-align:center;margin-bottom:12px;">
+    <div style="font-size:22px;font-weight:700;color:#000;letter-spacing:0.5px;">${d.name}</div>
+    <div style="font-size:12px;color:#1a1a1a;margin-top:4px;">${[d.email,d.phone,d.location,d.linkedin].filter(Boolean).join(' | ')}</div>
+  </div>
+  <div style="border-top:1.5px solid #000;margin-bottom:14px;"></div>`;
+
+  // IIT order: Summary → Education → Skills → Experience → Projects → Certs → Awards
+  if (d.summary)           h += sec('Professional Summary', `<div style="font-size:12.5px;color:#1a1a1a;line-height:1.65;">${d.summary}</div>`);
+  if (d.education.length)  h += sec('Education', d.education.map(eduItem).join(''));
+  const skillLines = [];
+  if (tech.length)  skillLines.push(`<div style="font-size:12.5px;margin-bottom:5px;"><span style="font-weight:700;">Technical Skills: </span>${tech.join(', ')}</div>`);
+  if (soft.length)  skillLines.push(`<div style="font-size:12.5px;margin-bottom:5px;"><span style="font-weight:700;">Core Competencies: </span>${soft.join(', ')}</div>`);
+  if (langs.length) skillLines.push(`<div style="font-size:12.5px;"><span style="font-weight:700;">Languages: </span>${langs.join(', ')}</div>`);
+  if (skillLines.length) h += sec('Skills', skillLines.join(''));
+  if (d.experience.length) h += sec('Professional Experience', d.experience.map(expItem).join(''));
+  if (projs.length)        h += sec('Projects', projs.map(p=>`<div style="margin-bottom:8px;"><div style="font-weight:700;font-size:13px;">${p.name||p}</div>${p.description?`<ul style="padding-left:18px;margin-top:3px;"><li style="font-size:12px;color:#1a1a1a;">${p.description}</li></ul>`:''}${p.impact?`<ul style="padding-left:18px;"><li style="font-size:12px;color:#1a1a1a;">Impact: ${p.impact}</li></ul>`:''}</div>`).join(''));
+  if (certs.length)        h += sec('Certifications', '<ul style="padding-left:18px;">'+certs.map(c=>`<li style="font-size:12px;margin-bottom:3px;">${c}</li>`).join('')+'</ul>');
+  if (awds.length)         h += sec('Awards & Achievements', '<ul style="padding-left:18px;">'+awds.map(a=>`<li style="font-size:12px;margin-bottom:3px;">${a}</li>`).join('')+'</ul>');
+  h += '</div>';
+  return h;
+}
+
 function renderByTemplate(data, aiData) {
   const d = buildResumeData(data, aiData);
   const renderers = {
@@ -1520,6 +1784,7 @@ function renderByTemplate(data, aiData) {
     executive: renderExecutive,
     fresher:   renderFresher,
     creative:  renderCreative,
+    iit:       renderIIT,
   };
   // Render all templates and cache them
   Object.keys(renderers).forEach(key => {
