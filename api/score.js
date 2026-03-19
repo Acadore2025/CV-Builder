@@ -35,7 +35,7 @@ module.exports = async function handler(req, res) {
 
 function buildPrompt(resume, market, level, role, isQuick) {
   const mctx = {
-    India: 'India (Naukri/LinkedIn). No critical failures defined. Photo acceptable. CGPA expected. CTC/notice period expected.',
+    India: 'India (Naukri/LinkedIn). No critical failures defined. Photo acceptable. CGPA expected. Naukri headline improves search visibility.',
     US: 'US (Workday/Greenhouse). CRITICAL: photo=ATS cap 35+market 0. DOB=market cap 20. Nationality/religion=market cap 20. Over 1 page under 10yrs=structure cap 30.',
     'Gulf/UAE': 'Gulf/UAE (Bayt/GulfTalent). CRITICAL: no nationality=market cap 40. No visa=market cap 40. No photo=major failure. Languages required.',
     Europe: 'Europe (Europass). Work auth required. Language levels (A1-C2) required. No photo recommended (GDPR). 2-page standard.'
@@ -116,13 +116,12 @@ OTHER:
   Visual balance (no section over 60% of resume): 15pts
 
 === DIMENSION 5: CAREER NARRATIVE ===
-  Career progression clear (titles/responsibility increasing): 30pts
-  No unexplained gaps over 6 months (deduct 10 per gap): 20pts
-  Summary claims match actual experience shown: 25pts
-  Roles connect logically to target position: 25pts
+  Summary claims match actual experience shown (years, domain, seniority): 50pts
+  Roles connect logically to target position (career makes sense for the role applied): 50pts
+  NOTE: Do NOT penalise for single employer or internal tenure. Do NOT penalise for employment gaps unless directly contradicts dates shown.
 
 === DIMENSION 6: MARKET FIT ===
-India: CGPA present(20) + CTC/expected CTC(20) + notice period(20) + naukri headline(15) + valid phone format(15) + no foreign elements(10)
+India: CGPA present(30) + naukri headline(25) + valid Indian phone format(25) + no foreign elements(20)
 US: No photo(25) + no DOB(20) + no nationality/religion/marital(20) + 1-page if <10yrs(20) + GPA only if 3.5+(15)
 Gulf: Photo present(20) + nationality(20) + visa status(20) + languages(20) + DOB(10) + driving license(10)
 Europe: Work auth stated(25) + language levels shown(25) + no unnecessary personal data(25) + correct length(25)
