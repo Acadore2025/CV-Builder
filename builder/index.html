@@ -220,6 +220,37 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg0); 
 .date-current-check { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); cursor: pointer; white-space: nowrap; }
 .date-current-check input[type=checkbox] { width: 14px; height: 14px; accent-color: var(--purple); cursor: pointer; }
 
+
+/* ── TEMPLATE SELECTOR ─────────────────────────── */
+.template-section { padding: 14px 18px; border-bottom: 1px solid var(--border); }
+.template-section-label { font-size: 10px; font-weight: 600; color: var(--dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
+.template-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.tpl-card {
+  cursor: pointer; border-radius: 8px;
+  border: 2px solid var(--border);
+  overflow: hidden; transition: all 0.15s;
+  background: rgba(255,255,255,0.03);
+  position: relative;
+}
+.tpl-card:hover { border-color: var(--purple2); }
+.tpl-card.active { border-color: var(--purple); box-shadow: 0 0 0 2px rgba(108,92,231,0.25); }
+.tpl-card.active::after {
+  content: '✓'; position: absolute; top: 4px; right: 5px;
+  font-size: 9px; font-weight: 700;
+  background: var(--purple); color: #fff;
+  width: 14px; height: 14px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  line-height: 14px; text-align: center;
+}
+.tpl-thumb { width: 100%; aspect-ratio: 3/4; display: block; }
+.tpl-name {
+  font-size: 9px; font-weight: 500; color: var(--muted);
+  text-align: center; padding: 4px 2px;
+  border-top: 1px solid var(--border);
+  background: rgba(0,0,0,0.2);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
 /* end resume doc styles */
 </style>
 </head>
@@ -243,6 +274,232 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg0); 
     <div class="sidebar-header">
       <div class="sidebar-title">Select your target market</div>
       <div class="sidebar-sub">Format, fields & ATS rules adapt automatically</div>
+    </div>
+
+
+    <div class="template-section">
+      <div class="template-section-label">Resume Template</div>
+      <div class="template-grid" id="template-grid">
+
+        <!-- T1: Classic Naukri -->
+        <div class="tpl-card active" onclick="selectTemplate('classic',this)" title="Classic Naukri">
+          <svg class="tpl-thumb" viewBox="0 0 90 120" xmlns="http://www.w3.org/2000/svg">
+            <rect width="90" height="120" fill="#fff"/>
+            <rect x="8" y="8" width="74" height="6" rx="1" fill="#1a1a2e"/>
+            <rect x="8" y="16" width="40" height="2.5" rx="1" fill="#C9953A"/>
+            <rect x="8" y="21" width="74" height="0.8" fill="#1a1a2e"/>
+            <rect x="8" y="25" width="30" height="1.5" rx="0.5" fill="#ccc"/>
+            <rect x="45" y="25" width="22" height="1.5" rx="0.5" fill="#ccc"/>
+            <rect x="8" y="32" width="20" height="1.8" rx="0.5" fill="#1a1a2e"/>
+            <rect x="8" y="35" width="74" height="0.6" fill="#e8e0d0"/>
+            <rect x="8" y="38" width="70" height="1.5" rx="0.5" fill="#ddd"/>
+            <rect x="8" y="41" width="60" height="1.5" rx="0.5" fill="#ddd"/>
+            <rect x="8" y="50" width="22" height="1.8" rx="0.5" fill="#1a1a2e"/>
+            <rect x="8" y="53" width="74" height="0.6" fill="#e8e0d0"/>
+            <rect x="8" y="57" width="50" height="1.5" rx="0.5" fill="#C9953A"/>
+            <rect x="8" y="60" width="70" height="1.2" rx="0.5" fill="#ddd"/>
+            <rect x="8" y="63" width="65" height="1.2" rx="0.5" fill="#ddd"/>
+            <rect x="8" y="66" width="68" height="1.2" rx="0.5" fill="#ddd"/>
+            <rect x="8" y="73" width="50" height="1.5" rx="0.5" fill="#C9953A"/>
+            <rect x="8" y="76" width="70" height="1.2" rx="0.5" fill="#ddd"/>
+            <rect x="8" y="79" width="60" height="1.2" rx="0.5" fill="#ddd"/>
+            <rect x="8" y="87" width="22" height="1.8" rx="0.5" fill="#1a1a2e"/>
+            <rect x="8" y="90" width="74" height="0.6" fill="#e8e0d0"/>
+            <rect x="8" y="93" width="55" height="1.5" rx="0.5" fill="#ddd"/>
+            <rect x="8" y="96" width="45" height="1.5" rx="0.5" fill="#ddd"/>
+            <rect x="8" y="104" width="22" height="1.8" rx="0.5" fill="#1a1a2e"/>
+            <rect x="8" y="107" width="74" height="0.6" fill="#e8e0d0"/>
+            <rect x="8" y="110" width="18" height="4" rx="2" fill="#f0eae0"/>
+            <rect x="28" y="110" width="18" height="4" rx="2" fill="#f0eae0"/>
+            <rect x="48" y="110" width="18" height="4" rx="2" fill="#f0eae0"/>
+          </svg>
+          <div class="tpl-name">Classic Naukri</div>
+        </div>
+
+        <!-- T2: Modern IT -->
+        <div class="tpl-card" onclick="selectTemplate('modern',this)" title="Modern IT">
+          <svg class="tpl-thumb" viewBox="0 0 90 120" xmlns="http://www.w3.org/2000/svg">
+            <rect width="90" height="120" fill="#fff"/>
+            <rect width="28" height="120" fill="#1a1a2e"/>
+            <rect x="3" y="10" width="22" height="6" rx="1" fill="#fff"/>
+            <rect x="3" y="18" width="22" height="1.5" rx="0.5" fill="rgba(255,255,255,0.4)"/>
+            <rect x="3" y="21" width="18" height="1.2" rx="0.5" fill="rgba(255,255,255,0.3)"/>
+            <rect x="3" y="24" width="20" height="1.2" rx="0.5" fill="rgba(255,255,255,0.3)"/>
+            <rect x="3" y="32" width="15" height="1.5" rx="0.5" fill="#C9953A"/>
+            <rect x="3" y="36" width="22" height="0.5" fill="rgba(255,255,255,0.2)"/>
+            <rect x="3" y="39" width="18" height="2" rx="1" fill="rgba(255,255,255,0.15)"/>
+            <rect x="3" y="43" width="18" height="2" rx="1" fill="rgba(255,255,255,0.15)"/>
+            <rect x="3" y="47" width="18" height="2" rx="1" fill="rgba(255,255,255,0.15)"/>
+            <rect x="3" y="53" width="15" height="1.5" rx="0.5" fill="#C9953A"/>
+            <rect x="3" y="56" width="22" height="0.5" fill="rgba(255,255,255,0.2)"/>
+            <rect x="3" y="59" width="18" height="2" rx="1" fill="rgba(255,255,255,0.15)"/>
+            <rect x="3" y="63" width="14" height="2" rx="1" fill="rgba(255,255,255,0.15)"/>
+            <rect x="3" y="67" width="16" height="2" rx="1" fill="rgba(255,255,255,0.15)"/>
+            <rect x="32" y="8" width="52" height="5" rx="1" fill="#1a1a2e"/>
+            <rect x="32" y="15" width="35" height="2" rx="0.5" fill="#C9953A"/>
+            <rect x="32" y="22" width="20" height="1.8" rx="0.5" fill="#333"/>
+            <rect x="32" y="25" width="52" height="0.6" fill="#e8e0d0"/>
+            <rect x="32" y="28" width="50" height="1.5" rx="0.5" fill="#C9953A"/>
+            <rect x="32" y="31" width="48" height="1.2" rx="0.5" fill="#ddd"/>
+            <rect x="32" y="34" width="45" height="1.2" rx="0.5" fill="#ddd"/>
+            <rect x="32" y="37" width="50" height="1.2" rx="0.5" fill="#ddd"/>
+            <rect x="32" y="43" width="20" height="1.8" rx="0.5" fill="#333"/>
+            <rect x="32" y="46" width="52" height="0.6" fill="#e8e0d0"/>
+            <rect x="32" y="49" width="50" height="1.5" rx="0.5" fill="#C9953A"/>
+            <rect x="32" y="52" width="48" height="1.2" rx="0.5" fill="#ddd"/>
+            <rect x="32" y="55" width="45" height="1.2" rx="0.5" fill="#ddd"/>
+            <rect x="32" y="58" width="52" height="1.2" rx="0.5" fill="#ddd"/>
+            <rect x="32" y="64" width="20" height="1.8" rx="0.5" fill="#333"/>
+            <rect x="32" y="67" width="52" height="0.6" fill="#e8e0d0"/>
+            <rect x="32" y="70" width="48" height="1.2" rx="0.5" fill="#ddd"/>
+            <rect x="32" y="73" width="40" height="1.2" rx="0.5" fill="#ddd"/>
+          </svg>
+          <div class="tpl-name">Modern IT</div>
+        </div>
+
+        <!-- T3: Corporate BFSI -->
+        <div class="tpl-card" onclick="selectTemplate('corporate',this)" title="Corporate / BFSI">
+          <svg class="tpl-thumb" viewBox="0 0 90 120" xmlns="http://www.w3.org/2000/svg">
+            <rect width="90" height="120" fill="#fff"/>
+            <rect x="8" y="8" width="74" height="5" rx="0.5" fill="#1E3A5F"/>
+            <rect x="8" y="15" width="48" height="2.5" rx="0.5" fill="#1E3A5F"/>
+            <rect x="8" y="19" width="74" height="1.2" fill="#1E3A5F"/>
+            <rect x="8" y="22" width="28" height="1.2" rx="0.5" fill="#aaa"/>
+            <rect x="42" y="22" width="28" height="1.2" rx="0.5" fill="#aaa"/>
+            <rect x="8" y="29" width="16" height="1.6" rx="0.3" fill="#1E3A5F"/>
+            <rect x="8" y="33" width="74" height="0.5" fill="#c0ccd8"/>
+            <rect x="8" y="36" width="70" height="1.2" rx="0.5" fill="#ccc"/>
+            <rect x="8" y="39" width="65" height="1.2" rx="0.5" fill="#ccc"/>
+            <rect x="8" y="47" width="16" height="1.6" rx="0.3" fill="#1E3A5F"/>
+            <rect x="8" y="51" width="74" height="0.5" fill="#c0ccd8"/>
+            <rect x="8" y="54" width="44" height="1.3" rx="0.5" fill="#1E3A5F"/>
+            <rect x="8" y="57" width="70" height="1.1" rx="0.5" fill="#ccc"/>
+            <rect x="8" y="60" width="66" height="1.1" rx="0.5" fill="#ccc"/>
+            <rect x="8" y="63" width="68" height="1.1" rx="0.5" fill="#ccc"/>
+            <rect x="8" y="70" width="44" height="1.3" rx="0.5" fill="#1E3A5F"/>
+            <rect x="8" y="73" width="70" height="1.1" rx="0.5" fill="#ccc"/>
+            <rect x="8" y="76" width="60" height="1.1" rx="0.5" fill="#ccc"/>
+            <rect x="8" y="79" width="65" height="1.1" rx="0.5" fill="#ccc"/>
+            <rect x="8" y="86" width="16" height="1.6" rx="0.3" fill="#1E3A5F"/>
+            <rect x="8" y="90" width="74" height="0.5" fill="#c0ccd8"/>
+            <rect x="8" y="93" width="50" height="1.2" rx="0.5" fill="#ccc"/>
+            <rect x="8" y="96" width="42" height="1.2" rx="0.5" fill="#ccc"/>
+            <rect x="8" y="103" width="16" height="1.6" rx="0.3" fill="#1E3A5F"/>
+            <rect x="8" y="107" width="74" height="0.5" fill="#c0ccd8"/>
+            <rect x="8" y="110" width="15" height="3" rx="1.5" fill="#e8eef5"/>
+            <rect x="26" y="110" width="15" height="3" rx="1.5" fill="#e8eef5"/>
+            <rect x="44" y="110" width="15" height="3" rx="1.5" fill="#e8eef5"/>
+          </svg>
+          <div class="tpl-name">Corporate / BFSI</div>
+        </div>
+
+        <!-- T4: Executive -->
+        <div class="tpl-card" onclick="selectTemplate('executive',this)" title="Executive">
+          <svg class="tpl-thumb" viewBox="0 0 90 120" xmlns="http://www.w3.org/2000/svg">
+            <rect width="90" height="120" fill="#fff"/>
+            <rect x="0" y="0" width="90" height="24" fill="#1a1a2e"/>
+            <rect x="8" y="5" width="55" height="7" rx="1" fill="#fff"/>
+            <rect x="8" y="14" width="35" height="2.5" rx="0.5" fill="#C9953A"/>
+            <rect x="8" y="28" width="74" height="1.2" rx="0.5" fill="#ccc"/>
+            <rect x="8" y="31" width="60" height="1.2" rx="0.5" fill="#ccc"/>
+            <rect x="8" y="38" width="20" height="1.8" rx="0.5" fill="#1a1a2e"/>
+            <rect x="8" y="41" width="74" height="0.6" fill="#e8e0d0"/>
+            <rect x="8" y="44" width="3" height="10" rx="1" fill="#C9953A"/>
+            <rect x="14" y="44" width="40" height="1.5" rx="0.5" fill="#1a1a2e"/>
+            <rect x="14" y="48" width="55" height="1.2" rx="0.5" fill="#ddd"/>
+            <rect x="14" y="51" width="50" height="1.2" rx="0.5" fill="#ddd"/>
+            <rect x="8" y="57" width="3" height="10" rx="1" fill="#C9953A"/>
+            <rect x="14" y="57" width="38" height="1.5" rx="0.5" fill="#1a1a2e"/>
+            <rect x="14" y="61" width="52" height="1.2" rx="0.5" fill="#ddd"/>
+            <rect x="14" y="64" width="48" height="1.2" rx="0.5" fill="#ddd"/>
+            <rect x="8" y="72" width="20" height="1.8" rx="0.5" fill="#1a1a2e"/>
+            <rect x="8" y="75" width="74" height="0.6" fill="#e8e0d0"/>
+            <rect x="8" y="78" width="50" height="1.2" rx="0.5" fill="#ddd"/>
+            <rect x="8" y="81" width="42" height="1.2" rx="0.5" fill="#ddd"/>
+            <rect x="8" y="88" width="20" height="1.8" rx="0.5" fill="#1a1a2e"/>
+            <rect x="8" y="91" width="74" height="0.6" fill="#e8e0d0"/>
+            <rect x="8" y="94" width="15" height="3.5" rx="1" fill="#f5f0e8"/>
+            <rect x="26" y="94" width="15" height="3.5" rx="1" fill="#f5f0e8"/>
+            <rect x="44" y="94" width="15" height="3.5" rx="1" fill="#f5f0e8"/>
+            <rect x="62" y="94" width="15" height="3.5" rx="1" fill="#f5f0e8"/>
+          </svg>
+          <div class="tpl-name">Executive</div>
+        </div>
+
+        <!-- T5: Fresh Graduate -->
+        <div class="tpl-card" onclick="selectTemplate('fresher',this)" title="Fresh Graduate">
+          <svg class="tpl-thumb" viewBox="0 0 90 120" xmlns="http://www.w3.org/2000/svg">
+            <rect width="90" height="120" fill="#fff"/>
+            <rect x="0" y="0" width="90" height="4" fill="#4CAF82"/>
+            <rect x="8" y="8" width="52" height="5.5" rx="0.8" fill="#1a1a2e"/>
+            <rect x="8" y="15" width="32" height="2" rx="0.5" fill="#4CAF82"/>
+            <rect x="8" y="19" width="25" height="1.2" rx="0.5" fill="#bbb"/>
+            <rect x="38" y="19" width="22" height="1.2" rx="0.5" fill="#bbb"/>
+            <rect x="8" y="27" width="20" height="1.8" rx="0.5" fill="#1a1a2e"/>
+            <rect x="8" y="30" width="74" height="0.6" fill="#d0ead8"/>
+            <rect x="8" y="33" width="50" height="1.3" rx="0.5" fill="#1a1a2e"/>
+            <rect x="8" y="36" width="35" height="1.2" rx="0.5" fill="#4CAF82"/>
+            <rect x="8" y="39" width="20" height="1.2" rx="0.5" fill="#ccc"/>
+            <rect x="8" y="46" width="20" height="1.8" rx="0.5" fill="#1a1a2e"/>
+            <rect x="8" y="49" width="74" height="0.6" fill="#d0ead8"/>
+            <rect x="8" y="52" width="60" height="1.2" rx="0.5" fill="#ccc"/>
+            <rect x="8" y="55" width="55" height="1.2" rx="0.5" fill="#ccc"/>
+            <rect x="8" y="58" width="50" height="1.2" rx="0.5" fill="#ccc"/>
+            <rect x="8" y="65" width="20" height="1.8" rx="0.5" fill="#1a1a2e"/>
+            <rect x="8" y="68" width="74" height="0.6" fill="#d0ead8"/>
+            <rect x="8" y="71" width="48" height="1.3" rx="0.5" fill="#1a1a2e"/>
+            <rect x="8" y="74" width="60" height="1.2" rx="0.5" fill="#ccc"/>
+            <rect x="8" y="77" width="52" height="1.2" rx="0.5" fill="#ccc"/>
+            <rect x="8" y="84" width="20" height="1.8" rx="0.5" fill="#1a1a2e"/>
+            <rect x="8" y="87" width="74" height="0.6" fill="#d0ead8"/>
+            <rect x="8" y="90" width="13" height="3" rx="1.5" fill="#e6f5ec"/>
+            <rect x="24" y="90" width="13" height="3" rx="1.5" fill="#e6f5ec"/>
+            <rect x="40" y="90" width="13" height="3" rx="1.5" fill="#e6f5ec"/>
+            <rect x="56" y="90" width="13" height="3" rx="1.5" fill="#e6f5ec"/>
+            <rect x="8" y="98" width="20" height="1.8" rx="0.5" fill="#1a1a2e"/>
+            <rect x="8" y="101" width="74" height="0.6" fill="#d0ead8"/>
+            <rect x="8" y="104" width="60" height="1.2" rx="0.5" fill="#ccc"/>
+            <rect x="8" y="107" width="50" height="1.2" rx="0.5" fill="#ccc"/>
+          </svg>
+          <div class="tpl-name">Fresh Graduate</div>
+        </div>
+
+        <!-- T6: Creative/Marketing -->
+        <div class="tpl-card" onclick="selectTemplate('creative',this)" title="Creative / Marketing">
+          <svg class="tpl-thumb" viewBox="0 0 90 120" xmlns="http://www.w3.org/2000/svg">
+            <rect width="90" height="120" fill="#fff"/>
+            <rect x="0" y="0" width="90" height="28" fill="#5B3E8F"/>
+            <rect x="8" y="6" width="50" height="6" rx="1" fill="#fff"/>
+            <rect x="8" y="14" width="30" height="2" rx="0.5" fill="rgba(255,210,140,0.9)"/>
+            <rect x="8" y="18" width="22" height="1.5" rx="0.5" fill="rgba(255,255,255,0.5)"/>
+            <rect x="38" y="18" width="20" height="1.5" rx="0.5" fill="rgba(255,255,255,0.5)"/>
+            <rect x="8" y="32" width="20" height="1.8" rx="0.5" fill="#5B3E8F"/>
+            <rect x="8" y="35" width="74" height="0.6" fill="#e0d5f0"/>
+            <rect x="8" y="38" width="70" height="1.2" rx="0.5" fill="#ccc"/>
+            <rect x="8" y="41" width="62" height="1.2" rx="0.5" fill="#ccc"/>
+            <rect x="8" y="48" width="20" height="1.8" rx="0.5" fill="#5B3E8F"/>
+            <rect x="8" y="51" width="74" height="0.6" fill="#e0d5f0"/>
+            <rect x="8" y="54" width="46" height="1.3" rx="0.5" fill="#5B3E8F"/>
+            <rect x="8" y="57" width="30" height="1.2" rx="0.5" fill="rgba(91,62,143,0.5)"/>
+            <rect x="8" y="60" width="65" height="1.1" rx="0.5" fill="#ddd"/>
+            <rect x="8" y="63" width="60" height="1.1" rx="0.5" fill="#ddd"/>
+            <rect x="8" y="66" width="58" height="1.1" rx="0.5" fill="#ddd"/>
+            <rect x="8" y="73" width="20" height="1.8" rx="0.5" fill="#5B3E8F"/>
+            <rect x="8" y="76" width="74" height="0.6" fill="#e0d5f0"/>
+            <rect x="8" y="79" width="46" height="1.3" rx="0.5" fill="#5B3E8F"/>
+            <rect x="8" y="82" width="62" height="1.1" rx="0.5" fill="#ddd"/>
+            <rect x="8" y="85" width="55" height="1.1" rx="0.5" fill="#ddd"/>
+            <rect x="8" y="92" width="20" height="1.8" rx="0.5" fill="#5B3E8F"/>
+            <rect x="8" y="95" width="74" height="0.6" fill="#e0d5f0"/>
+            <rect x="8" y="98" width="14" height="3" rx="1.5" fill="#ece6f8"/>
+            <rect x="25" y="98" width="14" height="3" rx="1.5" fill="#ece6f8"/>
+            <rect x="42" y="98" width="14" height="3" rx="1.5" fill="#ece6f8"/>
+            <rect x="59" y="98" width="14" height="3" rx="1.5" fill="#ece6f8"/>
+          </svg>
+          <div class="tpl-name">Creative</div>
+        </div>
+
+      </div>
     </div>
 
     <div class="market-grid">
@@ -632,7 +889,19 @@ Looking for senior dev roles in product companies"></textarea>
 // ── STATE ──────────────────────────────────────────────────────────────
 let currentMarket = 'india';
 let currentMode = 'form';
+let currentTemplate = 'classic';
 let photoDataUrl = null;
+let lastRenderedHTML = {};
+
+function selectTemplate(id, btn) {
+  currentTemplate = id;
+  document.querySelectorAll('.tpl-card').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  if (lastRenderedHTML[id]) {
+    document.getElementById('resume-preview').innerHTML = lastRenderedHTML[id];
+    generatedHTML = lastRenderedHTML[id];
+  }
+}
 let expCount = 1;
 let eduCount = 1;
 let generatedHTML = '';
@@ -977,6 +1246,288 @@ Rules:
 
 async function runAIRewrite() { await generateResume(); }
 
+
+// ── TEMPLATE RENDER FUNCTIONS ──────────────────────────────────────────
+function buildResumeData(data, aiData) {
+  return {
+    name:       aiData?.name      || data.name      || 'Your Name',
+    title:      aiData?.title     || data.title     || '',
+    email:      aiData?.email     || data.email     || '',
+    phone:      aiData?.phone     || data.phone     || '',
+    location:   aiData?.location  || data.location  || '',
+    linkedin:   aiData?.linkedin  || data.linkedin  || '',
+    portfolio:  data.portfolio || '',
+    summary:    aiData?.summary   || data.summary   || '',
+    experience: aiData?.experience || [],
+    education:  aiData?.education  || [],
+    skills:     aiData?.skills     || {},
+    certs:      aiData?.certs      || [],
+    projects:   aiData?.projects   || [],
+    awards:     aiData?.awards     || [],
+    techSkills: data.techSkills || '',
+    softSkills: data.softSkills || '',
+    tools:      data.tools      || '',
+    aiTools:    data.aiTools    || '',
+    languages:  data.languages  || '',
+    ctc:        data.ctc        || '',
+    market:     data.market,
+    photo:      data.photo,
+    nationality: data.nationality || '',
+    visa:        data.visa        || '',
+    naukri:      data.naukri      || '',
+  };
+}
+
+function expHTML(exp) {
+  const bullets = exp.bullets
+    ? (Array.isArray(exp.bullets) ? exp.bullets : exp.bullets.split('\n').filter(b=>b.trim()))
+    : [];
+  const bHTML = bullets.length
+    ? '<ul>' + bullets.map(b=>`<li>${b.replace(/^[•\-\*]\s*/,'').trim()}</li>`).join('') + '</ul>'
+    : '';
+  const dates = [exp.start, exp.end].filter(Boolean).join(' – ');
+  return `<div class="resume-entry">
+    <div class="resume-entry-header">
+      <div class="resume-entry-title">${exp.title||''}</div>
+      <div class="resume-entry-meta">${dates}${exp.location?' | '+exp.location:''}</div>
+    </div>
+    <div class="resume-entry-sub">${exp.company||''}</div>
+    ${bHTML}
+  </div>`;
+}
+
+function skillsLine(arr) {
+  return arr.map(s=>s.trim()).filter(Boolean).join(' | ');
+}
+
+function allTechSkills(skills, data) {
+  return [
+    ...(skills.technical || (data.techSkills ? data.techSkills.split(',') : [])),
+    ...(skills.tools     || (data.tools      ? data.tools.split(',')      : [])),
+    ...(skills.ai        || (data.aiTools    ? data.aiTools.split(',')    : []))
+  ].map(s=>s.trim()).filter(Boolean);
+}
+
+function softSkillsArr(skills, data) {
+  return (skills.soft || (data.softSkills ? data.softSkills.split(',') : [])).map(s=>s.trim()).filter(Boolean);
+}
+
+// ── T1: CLASSIC NAUKRI ────────────────────────────────────────────────
+function renderClassic(d) {
+  const tech = allTechSkills(d.skills, d);
+  const soft = softSkillsArr(d.skills, d);
+  let h = `<div style="padding:40px 48px;font-family:'Inter',sans-serif;font-size:13px;line-height:1.6;color:#1a1a1a;">
+  <div style="font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:700;color:#0F1B2D;letter-spacing:-0.5px;">${d.name}</div>
+  ${d.title?`<div style="font-size:14px;color:#C9953A;font-weight:500;margin-top:2px;">${d.title}</div>`:''}
+  <div style="display:flex;flex-wrap:wrap;gap:14px;font-size:12px;color:#4A5568;padding:10px 0 12px;border-bottom:2px solid #0F1B2D;margin-bottom:16px;">
+    ${d.email?`<span>✉ ${d.email}</span>`:''}
+    ${d.phone?`<span>📱 ${d.phone}</span>`:''}
+    ${d.location?`<span>📍 ${d.location}</span>`:''}
+    ${d.linkedin?`<span>🔗 ${d.linkedin.replace(/https?:\/\//,'')}</span>`:''}
+    ${d.ctc?`<span>💰 CTC: ${d.ctc}</span>`:''}
+  </div>`;
+
+  const sec = (title, body) => `<div style="margin-bottom:16px;">
+    <div style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#0F1B2D;border-bottom:1.5px solid #F0EAE0;padding-bottom:4px;margin-bottom:10px;">${title}</div>
+    ${body}
+  </div>`;
+
+  if (d.summary) h += sec('Professional Summary', `<div style="font-size:13px;color:#4A5568;line-height:1.7;">${d.summary}</div>`);
+  if (d.experience.length) h += sec('Work Experience', d.experience.map(expHTML).join(''));
+  if (d.education.length)  h += sec('Education', d.education.map(e=>`<div class="resume-entry"><div class="resume-entry-header"><div class="resume-entry-title">${e.degree||''}</div><div class="resume-entry-meta">${e.year||''}${e.location?' | '+e.location:''}</div></div><div class="resume-entry-sub">${e.institution||''}</div>${e.cgpa?`<div style="font-size:12px;color:#4A5568;">CGPA: ${e.cgpa}</div>`:''}</div>`).join(''));
+  if (tech.length) h += sec('Technical Skills', `<div style="font-size:12.5px;color:#4A5568;line-height:2;">${skillsLine(tech)}</div>`);
+  if (soft.length) h += sec('Core Competencies', `<div style="font-size:12.5px;color:#4A5568;line-height:2;">${skillsLine(soft)}</div>`);
+  if (d.certs.length) h += sec('Certifications', '<ul>'+d.certs.map(c=>`<li style="font-size:12px;color:#4A5568;margin-bottom:3px;">${c}</li>`).join('')+'</ul>');
+  if (d.projects.length) h += sec('Key Projects', d.projects.map(p=>`<div style="margin-bottom:10px;"><div style="font-weight:600;font-size:13px;">${p.name||p}</div>${p.description?`<div style="font-size:12px;color:#4A5568;">${p.description}</div>`:''}</div>`).join(''));
+  if (d.awards.length) h += sec('Awards & Achievements', '<ul>'+d.awards.map(a=>`<li style="font-size:12px;color:#4A5568;margin-bottom:3px;">${a}</li>`).join('')+'</ul>');
+  h += '</div>';
+  return h;
+}
+
+// ── T2: MODERN IT (Left dark sidebar) ────────────────────────────────
+function renderModern(d) {
+  const tech = allTechSkills(d.skills, d);
+  const soft = softSkillsArr(d.skills, d);
+  const sidebar = `
+    <div style="width:200px;min-width:200px;background:#1a1a2e;padding:28px 20px;color:#fff;flex-shrink:0;">
+      <div style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:700;color:#fff;line-height:1.2;margin-bottom:4px;">${d.name}</div>
+      ${d.title?`<div style="font-size:12px;color:#C9953A;font-weight:500;margin-bottom:16px;">${d.title}</div>`:''}
+      <div style="font-size:11px;color:rgba(255,255,255,0.6);margin-bottom:4px;border-bottom:1px solid rgba(255,255,255,0.15);padding-bottom:12px;margin-bottom:12px;">
+        ${d.email?`<div style="margin-bottom:4px;word-break:break-all;">✉ ${d.email}</div>`:''}
+        ${d.phone?`<div style="margin-bottom:4px;">📱 ${d.phone}</div>`:''}
+        ${d.location?`<div style="margin-bottom:4px;">📍 ${d.location}</div>`:''}
+        ${d.linkedin?`<div style="word-break:break-all;">🔗 ${d.linkedin.replace(/https?:\/\//,'')}</div>`:''}
+      </div>
+      ${tech.length?`<div style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#C9953A;margin-bottom:8px;">Technical Skills</div><div style="font-size:11px;color:rgba(255,255,255,0.75);line-height:1.9;">${tech.join('<br>')}</div>`:''}
+      ${soft.length?`<div style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#C9953A;margin-top:14px;margin-bottom:8px;">Competencies</div><div style="font-size:11px;color:rgba(255,255,255,0.75);line-height:1.9;">${soft.join('<br>')}</div>`:''}
+      ${d.certs.length?`<div style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#C9953A;margin-top:14px;margin-bottom:8px;">Certifications</div><div style="font-size:11px;color:rgba(255,255,255,0.75);line-height:1.9;">${d.certs.join('<br>')}</div>`:''}
+    </div>`;
+
+  const sec = (title, body) => `<div style="margin-bottom:16px;">
+    <div style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#0F1B2D;border-bottom:1.5px solid #F0EAE0;padding-bottom:4px;margin-bottom:10px;">${title}</div>
+    ${body}
+  </div>`;
+
+  let main = `<div style="flex:1;padding:28px 32px;font-size:13px;color:#1a1a1a;line-height:1.6;">`;
+  if (d.summary) main += sec('Professional Summary', `<div style="font-size:13px;color:#4A5568;line-height:1.7;">${d.summary}</div>`);
+  if (d.experience.length) main += sec('Work Experience', d.experience.map(expHTML).join(''));
+  if (d.education.length)  main += sec('Education', d.education.map(e=>`<div class="resume-entry"><div class="resume-entry-header"><div class="resume-entry-title">${e.degree||''}</div><div class="resume-entry-meta">${e.year||''}</div></div><div class="resume-entry-sub">${e.institution||''}</div>${e.cgpa?`<div style="font-size:12px;color:#4A5568;">CGPA: ${e.cgpa}</div>`:''}</div>`).join(''));
+  if (d.projects.length) main += sec('Key Projects', d.projects.map(p=>`<div style="margin-bottom:8px;"><div style="font-weight:600;">${p.name||p}</div>${p.description?`<div style="font-size:12px;color:#4A5568;">${p.description}</div>`:''}</div>`).join(''));
+  main += '</div>';
+  return `<div style="display:flex;font-family:'Inter',sans-serif;min-height:600px;">${sidebar}${main}</div>`;
+}
+
+// ── T3: CORPORATE / BFSI ─────────────────────────────────────────────
+function renderCorporate(d) {
+  const tech = allTechSkills(d.skills, d);
+  const soft = softSkillsArr(d.skills, d);
+  let h = `<div style="padding:40px 48px;font-family:'Inter',sans-serif;font-size:13px;line-height:1.6;color:#1a1a1a;">
+  <div style="border-bottom:3px solid #1E3A5F;padding-bottom:14px;margin-bottom:18px;">
+    <div style="font-family:'Inter',sans-serif;font-size:26px;font-weight:700;color:#1E3A5F;letter-spacing:-0.3px;">${d.name}</div>
+    ${d.title?`<div style="font-size:13px;color:#1E3A5F;font-weight:500;margin-top:3px;opacity:0.7;">${d.title}</div>`:''}
+    <div style="display:flex;flex-wrap:wrap;gap:16px;font-size:11.5px;color:#4A5568;margin-top:8px;">
+      ${d.email?`<span>${d.email}</span>`:''}
+      ${d.phone?`<span>${d.phone}</span>`:''}
+      ${d.location?`<span>${d.location}</span>`:''}
+      ${d.linkedin?`<span>${d.linkedin.replace(/https?:\/\//,'')}</span>`:''}
+      ${d.ctc?`<span>CTC: ${d.ctc}</span>`:''}
+    </div>
+  </div>`;
+
+  const sec = (title, body) => `<div style="margin-bottom:18px;">
+    <div style="font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#1E3A5F;margin-bottom:6px;">${title}</div>
+    <div style="border-left:3px solid #1E3A5F;padding-left:12px;">${body}</div>
+  </div>`;
+
+  if (d.summary) h += sec('Executive Summary', `<div style="font-size:13px;color:#4A5568;line-height:1.75;">${d.summary}</div>`);
+  if (d.experience.length) h += sec('Professional Experience', d.experience.map(expHTML).join(''));
+  if (d.education.length)  h += sec('Education', d.education.map(e=>`<div style="margin-bottom:8px;"><div style="font-weight:600;">${e.degree||''} — ${e.institution||''}</div><div style="font-size:12px;color:#4A5568;">${e.year||''}${e.cgpa?' · CGPA: '+e.cgpa:''}</div></div>`).join(''));
+  if (tech.length) h += sec('Core Competencies', `<div style="font-size:12.5px;color:#4A5568;line-height:2;">${skillsLine([...tech,...soft])}</div>`);
+  if (d.certs.length) h += sec('Certifications', '<ul>'+d.certs.map(c=>`<li style="font-size:12px;color:#4A5568;margin-bottom:3px;">${c}</li>`).join('')+'</ul>');
+  h += '</div>';
+  return h;
+}
+
+// ── T4: EXECUTIVE ─────────────────────────────────────────────────────
+function renderExecutive(d) {
+  const tech = allTechSkills(d.skills, d);
+  const soft = softSkillsArr(d.skills, d);
+  let h = `<div style="font-family:'Inter',sans-serif;font-size:13px;line-height:1.6;color:#1a1a1a;">
+  <div style="background:#1a1a2e;padding:28px 48px 24px;">
+    <div style="font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:700;color:#fff;letter-spacing:-1px;">${d.name}</div>
+    ${d.title?`<div style="font-size:15px;color:#C9953A;font-weight:500;margin-top:4px;">${d.title}</div>`:''}
+    <div style="display:flex;flex-wrap:wrap;gap:18px;font-size:12px;color:rgba(255,255,255,0.65);margin-top:12px;">
+      ${d.email?`<span>${d.email}</span>`:''}
+      ${d.phone?`<span>${d.phone}</span>`:''}
+      ${d.location?`<span>${d.location}</span>`:''}
+      ${d.linkedin?`<span>${d.linkedin.replace(/https?:\/\//,'')}</span>`:''}
+    </div>
+  </div>
+  <div style="padding:32px 48px;">`;
+
+  const sec = (title, body) => `<div style="margin-bottom:20px;">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+      <div style="width:4px;height:18px;background:#C9953A;border-radius:2px;flex-shrink:0;"></div>
+      <div style="font-size:12px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#0F1B2D;">${title}</div>
+    </div>
+    ${body}
+  </div>`;
+
+  if (d.summary) h += sec('Executive Profile', `<div style="font-size:13.5px;color:#4A5568;line-height:1.8;">${d.summary}</div>`);
+  if (d.experience.length) h += sec('Career History', d.experience.map(e=>`
+    <div style="border-left:2px solid #F0EAE0;padding-left:14px;margin-bottom:14px;">${expHTML(e)}</div>`).join(''));
+  if (d.education.length)  h += sec('Education', d.education.map(e=>`<div style="margin-bottom:8px;"><span style="font-weight:600;">${e.degree||''}</span> — ${e.institution||''} <span style="color:#8A9BB0;">(${e.year||''}${e.cgpa?' · CGPA '+e.cgpa:''})</span></div>`).join(''));
+  if (tech.length || soft.length) h += sec('Core Competencies', `<div style="display:flex;flex-wrap:wrap;gap:6px;">${[...tech,...soft].map(s=>`<span style="background:#f5f0e8;color:#4A5568;padding:4px 10px;border-radius:4px;font-size:12px;border:1px solid #e8e0d0;">${s}</span>`).join('')}</div>`);
+  if (d.certs.length) h += sec('Certifications', '<ul>'+d.certs.map(c=>`<li style="font-size:12px;color:#4A5568;margin-bottom:4px;">${c}</li>`).join('')+'</ul>');
+  h += '</div></div>';
+  return h;
+}
+
+// ── T5: FRESH GRADUATE ───────────────────────────────────────────────
+function renderFresher(d) {
+  const tech = allTechSkills(d.skills, d);
+  const soft = softSkillsArr(d.skills, d);
+  let h = `<div style="padding:36px 44px;font-family:'Inter',sans-serif;font-size:13px;line-height:1.6;color:#1a1a1a;">
+  <div style="border-left:4px solid #4CAF82;padding-left:16px;margin-bottom:18px;">
+    <div style="font-size:28px;font-weight:700;color:#1a1a2e;letter-spacing:-0.3px;">${d.name}</div>
+    ${d.title?`<div style="font-size:13px;color:#4CAF82;font-weight:500;margin-top:2px;">${d.title}</div>`:''}
+    <div style="display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:#4A5568;margin-top:8px;">
+      ${d.email?`<span>✉ ${d.email}</span>`:''}
+      ${d.phone?`<span>📱 ${d.phone}</span>`:''}
+      ${d.location?`<span>📍 ${d.location}</span>`:''}
+      ${d.linkedin?`<span>🔗 ${d.linkedin.replace(/https?:\/\//,'')}</span>`:''}
+    </div>
+  </div>`;
+
+  const sec = (title, body) => `<div style="margin-bottom:16px;">
+    <div style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#1a1a2e;border-bottom:1.5px solid #d0ead8;padding-bottom:4px;margin-bottom:10px;">${title}</div>
+    ${body}
+  </div>`;
+
+  // Education FIRST for fresher
+  if (d.education.length) h += sec('Education', d.education.map(e=>`<div style="margin-bottom:10px;"><div style="display:flex;justify-content:space-between;"><div style="font-weight:600;">${e.degree||''}</div><div style="font-size:12px;color:#8A9BB0;">${e.year||''}</div></div><div style="color:#4CAF82;font-size:12px;font-weight:500;">${e.institution||''}</div>${e.cgpa?`<div style="font-size:12px;color:#4A5568;background:#e6f5ec;display:inline-block;padding:1px 8px;border-radius:999px;margin-top:2px;">CGPA: ${e.cgpa}</div>`:''}</div>`).join(''));
+  if (d.summary) h += sec('Career Objective', `<div style="font-size:13px;color:#4A5568;line-height:1.7;">${d.summary}</div>`);
+  if (d.projects.length) h += sec('Projects', d.projects.map(p=>`<div style="margin-bottom:10px;"><div style="font-weight:600;">${p.name||p}</div>${p.description?`<div style="font-size:12px;color:#4A5568;">${p.description}</div>`:''}</div>`).join(''));
+  if (d.experience.length) h += sec('Internship / Experience', d.experience.map(expHTML).join(''));
+  if (tech.length) h += sec('Technical Skills', `<div style="font-size:12.5px;color:#4A5568;line-height:2;">${skillsLine(tech)}</div>`);
+  if (soft.length) h += sec('Soft Skills', `<div style="font-size:12.5px;color:#4A5568;line-height:2;">${skillsLine(soft)}</div>`);
+  if (d.certs.length) h += sec('Certifications', '<ul>'+d.certs.map(c=>`<li style="font-size:12px;color:#4A5568;margin-bottom:3px;">${c}</li>`).join('')+'</ul>');
+  if (d.awards.length) h += sec('Achievements', '<ul>'+d.awards.map(a=>`<li style="font-size:12px;color:#4A5568;margin-bottom:3px;">${a}</li>`).join('')+'</ul>');
+  h += '</div>';
+  return h;
+}
+
+// ── T6: CREATIVE / MARKETING ─────────────────────────────────────────
+function renderCreative(d) {
+  const tech = allTechSkills(d.skills, d);
+  const soft = softSkillsArr(d.skills, d);
+  let h = `<div style="font-family:'Inter',sans-serif;font-size:13px;line-height:1.6;color:#1a1a1a;">
+  <div style="background:linear-gradient(135deg,#5B3E8F,#7B5EA7);padding:28px 44px 24px;">
+    <div style="font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:700;color:#fff;letter-spacing:-0.5px;">${d.name}</div>
+    ${d.title?`<div style="font-size:13px;color:rgba(255,210,140,0.95);font-weight:500;margin-top:4px;">${d.title}</div>`:''}
+    <div style="display:flex;flex-wrap:wrap;gap:16px;font-size:11.5px;color:rgba(255,255,255,0.7);margin-top:10px;">
+      ${d.email?`<span>${d.email}</span>`:''}
+      ${d.phone?`<span>${d.phone}</span>`:''}
+      ${d.location?`<span>${d.location}</span>`:''}
+      ${d.linkedin?`<span>${d.linkedin.replace(/https?:\/\//,'')}</span>`:''}
+    </div>
+  </div>
+  <div style="padding:30px 44px;">`;
+
+  const sec = (title, body) => `<div style="margin-bottom:18px;">
+    <div style="font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#5B3E8F;border-bottom:2px solid #e0d5f0;padding-bottom:5px;margin-bottom:10px;">${title}</div>
+    ${body}
+  </div>`;
+
+  if (d.summary) h += sec('Profile', `<div style="font-size:13px;color:#4A5568;line-height:1.75;">${d.summary}</div>`);
+  if (d.experience.length) h += sec('Experience', d.experience.map(expHTML).join(''));
+  if (d.education.length)  h += sec('Education', d.education.map(e=>`<div style="margin-bottom:8px;"><div style="font-weight:600;">${e.degree||''}</div><div style="font-size:12px;color:#5B3E8F;">${e.institution||''}</div><div style="font-size:12px;color:#8A9BB0;">${e.year||''}${e.cgpa?' · CGPA: '+e.cgpa:''}</div></div>`).join(''));
+  if (tech.length) h += sec('Skills & Tools', `<div style="display:flex;flex-wrap:wrap;gap:5px;">${tech.map(s=>`<span style="background:#ece6f8;color:#5B3E8F;padding:3px 9px;border-radius:999px;font-size:11.5px;">${s}</span>`).join('')}</div>`);
+  if (soft.length) h += sec('Core Competencies', `<div style="font-size:12.5px;color:#4A5568;line-height:2;">${skillsLine(soft)}</div>`);
+  if (d.certs.length) h += sec('Certifications', '<ul>'+d.certs.map(c=>`<li style="font-size:12px;color:#4A5568;margin-bottom:3px;">${c}</li>`).join('')+'</ul>');
+  if (d.projects.length) h += sec('Key Projects', d.projects.map(p=>`<div style="margin-bottom:8px;"><div style="font-weight:600;">${p.name||p}</div>${p.description?`<div style="font-size:12px;color:#4A5568;">${p.description}</div>`:''}</div>`).join(''));
+  h += '</div></div>';
+  return h;
+}
+
+// ── DISPATCH ──────────────────────────────────────────────────────────
+function renderByTemplate(data, aiData) {
+  const d = buildResumeData(data, aiData);
+  const renderers = {
+    classic:   renderClassic,
+    modern:    renderModern,
+    corporate: renderCorporate,
+    executive: renderExecutive,
+    fresher:   renderFresher,
+    creative:  renderCreative,
+  };
+  // Render all templates and cache them
+  Object.keys(renderers).forEach(key => {
+    lastRenderedHTML[key] = renderers[key](d);
+  });
+  return renderers[currentTemplate](d);
+}
+
 // ── RENDER RESUME ──────────────────────────────────────────────────────
 function renderResume(data, aiData, rawText) {
   const name = aiData?.name || data.name || 'Your Name';
@@ -1132,12 +1683,15 @@ function renderResume(data, aiData, rawText) {
   // ATS keywords used internally for scoring only
 
   html += `</div>`;
-  generatedHTML = html;
+
+  // Render using selected template (also pre-renders all others)
+  const templateHTML = renderByTemplate(data, aiData);
+  generatedHTML = templateHTML;
 
   // Build ATS text version
   generatedATS = buildATSText(aiData || {}, data);
 
-  document.getElementById('resume-preview').innerHTML = html;
+  document.getElementById('resume-preview').innerHTML = templateHTML;
   document.getElementById('ats-preview-box').style.display = 'none';
 }
 
