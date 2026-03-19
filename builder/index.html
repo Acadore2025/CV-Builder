@@ -1340,8 +1340,7 @@ function buildCompletenessChecklist(data) {
       if (!e.bullets || e.bullets.trim().length===0) {
         items.push({section:'Experience', status:'missing', icon:'❌', text:`<strong>${e.title} at ${e.company}</strong> — no achievements/bullets added`});
       } else {
-        const bullets = e.bullets.split('
-').filter(b=>b.trim().length>0);
+        const bullets = e.bullets.split('\n').filter(b=>b.trim().length>0);
         const hasMetric = bullets.some(b=>/\d+/.test(b));
         if (!hasMetric) items.push({section:'Experience', status:'warn', icon:'⚠️', text:`<strong>${e.title} at ${e.company}</strong> — none of your bullets have a number or metric. Add at least one (%, $, users, time saved)`});
         else if (bullets.length<3) items.push({section:'Experience', status:'warn', icon:'⚠️', text:`<strong>${e.title} at ${e.company}</strong> — only ${bullets.length} bullet${bullets.length===1?'':'s'}. Add 3–5 for this role`});
