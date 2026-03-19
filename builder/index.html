@@ -213,6 +213,13 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg0); 
   .checklist-grid { grid-template-columns: 1fr; }
 }
 /* Resume template styles — keep for PDF */
+
+/* Month/Year date picker */
+.date-picker-wrap { display: flex; gap: 6px; align-items: center; }
+.date-picker-wrap select { flex: 1; padding: 10px 8px; }
+.date-current-check { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); cursor: pointer; white-space: nowrap; }
+.date-current-check input[type=checkbox] { width: 14px; height: 14px; accent-color: var(--purple); cursor: pointer; }
+
 /* end resume doc styles */
 </style>
 </head>
@@ -376,8 +383,48 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg0); 
                 <div class="field"><label>Company Name <span class="required">*</span></label><input class="exp-company" placeholder="Google India"></div>
               </div>
               <div class="field-grid three">
-                <div class="field"><label>Start Date</label><input class="exp-start" placeholder="Jan 2021"></div>
-                <div class="field"><label>End Date</label><input class="exp-end" placeholder="Present"></div>
+                <div class="field">
+                  <label>Start Date</label>
+                  <div class="date-picker-wrap">
+                    <select class="exp-start-month">
+                      <option value="">Month</option>
+                      <option>Jan</option><option>Feb</option><option>Mar</option><option>Apr</option>
+                      <option>May</option><option>Jun</option><option>Jul</option><option>Aug</option>
+                      <option>Sep</option><option>Oct</option><option>Nov</option><option>Dec</option>
+                    </select>
+                    <select class="exp-start-year">
+                      <option value="">Year</option>
+                      <option>2026</option><option>2025</option><option>2024</option><option>2023</option>
+                      <option>2022</option><option>2021</option><option>2020</option><option>2019</option>
+                      <option>2018</option><option>2017</option><option>2016</option><option>2015</option>
+                      <option>2014</option><option>2013</option><option>2012</option><option>2011</option>
+                      <option>2010</option><option>2009</option><option>2008</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="field">
+                  <label>End Date</label>
+                  <div class="date-picker-wrap">
+                    <select class="exp-end-month" id="end-month-exp-0">
+                      <option value="">Month</option>
+                      <option>Jan</option><option>Feb</option><option>Mar</option><option>Apr</option>
+                      <option>May</option><option>Jun</option><option>Jul</option><option>Aug</option>
+                      <option>Sep</option><option>Oct</option><option>Nov</option><option>Dec</option>
+                    </select>
+                    <select class="exp-end-year" id="end-year-exp-0">
+                      <option value="">Year</option>
+                      <option>2026</option><option>2025</option><option>2024</option><option>2023</option>
+                      <option>2022</option><option>2021</option><option>2020</option><option>2019</option>
+                      <option>2018</option><option>2017</option><option>2016</option><option>2015</option>
+                      <option>2014</option><option>2013</option><option>2012</option><option>2011</option>
+                      <option>2010</option><option>2009</option><option>2008</option>
+                    </select>
+                    <label class="date-current-check">
+                      <input type="checkbox" class="exp-current" id="current-exp-0" onchange="toggleCurrentJob(this)">
+                      Present
+                    </label>
+                  </div>
+                </div>
                 <div class="field"><label>Location</label><input class="exp-location" placeholder="Hyderabad / Remote"></div>
               </div>
               <div class="field field-grid one">
@@ -453,10 +500,6 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg0); 
           <div class="field-grid one field" style="margin-top:12px;"><label>Key Projects</label><textarea id="f-projects" rows="4" placeholder="Project Name | Tech Stack | Link&#10;E-commerce Platform | React, Node.js, AWS | github.com/project&#10;ML Fraud Detection | Python, TensorFlow | 98% accuracy, saved $2M annually"></textarea></div>
           <div class="field-grid one field" style="margin-top:12px;"><label>Awards & Achievements</label><textarea id="f-awards" rows="3" placeholder="Employee of the Year 2023 — TCS&#10;Hackathon Winner — Microsoft Build 2022&#10;Speaker — PyCon India 2023"></textarea></div>
           <!-- India specific -->
-          <div class="field-grid one field market-field india-field" style="margin-top:12px;">
-            <label>Notice Period <span style="font-weight:400;color:var(--text3)">(expected on Indian resumes)</span></label>
-            <select id="f-notice"><option value="">Select notice period</option><option>Immediate</option><option>15 days</option><option>30 days</option><option>60 days</option><option>90 days</option></select>
-          </div>
           <div style="display:flex;gap:8px;margin-top:1.5rem;">
             <button class="btn btn-secondary" onclick="prevSection('skills')">← Back</button>
             <button class="btn btn-primary" onclick="generateResume()" style="width:auto;padding:10px 28px">✨ Generate Resume</button>
@@ -552,7 +595,7 @@ Looking for senior dev roles in product companies"></textarea>
     <!-- COMPLETENESS CHECKLIST PANEL -->
     <div class="checklist-panel" id="checklist-panel">
       <div class="cl-title">Before you go — here is what you may have missed</div>
-      <div class="cl-sub">These are data points that would significantly strengthen your resume. No score — just guidance.</div>
+      <div class="cl-sub">Here's what to strengthen before your full analysis.</div>
       <div id="checklist-content"></div>
       <div class="cl-actions">
         <a class="cl-analyse-btn" id="analyse-deep-link" href="/analyser/" target="_blank">📊 Get Full Analysis in Analyser →</a>
@@ -663,8 +706,8 @@ function addExperience() {
       <div class="field"><label>Company Name</label><input class="exp-company" placeholder="Company Name"></div>
     </div>
     <div class="field-grid three">
-      <div class="field"><label>Start Date</label><input class="exp-start" placeholder="Jan 2021"></div>
-      <div class="field"><label>End Date</label><input class="exp-end" placeholder="Present"></div>
+      <div class="field"><label>Start Date</label><div class="date-picker-wrap"><select class="exp-start-month"><option value="">Month</option><option>Jan</option><option>Feb</option><option>Mar</option><option>Apr</option><option>May</option><option>Jun</option><option>Jul</option><option>Aug</option><option>Sep</option><option>Oct</option><option>Nov</option><option>Dec</option></select><select class="exp-start-year"><option value="">Year</option><option>2026</option><option>2025</option><option>2024</option><option>2023</option><option>2022</option><option>2021</option><option>2020</option><option>2019</option><option>2018</option><option>2017</option><option>2016</option><option>2015</option><option>2014</option><option>2013</option><option>2012</option><option>2011</option><option>2010</option></select></div></div>
+      <div class="field"><label>End Date</label><div class="date-picker-wrap"><select class="exp-end-month"><option value="">Month</option><option>Jan</option><option>Feb</option><option>Mar</option><option>Apr</option><option>May</option><option>Jun</option><option>Jul</option><option>Aug</option><option>Sep</option><option>Oct</option><option>Nov</option><option>Dec</option></select><select class="exp-end-year"><option value="">Year</option><option>2026</option><option>2025</option><option>2024</option><option>2023</option><option>2022</option><option>2021</option><option>2020</option><option>2019</option><option>2018</option><option>2017</option><option>2016</option><option>2015</option><option>2014</option><option>2013</option></select><label class="date-current-check"><input type="checkbox" class="exp-current" onchange="toggleCurrentJob(this)"> Present</label></div></div>
       <div class="field"><label>Location</label><input class="exp-location" placeholder="City / Remote"></div>
     </div>
     <div class="field field-grid one">
@@ -696,6 +739,19 @@ function addEducation() {
 function removeEntry(id) {
   const el = document.getElementById(id);
   if (el) el.remove();
+}
+
+function toggleCurrentJob(checkbox) {
+  const card = checkbox.closest('.entry-card');
+  if (!card) return;
+  const endMonth = card.querySelector('.exp-end-month');
+  const endYear  = card.querySelector('.exp-end-year');
+  if (endMonth) endMonth.disabled = checkbox.checked;
+  if (endYear)  endYear.disabled  = checkbox.checked;
+  if (checkbox.checked) {
+    if (endMonth) endMonth.value = '';
+    if (endYear)  endYear.value  = '';
+  }
 }
 
 // ── PHOTO HANDLER ──────────────────────────────────────────────────────
@@ -778,7 +834,6 @@ ${data.dob ? 'Date of Birth: ' + data.dob : ''}
 ${data.driving ? 'Driving License: ' + data.driving : ''}
 ${data.ctc ? 'Current CTC: ' + data.ctc : ''}
 ${data.ectc ? 'Expected CTC: ' + data.ectc : ''}
-${data.notice ? 'Notice Period: ' + data.notice : ''}
 
 PROFESSIONAL SUMMARY:
 ${data.summary || 'Not provided'}
@@ -963,7 +1018,6 @@ function renderResume(data, aiData, rawText) {
   if (data.market === 'gulf' && data.nationality) html += `<span>🌍 ${data.nationality}</span>`;
   if (data.market === 'gulf' && data.visa) html += `<span>📋 ${data.visa}</span>`;
   if (data.market === 'india' && data.ctc) html += `<span>💰 CTC: ${data.ctc}</span>`;
-  if (data.market === 'india' && data.notice) html += `<span>⏱ Notice: ${data.notice}</span>`;
   html += `</div>`;
 
   if (data.market === 'gulf' && data.photo) { html += `</div></div>`; }
@@ -1025,26 +1079,23 @@ function renderResume(data, aiData, rawText) {
 
   if (allSkills.length > 0) {
     html += `<div class="resume-section"><div class="resume-section-title">Technical Skills</div>
-      <div class="resume-skills">`;
-    allSkills.forEach(s => { html += `<span class="resume-skill">${s}</span>`; });
-    html += `</div></div>`;
+      <div style="font-size:12.5px;color:var(--text2);line-height:1.8;">${allSkills.map(s=>s.trim()).filter(Boolean).join(' &nbsp;|&nbsp; ')}</div>
+    </div>`;
   }
 
   const softSkills = skills.soft || (data.softSkills ? data.softSkills.split(',') : []);
   if (softSkills.length > 0) {
     html += `<div class="resume-section"><div class="resume-section-title">Core Competencies</div>
-      <div class="resume-skills">`;
-    softSkills.map(s=>s.trim()).filter(Boolean).forEach(s => { html += `<span class="resume-skill">${s}</span>`; });
-    html += `</div></div>`;
+      <div style="font-size:12.5px;color:var(--text2);line-height:1.8;">${softSkills.map(s=>s.trim()).filter(Boolean).join(' &nbsp;|&nbsp; ')}</div>
+    </div>`;
   }
 
   // Languages (Gulf/Europe)
   const langs = skills.languages || (data.languages ? data.languages.split(',') : []);
   if (langs.length > 0 && (data.market === 'gulf' || data.market === 'europe')) {
     html += `<div class="resume-section"><div class="resume-section-title">Languages</div>
-      <div class="resume-skills">`;
-    langs.map(l=>l.trim()).filter(Boolean).forEach(l => { html += `<span class="resume-skill">${l}</span>`; });
-    html += `</div></div>`;
+      <div style="font-size:12.5px;color:var(--text2);line-height:1.8;">${langs.map(l=>l.trim()).filter(Boolean).join(' &nbsp;|&nbsp; ')}</div>
+    </div>`;
   }
 
   // Certifications
@@ -1078,13 +1129,7 @@ function renderResume(data, aiData, rawText) {
   }
 
   // ATS keywords footer
-  if (atsKeywords.length > 0) {
-    html += `<div style="margin-top:20px;padding-top:12px;border-top:1px solid var(--cream2);">
-      <div style="font-size:10px;color:var(--text3);margin-bottom:6px;">ATS OPTIMIZED FOR:</div>
-      <div class="resume-skills">`;
-    atsKeywords.forEach(k => { html += `<span class="resume-skill" style="background:var(--blue-bg);color:var(--blue);border-color:#bfdbfe;">${k}</span>`; });
-    html += `</div></div>`;
-  }
+  // ATS keywords used internally for scoring only
 
   html += `</div>`;
   generatedHTML = html;
@@ -1129,12 +1174,23 @@ function buildATSText(aiData, data) {
     lines.push('');
   }
   if (aiData.skills) {
-    lines.push('SKILLS');
-    lines.push('---');
-    if (aiData.skills.technical?.length) lines.push('Technical: ' + aiData.skills.technical.join(', '));
-    if (aiData.skills.tools?.length) lines.push('Tools: ' + aiData.skills.tools.join(', '));
-    if (aiData.skills.soft?.length) lines.push('Soft Skills: ' + aiData.skills.soft.join(', '));
-    lines.push('');
+    if (aiData.skills.technical?.length || aiData.skills.tools?.length || aiData.skills.ai?.length) {
+      lines.push('TECHNICAL SKILLS');
+      lines.push('---');
+      const techAll = [
+        ...(aiData.skills.technical || []),
+        ...(aiData.skills.tools || []),
+        ...(aiData.skills.ai || [])
+      ].map(s => s.trim()).filter(Boolean);
+      lines.push(techAll.join(' | '));
+      lines.push('');
+    }
+    if (aiData.skills.soft?.length) {
+      lines.push('CORE COMPETENCIES');
+      lines.push('---');
+      lines.push(aiData.skills.soft.map(s => s.trim()).filter(Boolean).join(' | '));
+      lines.push('');
+    }
   }
   return lines.join('\n');
 }
@@ -1266,7 +1322,6 @@ function runCompletenessCheck(data) {
   // Market-specific checks
   if (market === 'india') {
     checks.push({ label: 'CTC (India)', pass: !!data.ctc?.trim(), hint: 'Current CTC is expected on Indian resumes — missing this reduces Market Fit score.', warn: true });
-    checks.push({ label: 'Notice Period (India)', pass: !!data.notice?.trim(), hint: 'Notice period is a standard field on Indian resumes.', warn: true });
   }
   if (market === 'gulf') {
     checks.push({ label: 'Photo (Gulf/UAE)', pass: !!data.photo, hint: 'A professional photo is required for Gulf/UAE applications — missing it costs 25 Market Fit pts.', warn: false });
