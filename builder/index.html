@@ -277,12 +277,13 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg0); 
 }
 .tpl-option:hover {
   border-color: var(--purple2);
-  transform: translateY(-3px);
-  box-shadow: 0 12px 40px rgba(108,92,231,0.2);
+  transform: translateY(-4px);
+  box-shadow: 0 16px 48px rgba(108,92,231,0.25);
 }
 .tpl-option.selected {
   border-color: var(--purple);
-  box-shadow: 0 0 0 4px rgba(108,92,231,0.2);
+  box-shadow: 0 0 0 4px rgba(108,92,231,0.25), 0 8px 32px rgba(108,92,231,0.2);
+  transform: translateY(-2px);
 }
 .tpl-option.selected::after {
   content: '✓';
@@ -385,36 +386,36 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg0); 
 <div class="tpl-picker" id="tpl-picker">
   <div class="tpl-picker-nav">
     <div class="tpl-picker-logo">Resume<span>Forge</span></div>
-    <div class="tpl-picker-step">Step 1 of 2 — Choose your template</div>
+    <div class="tpl-picker-step">Step 1 of 2 — Pick your AI resume template</div>
   </div>
 
   <div class="tpl-picker-body">
-    <div class="tpl-picker-headline">Choose your resume style</div>
-    <div class="tpl-picker-sub">All templates are ATS-optimised and built for the Indian market. Click any to preview with a real sample.</div>
+    <div class="tpl-picker-headline">Choose your AI resume style</div>
+    <div class="tpl-picker-sub">All 7 templates are ATS-optimised, built for Naukri & LinkedIn India. Click any to preview — AI fills it with your data.</div>
 
     <div class="tpl-picker-grid" id="tpl-picker-grid">
 
-      <!-- T1: Classic Naukri -->
+      <!-- T1: India Standard -->
       <div class="tpl-option selected" data-id="classic" onclick="pickerSelect('classic',this)">
         <div class="tpl-preview-frame">
           <div class="tpl-preview-inner" id="tpl-pre-classic"></div>
         </div>
         <div class="tpl-meta">
-          <div class="tpl-meta-name">Classic Naukri</div>
-          <div class="tpl-meta-desc">Single column · Navy headings · Gold accents</div>
-          <span class="tpl-meta-badge">Most Used · 70% of India</span>
+          <div class="tpl-meta-name">India Standard</div>
+          <div class="tpl-meta-desc">Clean single-column · Navy headings · Gold accents</div>
+          <span class="tpl-meta-badge" style="background:rgba(0,200,150,0.12);color:#00C896;border-color:rgba(0,200,150,0.25);">⭐ Most Popular · 70% of India</span>
         </div>
       </div>
 
-      <!-- T2: Modern IT -->
+      <!-- T2: Tech Pro -->
       <div class="tpl-option" data-id="modern" onclick="pickerSelect('modern',this)">
         <div class="tpl-preview-frame">
           <div class="tpl-preview-inner" id="tpl-pre-modern"></div>
         </div>
         <div class="tpl-meta">
-          <div class="tpl-meta-name">Modern IT</div>
-          <div class="tpl-meta-desc">Dark sidebar · Skills on left · Experience on right</div>
-          <span class="tpl-meta-badge">FAANG · Product Companies</span>
+          <div class="tpl-meta-name">Tech Pro</div>
+          <div class="tpl-meta-desc">Dark sidebar · Skills left · Experience right</div>
+          <span class="tpl-meta-badge" style="background:rgba(96,165,250,0.12);color:#60A5FA;border-color:rgba(96,165,250,0.25);">🔥 FAANG · Startups · Product</span>
         </div>
       </div>
 
@@ -424,9 +425,9 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg0); 
           <div class="tpl-preview-inner" id="tpl-pre-corporate"></div>
         </div>
         <div class="tpl-meta">
-          <div class="tpl-meta-name">Corporate / BFSI</div>
-          <div class="tpl-meta-desc">Deep blue · Left accent borders · Formal tone</div>
-          <span class="tpl-meta-badge">Consulting · Banking · Finance</span>
+          <div class="tpl-meta-name">Corporate</div>
+          <div class="tpl-meta-desc">Deep blue · Accent borders · Formal</div>
+          <span class="tpl-meta-badge">Banking · Consulting · Finance</span>
         </div>
       </div>
 
@@ -442,15 +443,15 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg0); 
         </div>
       </div>
 
-      <!-- T5: Fresh Graduate -->
+      <!-- T5: Campus -->
       <div class="tpl-option" data-id="fresher" onclick="pickerSelect('fresher',this)">
         <div class="tpl-preview-frame">
           <div class="tpl-preview-inner" id="tpl-pre-fresher"></div>
         </div>
         <div class="tpl-meta">
-          <div class="tpl-meta-name">Fresh Graduate</div>
-          <div class="tpl-meta-desc">Education first · CGPA badge · Projects prominent</div>
-          <span class="tpl-meta-badge">0–2 Years · Campus · IIT/NIT</span>
+          <div class="tpl-meta-name">Campus</div>
+          <div class="tpl-meta-desc">Education first · CGPA · Projects up front</div>
+          <span class="tpl-meta-badge">0–2 Years · Fresher · Campus</span>
         </div>
       </div>
 
@@ -461,21 +462,21 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg0); 
         </div>
         <div class="tpl-meta">
           <div class="tpl-meta-name">Creative</div>
-          <div class="tpl-meta-desc">Purple gradient header · Pill skills · Modern feel</div>
-          <span class="tpl-meta-badge">Marketing · Brand · Product</span>
+          <div class="tpl-meta-desc">Gradient header · Pill skills · Bold feel</div>
+          <span class="tpl-meta-badge">Marketing · Design · Brand</span>
         </div>
       </div>
 
 
-      <!-- T7: IIT / Premier Institute -->
+      <!-- T7: Premier Institute -->
       <div class="tpl-option" data-id="iit" onclick="pickerSelect('iit',this)">
         <div class="tpl-preview-frame">
           <div class="tpl-preview-inner" id="tpl-pre-iit"></div>
         </div>
         <div class="tpl-meta">
-          <div class="tpl-meta-name">IIT / Premier Institute</div>
-          <div class="tpl-meta-desc">B&W · Times New Roman · Education first</div>
-          <span class="tpl-meta-badge">IIT · NIT · BITS · Top Campus</span>
+          <div class="tpl-meta-name">Premier Institute</div>
+          <div class="tpl-meta-desc">B&W · Classic serif · Academic format</div>
+          <span class="tpl-meta-badge">IIT · NIT · BITS · Top Campuses</span>
         </div>
       </div>
 
@@ -485,20 +486,20 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg0); 
   <div class="tpl-picker-footer">
     <div>
       <div class="tpl-selected-label">Selected template</div>
-      <div class="tpl-selected-name" id="tpl-selected-name">Classic Naukri</div>
+      <div class="tpl-selected-name" id="tpl-selected-name">India Standard</div>
     </div>
     <button class="btn-use-template" onclick="confirmTemplate()">
-      Use This Template <span class="arrow">→</span>
+      Start Building with AI <span class="arrow">→</span>
     </button>
   </div>
 </div>
 
 <nav class="nav">
-  <div class="nav-logo">Resume<span>Forge</span></div>
+  <div class="nav-logo">Resume<span>Forge</span></div><span style="font-size:10px;font-weight:600;padding:3px 8px;border-radius:5px;background:#F0EDFF;color:#6C5CE7;border:1px solid rgba(108,92,231,0.2);letter-spacing:0.05em;">AI POWERED</span>
   <div class="nav-right">
     <a href="/" class="nav-home">← Home</a>
     <button class="change-tpl-btn" onclick="showTemplatePicker()" id="change-tpl-btn" style="display:none;">✦ Change Template</button>
-    <span class="nav-badge" id="market-chip">🇮🇳 India Mode</span>
+    <span class="nav-badge" id="market-chip">🇮🇳 India</span>
     <span class="nav-badge-blue" id="mode-chip">Form Builder</span>
   </div>
 </nav>
@@ -524,7 +525,7 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg0); 
       <div class="mode-label">Builder Mode</div>
       <div class="mode-tabs">
         <button class="mode-tab active" onclick="setMode('form',this)">📝 Form Builder</button>
-        <button class="mode-tab" onclick="setMode('ai',this)">🤖 AI Rewrite</button>
+        <button class="mode-tab" onclick="setMode('ai',this)">✦ AI Rewrite</button>
       </div>
     </div>
 
@@ -540,7 +541,7 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg0); 
     </div>
 
     <div class="sidebar-actions">
-      <button class="btn btn-primary" onclick="generateResume()">✨ Generate Resume</button>
+      <button class="btn btn-primary" onclick="generateResume()">⚡ Generate with AI</button>
       <div class="export-row">
         <button class="btn btn-secondary btn-sm" onclick="exportPDF()" style="flex:1">⬇ PDF</button>
         <button class="btn btn-secondary btn-sm" onclick="exportDOCX()" style="flex:1">⬇ DOCX</button>
@@ -770,7 +771,7 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg0); 
           <!-- India specific -->
           <div style="display:flex;gap:8px;margin-top:1.5rem;">
             <button class="btn btn-secondary" onclick="prevSection('skills')">← Back</button>
-            <button class="btn btn-primary" onclick="generateResume()" style="width:auto;padding:10px 28px">✨ Generate Resume</button>
+            <button class="btn btn-primary" onclick="generateResume()" style="width:auto;padding:10px 28px">⚡ Generate with AI</button>
           </div>
         </div>
 
@@ -854,7 +855,7 @@ Looking for senior dev roles in product companies"></textarea>
       <div class="resume-loading">
         <div style="font-size:32px;">📄</div>
         <div style="font-size:14px;font-weight:500;color:var(--text);">Your resume will appear here</div>
-        <div style="font-size:12px;color:var(--text3);">Fill the form and click Generate Resume</div>
+        <div style="font-size:12px;color:var(--text3);">Fill the form and click Generate with AI</div>
       </div>
     </div>
 
@@ -961,7 +962,7 @@ const SAMPLE_DATA = {
   ]
 };
 
-const TPL_NAMES = { classic:'Classic Naukri', modern:'Modern IT', corporate:'Corporate / BFSI', executive:'Executive', fresher:'Fresh Graduate', creative:'Creative', iit:'IIT / Premier Institute' };
+const TPL_NAMES = { classic:'India Standard', modern:'Tech Pro', corporate:'Corporate', executive:'Executive', fresher:'Campus', creative:'Creative', iit:'Premier Institute' };
 
 function renderPickerPreviews() {
   const renderers = { classic:renderClassic, modern:renderModern, corporate:renderCorporate, executive:renderExecutive, fresher:renderFresher, creative:renderCreative, iit:renderIIT };
@@ -2031,18 +2032,32 @@ function showATS() {
 function exportPDF() {
   if (!generatedHTML) { showToast('Generate your resume first', 'error'); return; }
   const win = window.open('', '_blank');
-  win.document.write(`<!DOCTYPE html><html><head>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <style>
-      :root { --navy:#0F1B2D; --gold:#C9953A; --cream:#F8F4EE; --cream2:#F0EAE0; --text:#1A1A2E; --text2:#4A5568; --text3:#8A9BB0; --border:#E2D9CE; --green:#1B6B47; --blue:#1E40AF; --blue-bg:#EFF6FF; }
-      * { box-sizing:border-box; margin:0; padding:0; }
-      body { font-family:'DM Sans',sans-serif; }
-      @media print { @page { margin: 0; } body { margin: 1.6cm; } }
-      ${document.querySelector('style').textContent.split('/* ── TOP NAV')[0]}
-    </style>
-  </head><body>${generatedHTML}<script>window.onload=()=>window.print()<\/script></body></html>`);
+  if (!win) { showToast('Pop-up blocked — allow pop-ups and try again', 'error'); return; }
+  const styles = `
+    :root{--navy:#0F1B2D;--gold:#C9953A;--cream:#F8F4EE;--cream2:#F0EAE0;--text:#1A1A2E;--text2:#4A5568;--text3:#8A9BB0;--border-r:#E2D9CE;--green:#1B6B47;--blue:#1E40AF;--blue-bg:#EFF6FF;}
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'DM Sans',sans-serif;background:#f4f4f4;}
+    .print-wrap{max-width:794px;margin:0 auto;background:#fff;box-shadow:0 2px 20px rgba(0,0,0,0.15);}
+    .print-bar{background:#6C5CE7;color:#fff;padding:14px 28px;display:flex;align-items:center;justify-content:space-between;font-family:sans-serif;}
+    .print-bar-title{font-size:14px;font-weight:600;}
+    .print-bar-sub{font-size:12px;opacity:0.75;margin-top:2px;}
+    .print-btn{background:#fff;color:#6C5CE7;border:none;padding:10px 22px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:sans-serif;}
+    .print-btn:hover{background:#f0edff;}
+    @media print{.print-bar{display:none;}body{background:#fff;}.print-wrap{box-shadow:none;max-width:100%;margin:0;}}
+    @page{margin:0;}
+  `;
+  win.document.write('<!DOCTYPE html><html><head>'
+    + '<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">'
+    + '<style>' + styles + '</style>'
+    + '</head><body>'
+    + '<div class="print-bar">'
+    + '<div><div class="print-bar-title">ResumeForge — AI Resume</div><div class="print-bar-sub">Click "Save as PDF" in the print dialog</div></div>'
+    + '<button class="print-btn" onclick="window.print()">🖨 Save as PDF</button>'
+    + '</div>'
+    + '<div class="print-wrap">' + generatedHTML + '</div>'
+    + '</body></html>');
   win.document.close();
-  showToast('PDF export opened — use browser Print → Save as PDF', 'success');
+  showToast('✓ PDF window opened — click "Save as PDF"', 'success');
 }
 
 function exportDOCX() {
@@ -2292,3 +2307,4 @@ function renderChecklist(data) {
 </script>
 </body>
 </html>
+
