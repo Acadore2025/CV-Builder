@@ -792,11 +792,7 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg0); 
             <div class="field"><label>Years of Experience</label><input id="f-years" placeholder="5"></div>
           </div>
 
-          <!-- India-specific -->
-          <div class="field-grid market-field india-field" id="india-fields">
-            <div class="field"><label>Current CTC (₹ LPA)</label><input id="f-ctc" placeholder="12 LPA"><div class="hint">Cost to Company — expected on Indian resumes</div></div>
-            <div class="field"><label>Expected CTC (₹ LPA)</label><input id="f-ectc" placeholder="18 LPA"></div>
-          </div>
+
 
           <!-- Gulf-specific -->
           <div class="field-grid market-field gulf-field" style="display:none">
@@ -1147,12 +1143,12 @@ const SAMPLE_DATA = {
   market: 'india',
   name: 'Jane Doe',
   title: 'Business Analyst',
-  email: 'priya.gautam@example.com',
+  email: 'jane_doe@example.com',
   phone: '+91 99999 00000',
   location: 'Hyderabad, India',
   linkedin: 'linkedin.com/in/priyagautam',
   portfolio: '',
-  ctc: '12 LPA',
+  ctc: '',
   techSkills: 'Python, C++, SQL, Data Analytics, Machine Learning, Power BI, Excel, JIRA, SQL Server, Claude',
   softSkills: 'Stakeholder Management, Strategic Planning, Problem Solving, Communication, Project Management',
   tools: 'Power BI, Excel, JIRA, SQL Server',
@@ -1416,7 +1412,7 @@ function collectFormData() {
     softSkills: v('f-soft-skills'), tools: v('f-tools'), certs: v('f-certs'),
     projects: v('f-projects'), awards: v('f-awards'),
     // market-specific
-    ctc: v('f-ctc'), ectc: v('f-ectc'), naukri: v('f-naukri-headline'),
+    ctc: '', ectc: '', naukri: v('f-naukri-headline'),
     notice: v('f-notice'), aiTools: v('f-ai-tools'),
     nationality: v('f-nationality'), visa: v('f-visa'), dob: v('f-dob'),
     driving: v('f-driving'), languages: v('f-languages'),
@@ -1469,8 +1465,6 @@ ${data.nationality ? 'Nationality: ' + data.nationality : ''}
 ${data.visa ? 'Visa Status: ' + data.visa : ''}
 ${data.dob ? 'Date of Birth: ' + data.dob : ''}
 ${data.driving ? 'Driving License: ' + data.driving : ''}
-${data.ctc ? 'Current CTC: ' + data.ctc : ''}
-${data.ectc ? 'Expected CTC: ' + data.ectc : ''}
 
 PROFESSIONAL SUMMARY:
 ${data.summary || 'Not provided'}
@@ -1647,7 +1641,7 @@ function buildResumeData(data, aiData) {
     tools:       data.tools      || '',
     aiTools:     data.aiTools    || '',
     languages:   data.languages  || '',
-    ctc:         data.ctc        || '',
+    ctc:         '',
     market:      data.market,
     photo:       data.photo,
     nationality: data.nationality || '',
@@ -1729,7 +1723,7 @@ function renderClassic(d) {
   <div style="font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:700;color:#0F1B2D;letter-spacing:-0.5px;">${d.name}</div>
   ${d.title?`<div style="font-size:14px;color:#C9953A;font-weight:500;margin-top:2px;">${d.title}</div>`:''}
   <div style="display:flex;flex-wrap:wrap;gap:14px;font-size:12px;color:#4A5568;padding:10px 0 12px;border-bottom:2px solid #0F1B2D;margin-bottom:16px;">
-    ${d.email?`<span>✉ ${d.email}</span>`:''}${d.phone?`<span>📱 ${d.phone}</span>`:''}${d.location?`<span>📍 ${d.location}</span>`:''}${d.linkedin?`<span>🔗 ${d.linkedin.replace(/https?:\/\//,'')}</span>`:''}${d.ctc?`<span>💰 CTC: ${d.ctc}</span>`:''}
+    ${d.email?`<span>✉ ${d.email}</span>`:''}${d.phone?`<span>📱 ${d.phone}</span>`:''}${d.location?`<span>📍 ${d.location}</span>`:''}${d.linkedin?`<span>🔗 ${d.linkedin.replace(/https?:\/\//,'')}</span>`:''}
   </div>`;
 
   if (d.summary)     h += sec('Professional Summary', `<div style="font-size:13px;color:#4A5568;line-height:1.7;">${d.summary}</div>`);
@@ -1762,7 +1756,7 @@ function renderModern(d) {
       ${d.phone?`<div style="margin-bottom:4px;">📱 ${d.phone}</div>`:''}
       ${d.location?`<div style="margin-bottom:4px;">📍 ${d.location}</div>`:''}
       ${d.linkedin?`<div style="word-break:break-all;">🔗 ${d.linkedin.replace(/https?:\/\//,'')}</div>`:''}
-      ${d.ctc?`<div style="margin-top:4px;">💰 CTC: ${d.ctc}</div>`:''}
+      
     </div>
     ${tech.length?`<div style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#C9953A;margin-bottom:8px;">Technical Skills</div><div style="font-size:11px;color:rgba(255,255,255,0.75);line-height:1.9;">${tech.join('<br>')}</div>`:''}
     ${soft.length?`<div style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#C9953A;margin-top:14px;margin-bottom:8px;">Competencies</div><div style="font-size:11px;color:rgba(255,255,255,0.75);line-height:1.9;">${soft.join('<br>')}</div>`:''}
@@ -1815,7 +1809,7 @@ function renderCorporate(d) {
     <div style="font-size:26px;font-weight:700;color:#1E3A5F;letter-spacing:-0.3px;">${d.name}</div>
     ${d.title?`<div style="font-size:13px;color:#1E3A5F;font-weight:500;margin-top:3px;opacity:0.7;">${d.title}</div>`:''}
     <div style="display:flex;flex-wrap:wrap;gap:16px;font-size:11.5px;color:#4A5568;margin-top:8px;">
-      ${d.email?`<span>${d.email}</span>`:''}${d.phone?`<span>${d.phone}</span>`:''}${d.location?`<span>${d.location}</span>`:''}${d.linkedin?`<span>${d.linkedin.replace(/https?:\/\//,'')}</span>`:''}${d.ctc?`<span>CTC: ${d.ctc}</span>`:''}
+      ${d.email?`<span>${d.email}</span>`:''}${d.phone?`<span>${d.phone}</span>`:''}${d.location?`<span>${d.location}</span>`:''}${d.linkedin?`<span>${d.linkedin.replace(/https?:\/\//,'')}</span>`:''}
     </div>
   </div>`;
 
@@ -1859,7 +1853,7 @@ function renderExecutive(d) {
     <div style="font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:700;color:#fff;letter-spacing:-1px;">${d.name}</div>
     ${d.title?`<div style="font-size:15px;color:#C9953A;font-weight:500;margin-top:4px;">${d.title}</div>`:''}
     <div style="display:flex;flex-wrap:wrap;gap:18px;font-size:12px;color:rgba(255,255,255,0.65);margin-top:12px;">
-      ${d.email?`<span>${d.email}</span>`:''}${d.phone?`<span>${d.phone}</span>`:''}${d.location?`<span>${d.location}</span>`:''}${d.linkedin?`<span>${d.linkedin.replace(/https?:\/\//,'')}</span>`:''}${d.ctc?`<span>CTC: ${d.ctc}</span>`:''}
+      ${d.email?`<span>${d.email}</span>`:''}${d.phone?`<span>${d.phone}</span>`:''}${d.location?`<span>${d.location}</span>`:''}${d.linkedin?`<span>${d.linkedin.replace(/https?:\/\//,'')}</span>`:''}
     </div>
   </div>
   <div style="padding:32px 48px;">`;
@@ -2080,7 +2074,7 @@ function renderResume(data, aiData, rawText) {
   // Gulf specific
   if (data.market === 'gulf' && data.nationality) html += `<span>🌍 ${data.nationality}</span>`;
   if (data.market === 'gulf' && data.visa) html += `<span>📋 ${data.visa}</span>`;
-  if (data.market === 'india' && data.ctc) html += `<span>💰 CTC: ${data.ctc}</span>`;
+
   html += `</div>`;
 
   if (data.market === 'gulf' && data.photo) { html += `</div></div>`; }
@@ -2400,9 +2394,6 @@ function runCompletenessCheck(data) {
   });
 
   // Market-specific checks
-  if (market === 'india') {
-    checks.push({ label: 'CTC (India)', pass: !!data.ctc?.trim(), hint: 'Current CTC is expected on Indian resumes — missing this reduces Market Fit score.', warn: true });
-  }
   if (market === 'gulf') {
     checks.push({ label: 'Photo (Gulf/UAE)', pass: !!data.photo, hint: 'A professional photo is required for Gulf/UAE applications — missing it costs 25 Market Fit pts.', warn: false });
     checks.push({ label: 'Nationality (Gulf/UAE)', pass: !!data.nationality?.trim(), hint: 'Nationality is mandatory on Gulf applications.', warn: false });
@@ -2449,7 +2440,7 @@ function buildCompletenessChecklist(data) {
   if (!data.phone) items.push({section:'Personal', status:'missing', icon:'❌', text:'<strong>Phone number is missing</strong>'});
   if (!data.location) items.push({section:'Personal', status:'warn', icon:'⚠️', text:'<strong>City/Location not added</strong> — helps recruiters filter by geography'});
   if (!data.linkedin) items.push({section:'Personal', status:'warn', icon:'⚠️', text:'<strong>LinkedIn URL missing</strong> — 87% of recruiters check LinkedIn before calling'});
-  if (data.market==='india' && !data.ctc) items.push({section:'Personal', status:'warn', icon:'⚠️', text:'<strong>Current CTC not added</strong> — expected on Indian resumes'});
+
   if (data.market==='india' && !data.notice) items.push({section:'Personal', status:'warn', icon:'⚠️', text:'<strong>Notice period not added</strong> — recruiters always ask this upfront'});
   if (data.market==='gulf' && !data.nationality) items.push({section:'Personal', status:'missing', icon:'❌', text:'<strong>Nationality is missing</strong> — mandatory on all Gulf/UAE applications'});
   if (data.market==='gulf' && !data.visa) items.push({section:'Personal', status:'missing', icon:'❌', text:'<strong>Visa status is missing</strong> — mandatory on Gulf applications'});
@@ -2641,7 +2632,7 @@ function rfFillForm(data) {
   set('f-tech-skills', data.techSkills); set('f-soft-skills', data.softSkills);
   set('f-tools', data.tools); set('f-ai-tools', data.aiTools);
   set('f-certs', data.certs); set('f-projects', data.projects);
-  set('f-awards', data.awards); set('f-ctc', data.ctc); set('f-ectc', data.ectc);
+  set('f-awards', data.awards);
   set('f-nationality', data.nationality); set('f-languages', data.languages);
   var expList = document.getElementById('experience-list');
   if (expList && data.experience && data.experience.length) {
@@ -2688,7 +2679,7 @@ function rfCollectData() {
     years: g('f-years'), summary: g('f-summary'), naukri: g('f-naukri-headline'),
     techSkills: g('f-tech-skills'), softSkills: g('f-soft-skills'), tools: g('f-tools'),
     aiTools: g('f-ai-tools'), certs: g('f-certs'), projects: g('f-projects'),
-    awards: g('f-awards'), ctc: g('f-ctc'), ectc: g('f-ectc'),
+    awards: g('f-awards'), ctc: '', ectc: '',
     nationality: g('f-nationality'), languages: g('f-languages'),
     market: currentMarket,
     experience: Array.from(document.querySelectorAll('#experience-list .entry-card')).map(function(card) {
