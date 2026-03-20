@@ -653,7 +653,7 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg0); 
     <button style="font-size:11px;color:var(--purple2);background:rgba(108,92,231,0.1);border:1px solid rgba(108,92,231,0.2);border-radius:6px;padding:5px 11px;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.15s;" onclick="rfShowDashboard()">⊞ My Resumes</button>
     <span class="rf-autosave-indicator" id="rf-autosave-indicator">✓ Saved</span>
     <button class="change-tpl-btn" onclick="showTemplatePicker()" id="change-tpl-btn" style="display:none;">✦ Change Template</button>
-    <span class="nav-badge" id="market-chip">🇮🇳 India</span>
+    
     <span class="nav-badge-blue" id="mode-chip">Form Builder</span>
   </div>
 </nav>
@@ -664,15 +664,8 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg0); 
   <!-- SIDEBAR -->
   <aside class="sidebar">
     <div class="sidebar-header">
-      <div class="sidebar-title">Select your target market</div>
-      <div class="sidebar-sub">Format, fields & ATS rules adapt automatically</div>
-    </div>
-
-    <div class="market-grid">
-      <button class="market-btn active" onclick="setMarket('india',this)"><span class="flag">🇮🇳</span>India</button>
-      <button class="market-btn" onclick="setMarket('us',this)"><span class="flag">🇺🇸</span>United States</button>
-      <button class="market-btn" onclick="setMarket('gulf',this)"><span class="flag">🇦🇪</span>Gulf / UAE</button>
-      <button class="market-btn" onclick="setMarket('europe',this)"><span class="flag">🇪🇺</span>Europe</button>
+      <div class="sidebar-title">AI Resume Builder</div>
+      <div class="sidebar-sub">Fill in your details — AI crafts a world-class resume</div>
     </div>
 
     <div class="mode-toggle">
@@ -754,9 +747,9 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg0); 
           </div>
 
           <!-- India-specific -->
-          <div class="field-grid market-field india-field" id="india-fields">
-            <div class="field"><label>Current CTC (₹ LPA)</label><input id="f-ctc" placeholder="12 LPA"><div class="hint">Cost to Company — expected on Indian resumes</div></div>
-            <div class="field"><label>Expected CTC (₹ LPA)</label><input id="f-ectc" placeholder="18 LPA"></div>
+          <div class="field-grid">
+            <div class="field"><label>Current Salary (optional)</label><input id="f-ctc" placeholder="e.g. 12 LPA / $80K / €60K"><div class="hint">Include if comfortable — helps recruiters assess fit</div></div>
+            <div class="field"><label>Expected Salary (optional)</label><input id="f-ectc" placeholder="e.g. 18 LPA / $100K"></div>
           </div>
 
           <!-- Gulf-specific -->
@@ -1002,7 +995,8 @@ Looking for senior dev roles in product companies"></textarea>
 
     <!-- PREVIEW -->
     <div class="preview-header">
-      <span class="preview-title">Live Preview</span>
+      <button class="preview-btn" style="background:#F0EDFF;color:var(--purple);border:1px solid rgba(108,92,231,0.2);" onclick="goBackToEdit()">← Edit Resume</button>
+      <span class="preview-title" style="flex:1;text-align:center;">Live Preview</span>
       <div class="preview-actions">
         <button class="preview-btn pdf" onclick="exportPDF()">⬇ PDF</button>
         <button class="preview-btn docx" onclick="exportDOCX()">⬇ DOCX</button>
@@ -1010,6 +1004,12 @@ Looking for senior dev roles in product companies"></textarea>
       </div>
     </div>
 
+    <!-- Restore banner — shown when data is restored from saved version -->
+    <div id="restore-banner" style="display:none;margin:16px 28px 0;background:rgba(108,92,231,0.08);border:1px solid rgba(108,92,231,0.25);border-radius:10px;padding:14px 18px;display:none;align-items:center;gap:14px;flex-wrap:wrap;">
+      <span style="font-size:13px;color:var(--off);flex:1;">✦ Your resume data was restored. Click Generate to rebuild your resume.</span>
+      <button onclick="generateResume()" style="padding:9px 20px;background:var(--purple);color:#fff;border:none;border-radius:7px;font-size:13px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;">⚡ Generate Now</button>
+      <button onclick="document.getElementById('restore-banner').style.display='none'" style="padding:9px 14px;background:transparent;color:var(--muted);border:1px solid var(--border2);border-radius:7px;font-size:12px;font-family:'Inter',sans-serif;cursor:pointer;">Dismiss</button>
+    </div>
     <div id="resume-preview">
       <div class="resume-loading">
         <div style="font-size:32px;">📄</div>
@@ -1055,6 +1055,8 @@ Looking for senior dev roles in product companies"></textarea>
 
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
+<!-- Hidden print iframe -->
+<iframe id="print-iframe" style="display:none;position:fixed;top:-9999px;left:-9999px;width:0;height:0;" title="print"></iframe>
 
 <script>
 // ── STATE ──────────────────────────────────────────────────────────────
@@ -1177,7 +1179,7 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 
-let currentMarket = 'india';
+let currentMarket = 'global';
 let currentMode = 'form';
 let currentTemplate = 'classic';
 let photoDataUrl = null;
@@ -1201,10 +1203,11 @@ let generatedATS = '';
 function setMarket(market, btn) {
   currentMarket = market;
   document.querySelectorAll('.market-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  const labels = { india:'🇮🇳 India Mode', us:'🇺🇸 US Mode', gulf:'🇦🇪 Gulf Mode', europe:'🇪🇺 Europe Mode' };
-  document.getElementById('market-chip').textContent = labels[market];
-  document.getElementById('ai-market-label').textContent = labels[market].replace(' Mode','');
+  if (btn) btn.classList.add('active');
+  const chip = document.getElementById('market-chip');
+  if (chip) chip.textContent = market;
+  const aml = document.getElementById('ai-market-label');
+  if (aml) aml.textContent = market;
 
   // Show/hide market-specific fields
   ['india','us','gulf','europe'].forEach(m => {
@@ -1370,16 +1373,9 @@ function v(id) { return document.getElementById(id)?.value || ''; }
 
 // ── BUILD PROMPT ───────────────────────────────────────────────────────
 function buildPrompt(data) {
-  const marketInstructions = {
-    india: `TARGET MARKET: India. Rules: (1) Show CGPA not GPA, (2) Include CTC/Expected CTC if provided, (3) Show Notice Period if provided, (4) 2-page format is acceptable, (5) Optimize for Naukri.com keyword density, (6) Include Naukri headline if provided, (7) Use Indian date format.`,
-    us: `TARGET MARKET: United States. Rules: (1) STRICT 1-page format (experienced professionals max 2 pages), (2) Show GPA only if above 3.5, (3) No photo, no age, no nationality, (4) Optimize for Workday/Greenhouse/Taleo ATS systems, (5) Use strong action verbs, (6) Every bullet must have a metric or number.`,
-    gulf: `TARGET MARKET: UAE / Gulf. Rules: (1) Include photo section placeholder, (2) Show nationality, visa status, date of birth, driving license if provided, (3) Include languages section prominently, (4) Optimize for Bayt.com and GulfTalent.com, (5) 2-3 page format acceptable, (6) Include expected salary if provided.`,
-    europe: `TARGET MARKET: Europe. Rules: (1) Follow Europass-inspired structure, (2) Include nationality and work authorization, (3) 2-page format standard, (4) No photo recommended unless creative role, (5) Include language proficiency levels, (6) EU date format DD/MM/YYYY.`
-  };
-
   return `You are a world-class resume writer with 35 years of experience creating winning resumes. Generate a COMPLETE, polished resume for the following person.
 
-${marketInstructions[data.market]}
+GLOBAL STANDARD: Write for maximum ATS compatibility worldwide. Rules: (1) Use strong action verbs on every bullet, (2) Include quantified metrics wherever possible (%, numbers, $, time saved), (3) 1-2 page format standard, (4) Standard section headings (Experience, Education, Skills, Summary, Certifications), (5) Include all provided data fields — salary, languages, certifications, nationality if given, (6) Optimize keyword density for the target role.
 
 CANDIDATE DATA:
 Name: ${data.name || 'Not provided'}
@@ -1416,11 +1412,14 @@ AWARDS: ${data.awards || 'None'}
 ${data.naukri ? 'Naukri Headline: ' + data.naukri : ''}
 
 INSTRUCTIONS:
-1. Enhance bullet points with stronger action verbs and quantified metrics where plausible
-2. Rewrite the summary to be compelling and market-specific
-3. Ensure ATS-safe language with relevant keywords
-4. Preserve the candidate's authentic voice — don't make it sound generic
-5. Return ONLY a JSON object (no markdown, no backticks) with this exact structure:
+1. CRITICAL: Include ALL experience entries, ALL education entries, ALL projects. Never drop any entry.
+2. CRITICAL: For each experience entry, include ALL bullet points provided. If a bullet is very long (over 200 chars), summarise it intelligently to 1-2 concise lines — but never omit it.
+3. CRITICAL: If there are multiple projects, include every single one in the projects array. Do not truncate.
+4. Enhance bullet points with stronger action verbs and quantified metrics where plausible.
+5. Rewrite the summary to be compelling and impactful.
+6. Ensure ATS-safe language with relevant keywords for the target role.
+7. Preserve the candidate's authentic voice — don't make it sound generic.
+8. Return ONLY a JSON object (no markdown, no backticks) with this exact structure:
 {
   "summary": "enhanced summary text",
   "experience": [{"title":"","company":"","start":"","end":"","location":"","bullets":["bullet1","bullet2","bullet3","bullet4"]}],
@@ -1570,11 +1569,16 @@ function buildResumeData(data, aiData) {
 }
 
 function expHTML(exp) {
-  const bullets = exp.bullets
+  const rawBullets = exp.bullets
     ? (Array.isArray(exp.bullets) ? exp.bullets : exp.bullets.split('\n').filter(b=>b.trim()))
     : [];
+  // Include ALL bullets — trim excessively long ones to 220 chars max but never drop
+  const bullets = rawBullets.map(b => {
+    const clean = b.replace(/^[•\-\*o]\s*/,'').trim();
+    return clean.length > 220 ? clean.slice(0, 217) + '...' : clean;
+  }).filter(Boolean);
   const bHTML = bullets.length
-    ? '<ul>' + bullets.map(b=>`<li>${b.replace(/^[•\-\*o]\s*/,'').trim()}</li>`).join('') + '</ul>'
+    ? '<ul>' + bullets.map(b=>`<li>${b}</li>`).join('') + '</ul>'
     : '';
   const dates = [exp.start, exp.end].filter(Boolean).join(' – ');
   return `<div class="resume-entry">
@@ -2190,33 +2194,44 @@ function showATS() {
 // ── EXPORT FUNCTIONS ───────────────────────────────────────────────────
 function exportPDF() {
   if (!generatedHTML) { showToast('Generate your resume first', 'error'); return; }
-  const win = window.open('', '_blank');
-  if (!win) { showToast('Pop-up blocked — allow pop-ups and try again', 'error'); return; }
-  const styles = `
-    :root{--navy:#0F1B2D;--gold:#C9953A;--cream:#F8F4EE;--cream2:#F0EAE0;--text:#1A1A2E;--text2:#4A5568;--text3:#8A9BB0;--border-r:#E2D9CE;--green:#1B6B47;--blue:#1E40AF;--blue-bg:#EFF6FF;}
-    *{box-sizing:border-box;margin:0;padding:0;}
-    body{font-family:'DM Sans',sans-serif;background:#f4f4f4;}
-    .print-wrap{max-width:794px;margin:0 auto;background:#fff;box-shadow:0 2px 20px rgba(0,0,0,0.15);}
-    .print-bar{background:#6C5CE7;color:#fff;padding:14px 28px;display:flex;align-items:center;justify-content:space-between;font-family:sans-serif;}
-    .print-bar-title{font-size:14px;font-weight:600;}
-    .print-bar-sub{font-size:12px;opacity:0.75;margin-top:2px;}
-    .print-btn{background:#fff;color:#6C5CE7;border:none;padding:10px 22px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:sans-serif;}
-    .print-btn:hover{background:#f0edff;}
-    @media print{.print-bar{display:none;}body{background:#fff;}.print-wrap{box-shadow:none;max-width:100%;margin:0;}}
-    @page{margin:0;}
-  `;
-  win.document.write('<!DOCTYPE html><html><head>'
-    + '<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">'
-    + '<style>' + styles + '</style>'
-    + '</head><body>'
-    + '<div class="print-bar">'
-    + '<div><div class="print-bar-title">ResumeForge — AI Resume</div><div class="print-bar-sub">Click "Save as PDF" in the print dialog</div></div>'
-    + '<button class="print-btn" onclick="window.print()">🖨 Save as PDF</button>'
-    + '</div>'
-    + '<div class="print-wrap">' + generatedHTML + '</div>'
-    + '</body></html>');
-  win.document.close();
-  showToast('✓ PDF window opened — click "Save as PDF"', 'success');
+  const iframe = document.getElementById('print-iframe');
+  if (!iframe) { showToast('Print not available', 'error'); return; }
+  const styles = [
+    ':root{--navy:#0F1B2D;--gold:#C9953A;--cream:#F8F4EE;--cream2:#F0EAE0;--text:#1A1A2E;',
+    '--text2:#4A5568;--text3:#8A9BB0;--border-r:#E2D9CE;--green:#1B6B47;}',
+    '*{box-sizing:border-box;margin:0;padding:0;}',
+    'body{font-family:Inter,sans-serif;background:#fff;margin:0;}',
+    '@media print{@page{margin:1.2cm;size:A4;}body{-webkit-print-color-adjust:exact;}}'
+  ].join('');
+  const fonts = '<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">';
+  const content = '<!DOCTYPE html><html><head>' + fonts + '<style>' + styles + '</style></head><body>' + generatedHTML + '</body></html>';
+  iframe.style.display = 'block';
+  iframe.style.position = 'fixed';
+  iframe.style.top = '-9999px';
+  iframe.style.width = '794px';
+  iframe.style.height = '1123px';
+  const doc = iframe.contentDocument || iframe.contentWindow.document;
+  doc.open();
+  doc.write(content);
+  doc.close();
+  showToast('Preparing PDF — print dialog will open shortly...', 'success');
+  setTimeout(function() {
+    try {
+      iframe.contentWindow.focus();
+      iframe.contentWindow.print();
+    } catch(e) {
+      // Fallback: open in new tab if iframe print blocked
+      const win = window.open('', '_blank');
+      if (win) { win.document.write(content); win.document.close(); setTimeout(function(){ win.print(); }, 500); }
+      else { showToast('Please allow pop-ups for PDF download', 'error'); }
+    }
+    setTimeout(function() {
+      iframe.style.display = 'none';
+      iframe.style.top = '-9999px';
+      iframe.style.width = '0';
+      iframe.style.height = '0';
+    }, 3000);
+  }, 800);
 }
 
 function exportDOCX() {
@@ -2738,7 +2753,7 @@ window.addEventListener('DOMContentLoaded', function() {
     var ver  = null;
     for (var i = 0; i < vers.length; i++) { if (vers[i].id === activeId) { ver = vers[i]; break; } }
     if (ver && ver.data && Object.keys(ver.data).length > 0) {
-      setTimeout(function(){ rfFillForm(ver.data); }, 300);
+      setTimeout(function(){ rfFillForm(ver.data); showRestoreBanner(); }, 300);
       var inp = document.getElementById('rf-ver-name-inp');
       if (inp && ver.name) inp.value = ver.name;
     }
@@ -2898,6 +2913,25 @@ async function extractTemplateDOCX(file) {
     return _origRenderByTemplate(data, aiData);
   };
 })();
+
+
+// FIX 1 — Back to edit button
+function goBackToEdit() {
+  // Scroll to the form section panel that was last active
+  var formBuilder = document.getElementById('form-builder');
+  if (formBuilder) {
+    formBuilder.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // Show the personal section if nothing is active
+    var activePanel = document.querySelector('.section-panel.active');
+    if (!activePanel) showSection('personal', null);
+  }
+}
+
+// FIX 2 — Show restore banner when data is loaded from saved version
+function showRestoreBanner() {
+  var banner = document.getElementById('restore-banner');
+  if (banner) banner.style.display = 'flex';
+}
 
 </script>
 </body>
