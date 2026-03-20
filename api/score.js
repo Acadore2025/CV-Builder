@@ -15,7 +15,7 @@ module.exports = async function handler(req, res) {
       headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01' },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
-        max_tokens: isQuick ? 2000 : 7000,
+        max_tokens: isQuick ? 2000 : 8000,
         temperature: 0,
         messages: [{ role: 'user', content: buildPrompt(resume_text, market, experience_level, target_role, isQuick) }]
       })
@@ -28,10 +28,42 @@ module.exports = async function handler(req, res) {
     let clean = raw.replace(/```json/g,'').replace(/```/g,'').trim();
     const s = clean.indexOf('{'), e = clean.lastIndexOf('}');
     if (s<0||e<0) return res.status(500).json({ error: 'No JSON in response' });
-    try { return res.status(200).json(JSON.parse(clean.slice(s,e+1))); }
-    catch(err) { return res.status(500).json({ error: 'Parse error: '+err.message }); }
+    const jsonStr = clean.slice(s,e+1);
+    try { return res.status(200).json(JSON.parse(jsonStr)); }
+    catch(err) {
+      // Attempt repair: fix unescaped quotes and control characters inside string values
+      try {
+        const repaired = repairJSON(jsonStr);
+        return res.status(200).json(JSON.parse(repaired));
+      } catch(err2) {
+        return res.status(500).json({ error: 'Parse error: '+err.message+' | Repair failed: '+err2.message });
+      }
+    }
   } catch(err) { return res.status(500).json({ error: err.message }); }
 };
+
+
+function repairJSON(str) {
+  // Remove actual newlines/tabs inside string values (between quotes)
+  // Strategy: track if we're inside a string, escape problematic chars
+  let result = '';
+  let inString = false;
+  let escaped = false;
+  for (let i = 0; i < str.length; i++) {
+    const ch = str[i];
+    if (escaped) { result += ch; escaped = false; continue; }
+    if (ch === '\\') { escaped = true; result += ch; continue; }
+    if (ch === '"') { inString = !inString; result += ch; continue; }
+    if (inString) {
+      // Inside a string — escape any bare control chars
+      if (ch === '\n') { result += '\\n'; continue; }
+      if (ch === '\r') { result += '\\r'; continue; }
+      if (ch === '\t') { result += '\\t'; continue; }
+    }
+    result += ch;
+  }
+  return result;
+}
 
 function buildPrompt(resume, market, level, role, isQuick) {
   const mctx = {
