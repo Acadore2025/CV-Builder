@@ -476,6 +476,52 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg0); 
 .tpl-upload-status.ok { color: var(--teal); }
 .tpl-upload-status.err { color: var(--red); }
 
+
+/* ── INLINE SCORE PANEL ──────────────────────────────────────── */
+.score-panel{display:none;margin:0 28px 20px;background:var(--bg1);border:1px solid var(--border2);
+  border-radius:14px;overflow:hidden;}
+.score-panel.show{display:block;}
+.sp-header{padding:16px 20px 14px;border-bottom:1px solid var(--border);display:flex;
+  align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+.sp-title{font-size:14px;font-weight:600;color:var(--off);display:flex;align-items:center;gap:8px;}
+.sp-title-icon{width:22px;height:22px;border-radius:6px;background:rgba(108,92,231,0.15);
+  border:1px solid rgba(108,92,231,0.25);display:flex;align-items:center;justify-content:center;
+  font-size:11px;color:var(--purple2);}
+.sp-loading{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px;}
+.sp-spinner{width:14px;height:14px;border:2px solid rgba(108,92,231,0.2);border-top-color:var(--purple);
+  border-radius:50%;animation:spin 0.8s linear infinite;flex-shrink:0;}
+.sp-overall{display:flex;align-items:center;gap:10px;}
+.sp-ring-wrap{position:relative;width:52px;height:52px;flex-shrink:0;}
+.sp-ring-svg{transform:rotate(-90deg);}
+.sp-ring-text{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:700;letter-spacing:-0.5px;}
+.sp-analyse-btn{font-size:11px;padding:5px 12px;border-radius:6px;border:1px solid rgba(108,92,231,0.25);
+  background:rgba(108,92,231,0.1);color:var(--purple2);cursor:pointer;font-family:'Inter',sans-serif;
+  text-decoration:none;display:inline-flex;align-items:center;gap:4px;white-space:nowrap;transition:all 0.15s;}
+.sp-analyse-btn:hover{background:rgba(108,92,231,0.18);}
+.sp-scores{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;padding:14px 20px;
+  border-bottom:1px solid var(--border);}
+.sp-score-card{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:8px;
+  padding:10px 8px;text-align:center;}
+.sp-score-val{font-size:18px;font-weight:700;letter-spacing:-0.5px;line-height:1;}
+.sp-score-lbl{font-size:10px;color:var(--muted);margin-top:4px;line-height:1.3;}
+.sp-fixes{padding:14px 20px;}
+.sp-fixes-title{font-size:11px;font-weight:600;color:var(--dim);text-transform:uppercase;
+  letter-spacing:0.08em;margin-bottom:10px;}
+.sp-fix-row{display:flex;gap:10px;align-items:flex-start;padding:9px 0;
+  border-bottom:1px solid var(--border);}
+.sp-fix-row:last-child{border-bottom:none;}
+.sp-fix-num{width:20px;height:20px;border-radius:50%;background:rgba(108,92,231,0.15);
+  color:var(--purple2);font-size:10px;font-weight:600;display:flex;align-items:center;
+  justify-content:center;flex-shrink:0;margin-top:1px;}
+.sp-fix-body{flex:1;}
+.sp-fix-label{font-size:12px;font-weight:500;color:var(--off);margin-bottom:3px;}
+.sp-fix-meta{display:flex;gap:6px;align-items:center;flex-wrap:wrap;}
+.sp-fix-dim{font-size:10px;color:var(--muted);padding:1px 6px;border-radius:4px;
+  background:rgba(255,255,255,0.05);border:1px solid var(--border);}
+.sp-fix-pts{font-size:10px;font-weight:600;padding:1px 7px;border-radius:20px;
+  background:rgba(45,212,191,0.08);color:var(--teal);border:1px solid rgba(45,212,191,0.2);}
+
 /* end resume doc styles */
 </style>
 </head>
@@ -747,9 +793,9 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg0); 
           </div>
 
           <!-- India-specific -->
-          <div class="field-grid">
-            <div class="field"><label>Current Salary (optional)</label><input id="f-ctc" placeholder="e.g. 12 LPA / $80K / €60K"><div class="hint">Include if comfortable — helps recruiters assess fit</div></div>
-            <div class="field"><label>Expected Salary (optional)</label><input id="f-ectc" placeholder="e.g. 18 LPA / $100K"></div>
+          <div class="field-grid market-field india-field" id="india-fields">
+            <div class="field"><label>Current CTC (₹ LPA)</label><input id="f-ctc" placeholder="12 LPA"><div class="hint">Cost to Company — expected on Indian resumes</div></div>
+            <div class="field"><label>Expected CTC (₹ LPA)</label><input id="f-ectc" placeholder="18 LPA"></div>
           </div>
 
           <!-- Gulf-specific -->
@@ -989,14 +1035,14 @@ Looking for senior dev roles in product companies"></textarea>
         </div>
 
         <button class="btn btn-primary" style="margin-top:1.5rem;width:auto;padding:12px 32px;font-size:15px;" onclick="runAIRewrite()">🤖 Rewrite with AI →</button>
-        <div style="font-size:12px;color:var(--text3);margin-top:8px;">AI will optimize for your selected market (currently: <span id="ai-market-label">India</span>) and preserve your authentic voice.</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:8px;">AI will optimize for your selected market (global market ready) and preserve your authentic voice.</div>
       </div>
     </div>
 
     <!-- PREVIEW -->
     <div class="preview-header">
-      <button class="preview-btn" style="background:#F0EDFF;color:var(--purple);border:1px solid rgba(108,92,231,0.2);" onclick="goBackToEdit()">← Edit Resume</button>
-      <span class="preview-title" style="flex:1;text-align:center;">Live Preview</span>
+      <button class="preview-btn" onclick="goBackToEdit()" style="background:#F0EDFF;color:var(--purple);border:1px solid rgba(108,92,231,0.2);margin-right:8px;">← Edit Resume</button>
+      <span class="preview-title" id="preview-title-label" style="flex:1;">Live Preview</span>
       <div class="preview-actions">
         <button class="preview-btn pdf" onclick="exportPDF()">⬇ PDF</button>
         <button class="preview-btn docx" onclick="exportDOCX()">⬇ DOCX</button>
@@ -1004,21 +1050,58 @@ Looking for senior dev roles in product companies"></textarea>
       </div>
     </div>
 
-    <!-- Restore banner — shown when data is restored from saved version -->
-    <div id="restore-banner" style="display:none;margin:16px 28px 0;background:rgba(108,92,231,0.08);border:1px solid rgba(108,92,231,0.25);border-radius:10px;padding:14px 18px;display:none;align-items:center;gap:14px;flex-wrap:wrap;">
-      <span style="font-size:13px;color:var(--off);flex:1;">✦ Your resume data was restored. Click Generate to rebuild your resume.</span>
-      <button onclick="generateResume()" style="padding:9px 20px;background:var(--purple);color:#fff;border:none;border-radius:7px;font-size:13px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;">⚡ Generate Now</button>
-      <button onclick="document.getElementById('restore-banner').style.display='none'" style="padding:9px 14px;background:transparent;color:var(--muted);border:1px solid var(--border2);border-radius:7px;font-size:12px;font-family:'Inter',sans-serif;cursor:pointer;">Dismiss</button>
-    </div>
     <div id="resume-preview">
-      <div class="resume-loading">
+      <div class="resume-loading" id="resume-empty-state">
         <div style="font-size:32px;">📄</div>
         <div style="font-size:14px;font-weight:500;color:var(--text);">Your resume will appear here</div>
         <div style="font-size:12px;color:var(--text3);">Fill the form and click Generate with AI</div>
       </div>
+      <div class="resume-loading" id="resume-restore-banner" style="display:none;background:#F0FDF4;border:1px solid rgba(0,200,150,0.3);border-radius:10px;margin:20px 28px;padding:24px;">
+        <div style="font-size:24px;">✓</div>
+        <div style="font-size:14px;font-weight:600;color:#065F46;">Resume data restored</div>
+        <div style="font-size:12px;color:#047857;margin-top:4px;">Your saved information has been loaded back.</div>
+        <button onclick="generateResume()" style="margin-top:14px;padding:10px 24px;background:#6C5CE7;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;">⚡ Regenerate Resume</button>
+      </div>
     </div>
 
     <div id="ats-preview-box" style="display:none;"></div>
+
+
+    <!-- ── INLINE SCORE PANEL ──────────────────────────────── -->
+    <div class="score-panel" id="score-panel">
+      <div class="sp-header">
+        <div class="sp-title">
+          <div class="sp-title-icon">★</div>
+          AI Resume Score
+        </div>
+        <div class="sp-loading" id="sp-loading">
+          <div class="sp-spinner"></div>
+          Scoring your resume...
+        </div>
+        <div class="sp-overall" id="sp-overall" style="display:none;">
+          <div class="sp-ring-wrap">
+            <svg class="sp-ring-svg" width="52" height="52" viewBox="0 0 52 52">
+              <circle fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="4" cx="26" cy="26" r="21"/>
+              <circle id="sp-arc" fill="none" stroke-width="4" stroke-linecap="round"
+                cx="26" cy="26" r="21" stroke-dasharray="131.9" stroke-dashoffset="131.9"/>
+            </svg>
+            <div class="sp-ring-text" id="sp-overall-val">--</div>
+          </div>
+          <div>
+            <div style="font-size:11px;color:var(--muted);">Overall score</div>
+            <div style="font-size:11px;color:var(--dim);margin-top:2px;" id="sp-verdict"></div>
+          </div>
+        </div>
+        <a class="sp-analyse-btn" id="sp-analyse-link" href="/analyser/" target="_blank">
+          Full Analysis ↗
+        </a>
+      </div>
+      <div class="sp-scores" id="sp-scores" style="display:none;"></div>
+      <div class="sp-fixes" id="sp-fixes-wrap" style="display:none;">
+        <div class="sp-fixes-title">Top fixes to improve your score</div>
+        <div id="sp-fixes-list"></div>
+      </div>
+    </div>
 
     <!-- COMPLETENESS CHECKLIST PANEL -->
     <div class="checklist-panel" id="checklist-panel">
@@ -1055,8 +1138,6 @@ Looking for senior dev roles in product companies"></textarea>
 
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
-<!-- Hidden print iframe -->
-<iframe id="print-iframe" style="display:none;position:fixed;top:-9999px;left:-9999px;width:0;height:0;" title="print"></iframe>
 
 <script>
 // ── STATE ──────────────────────────────────────────────────────────────
@@ -1179,7 +1260,7 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 
-let currentMarket = 'global';
+let currentMarket = 'india';
 let currentMode = 'form';
 let currentTemplate = 'classic';
 let photoDataUrl = null;
@@ -1202,14 +1283,11 @@ let generatedATS = '';
 // ── MARKET SWITCHER ────────────────────────────────────────────────────
 function setMarket(market, btn) {
   currentMarket = market;
-  document.querySelectorAll('.market-btn').forEach(b => b.classList.remove('active'));
-  if (btn) btn.classList.add('active');
-  const chip = document.getElementById('market-chip');
-  if (chip) chip.textContent = market;
-  const aml = document.getElementById('ai-market-label');
-  if (aml) aml.textContent = market;
+  // Market buttons removed — function kept for version restore compatibility
+  const aiLbl = document.getElementById('ai-market-label');
+  if (aiLbl) aiLbl.textContent = market;
 
-  // Show/hide market-specific fields
+  // Show/hide market-specific fields (kept for users who may use gulf/europe data)
   ['india','us','gulf','europe'].forEach(m => {
     document.querySelectorAll('.'+m+'-field').forEach(el => {
       el.style.display = (m === market) ? 'flex' : 'none';
@@ -1373,9 +1451,13 @@ function v(id) { return document.getElementById(id)?.value || ''; }
 
 // ── BUILD PROMPT ───────────────────────────────────────────────────────
 function buildPrompt(data) {
+  const marketInstructions = {
+    global: `FORMAT: Global ATS-optimised resume. Rules: (1) 1-2 page format depending on experience level, (2) Strong action verbs on every bullet, (3) Quantify achievements with metrics wherever possible, (4) Clean section headings: Summary, Experience, Education, Skills, Certifications, (5) Include all provided contact details, (6) If CGPA/GPA provided, include it, (7) If languages provided, include them.`
+  };
+
   return `You are a world-class resume writer with 35 years of experience creating winning resumes. Generate a COMPLETE, polished resume for the following person.
 
-GLOBAL STANDARD: Write for maximum ATS compatibility worldwide. Rules: (1) Use strong action verbs on every bullet, (2) Include quantified metrics wherever possible (%, numbers, $, time saved), (3) 1-2 page format standard, (4) Standard section headings (Experience, Education, Skills, Summary, Certifications), (5) Include all provided data fields — salary, languages, certifications, nationality if given, (6) Optimize keyword density for the target role.
+${marketInstructions["global"]}
 
 CANDIDATE DATA:
 Name: ${data.name || 'Not provided'}
@@ -1393,8 +1475,11 @@ ${data.ectc ? 'Expected CTC: ' + data.ectc : ''}
 PROFESSIONAL SUMMARY:
 ${data.summary || 'Not provided'}
 
-EXPERIENCE:
-${data.experience.map((e,i) => `${i+1}. ${e.title} at ${e.company} | ${e.start} - ${e.end} | ${e.location}\n${e.bullets}`).join('\n\n')}
+EXPERIENCE (include ALL roles and ALL bullet points — do not skip or truncate any entry):
+${data.experience.map((e,i) => {
+  const bullets = e.bullets ? e.bullets.split('\n').filter(b=>b.trim()).map((b,j) => '  Bullet '+(j+1)+': '+b.trim()).join('\n') : '  No bullets provided';
+  return (i+1)+'. '+e.title+' at '+e.company+' | '+(e.start||'')+' - '+(e.end||'')+' | '+(e.location||'')+'\n'+bullets;
+}).join('\n\n')}
 
 EDUCATION:
 ${data.education.map(e => `${e.degree} | ${e.institution} | ${e.year} | ${e.cgpa || e.gpa} | ${e.location}`).join('\n')}
@@ -1412,14 +1497,13 @@ AWARDS: ${data.awards || 'None'}
 ${data.naukri ? 'Naukri Headline: ' + data.naukri : ''}
 
 INSTRUCTIONS:
-1. CRITICAL: Include ALL experience entries, ALL education entries, ALL projects. Never drop any entry.
-2. CRITICAL: For each experience entry, include ALL bullet points provided. If a bullet is very long (over 200 chars), summarise it intelligently to 1-2 concise lines — but never omit it.
-3. CRITICAL: If there are multiple projects, include every single one in the projects array. Do not truncate.
-4. Enhance bullet points with stronger action verbs and quantified metrics where plausible.
-5. Rewrite the summary to be compelling and impactful.
-6. Ensure ATS-safe language with relevant keywords for the target role.
-7. Preserve the candidate's authentic voice — don't make it sound generic.
-8. Return ONLY a JSON object (no markdown, no backticks) with this exact structure:
+1. Include EVERY experience role and EVERY bullet point from the input — do not drop any role or bullet
+2. If a role has many bullets (4+), preserve all of them in the output array — summarise long bullets to under 25 words each but keep ALL of them
+3. Enhance bullet points with stronger action verbs and quantified metrics where plausible
+4. Rewrite the summary to be compelling and results-focused
+5. Ensure ATS-safe language with relevant keywords for the role
+6. Preserve the candidate's authentic voice — don't make it sound generic
+7. Return ONLY a JSON object (no markdown, no backticks) with this exact structure:
 {
   "summary": "enhanced summary text",
   "experience": [{"title":"","company":"","start":"","end":"","location":"","bullets":["bullet1","bullet2","bullet3","bullet4"]}],
@@ -1434,6 +1518,8 @@ INSTRUCTIONS:
 
 // ── GENERATE RESUME ────────────────────────────────────────────────────
 async function generateResume() {
+  hideRestoreBanner();
+  var sp = document.getElementById('score-panel'); if (sp) sp.classList.remove('show');
   const data = currentMode === 'form' ? collectFormData() : null;
 
   if (currentMode === 'form') {
@@ -1480,6 +1566,8 @@ async function generateResume() {
     renderResume(displayData, aiData, text);
     hideAILoading();
     showToast('Resume generated successfully!', 'success');
+    // Score the generated resume inline
+    setTimeout(scoreGeneratedResume, 500);
     if(currentMode==='form'&&data){renderChecklist(data);}else if(currentMode==='ai'&&generatedATS){renderChecklist({market:currentMarket,name:'',email:'',phone:'',location:'',summary:'(AI mode)',techSkills:'',tools:'',experience:[],education:[],certs:'',naukri:'',ctc:'',notice:'',nationality:'',visa:'',photo:null,languages:'',aiTools:''});}
     // Run completeness check after generation
     if (currentMode === 'form') runCompletenessCheck(data);
@@ -1569,16 +1657,11 @@ function buildResumeData(data, aiData) {
 }
 
 function expHTML(exp) {
-  const rawBullets = exp.bullets
+  const bullets = exp.bullets
     ? (Array.isArray(exp.bullets) ? exp.bullets : exp.bullets.split('\n').filter(b=>b.trim()))
     : [];
-  // Include ALL bullets — trim excessively long ones to 220 chars max but never drop
-  const bullets = rawBullets.map(b => {
-    const clean = b.replace(/^[•\-\*o]\s*/,'').trim();
-    return clean.length > 220 ? clean.slice(0, 217) + '...' : clean;
-  }).filter(Boolean);
   const bHTML = bullets.length
-    ? '<ul>' + bullets.map(b=>`<li>${b}</li>`).join('') + '</ul>'
+    ? '<ul>' + bullets.map(b=>`<li>${b.replace(/^[•\-\*o]\s*/,'').trim()}</li>`).join('') + '</ul>'
     : '';
   const dates = [exp.start, exp.end].filter(Boolean).join(' – ');
   return `<div class="resume-entry">
@@ -2194,44 +2277,33 @@ function showATS() {
 // ── EXPORT FUNCTIONS ───────────────────────────────────────────────────
 function exportPDF() {
   if (!generatedHTML) { showToast('Generate your resume first', 'error'); return; }
-  const iframe = document.getElementById('print-iframe');
-  if (!iframe) { showToast('Print not available', 'error'); return; }
   const styles = [
-    ':root{--navy:#0F1B2D;--gold:#C9953A;--cream:#F8F4EE;--cream2:#F0EAE0;--text:#1A1A2E;',
-    '--text2:#4A5568;--text3:#8A9BB0;--border-r:#E2D9CE;--green:#1B6B47;}',
+    ':root{--navy:#0F1B2D;--gold:#C9953A;--cream:#F8F4EE;--cream2:#F0EAE0;',
+    '--text:#1A1A2E;--text2:#4A5568;--text3:#8A9BB0;--border-r:#E2D9CE;--green:#1B6B47;}',
     '*{box-sizing:border-box;margin:0;padding:0;}',
-    'body{font-family:Inter,sans-serif;background:#fff;margin:0;}',
-    '@media print{@page{margin:1.2cm;size:A4;}body{-webkit-print-color-adjust:exact;}}'
+    'body{font-family:"Inter",sans-serif;}',
+    '@media print{@page{margin:0;}body{margin:0;}}'
   ].join('');
-  const fonts = '<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">';
-  const content = '<!DOCTYPE html><html><head>' + fonts + '<style>' + styles + '</style></head><body>' + generatedHTML + '</body></html>';
-  iframe.style.display = 'block';
-  iframe.style.position = 'fixed';
-  iframe.style.top = '-9999px';
-  iframe.style.width = '794px';
-  iframe.style.height = '1123px';
-  const doc = iframe.contentDocument || iframe.contentWindow.document;
-  doc.open();
-  doc.write(content);
-  doc.close();
-  showToast('Preparing PDF — print dialog will open shortly...', 'success');
-  setTimeout(function() {
-    try {
+  const content = '<!DOCTYPE html><html><head>'
+    + '<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">'
+    + '<style>' + styles + '</style>'
+    + '</head><body>' + generatedHTML + '</body></html>';
+  // Use hidden iframe — keeps main page active
+  let iframe = document.getElementById('pdf-print-frame');
+  if (!iframe) {
+    iframe = document.createElement('iframe');
+    iframe.id = 'pdf-print-frame';
+    iframe.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:794px;height:1123px;border:none;';
+    document.body.appendChild(iframe);
+  }
+  iframe.onload = function() {
+    setTimeout(function() {
       iframe.contentWindow.focus();
       iframe.contentWindow.print();
-    } catch(e) {
-      // Fallback: open in new tab if iframe print blocked
-      const win = window.open('', '_blank');
-      if (win) { win.document.write(content); win.document.close(); setTimeout(function(){ win.print(); }, 500); }
-      else { showToast('Please allow pop-ups for PDF download', 'error'); }
-    }
-    setTimeout(function() {
-      iframe.style.display = 'none';
-      iframe.style.top = '-9999px';
-      iframe.style.width = '0';
-      iframe.style.height = '0';
-    }, 3000);
-  }, 800);
+    }, 400);
+  };
+  iframe.srcdoc = content;
+  showToast('Preparing PDF — print dialog will open shortly', 'success');
 }
 
 function exportDOCX() {
@@ -2915,22 +2987,147 @@ async function extractTemplateDOCX(file) {
 })();
 
 
-// FIX 1 — Back to edit button
 function goBackToEdit() {
-  // Scroll to the form section panel that was last active
-  var formBuilder = document.getElementById('form-builder');
-  if (formBuilder) {
-    formBuilder.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    // Show the personal section if nothing is active
-    var activePanel = document.querySelector('.section-panel.active');
-    if (!activePanel) showSection('personal', null);
-  }
+  // Show the form section (personal by default if no section active)
+  var activePanel = document.querySelector('.section-panel.active');
+  if (!activePanel) showSection('personal', null);
+  // Scroll to sidebar/form area
+  var sidebar = document.querySelector('.sidebar');
+  if (sidebar) sidebar.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  // On mobile — scroll to top
+  window.scrollTo({ top: 58, behavior: 'smooth' });
+  showToast('Edit your resume and click Generate when ready', '');
 }
 
-// FIX 2 — Show restore banner when data is loaded from saved version
 function showRestoreBanner() {
-  var banner = document.getElementById('restore-banner');
+  var empty = document.getElementById('resume-empty-state');
+  var banner = document.getElementById('resume-restore-banner');
+  if (empty) empty.style.display = 'none';
   if (banner) banner.style.display = 'flex';
+}
+function hideRestoreBanner() {
+  var banner = document.getElementById('resume-restore-banner');
+  if (banner) banner.style.display = 'none';
+}
+
+
+// ══════════════════════════════════════════════════════════════
+// INLINE RESUME SCORER
+// Called after generate completes. Uses /api/score in quick mode.
+// Shows score + top fixes inline below the resume preview.
+// ══════════════════════════════════════════════════════════════
+
+async function scoreGeneratedResume() {
+  if (!generatedATS) return;
+
+  // Show panel in loading state
+  var panel = document.getElementById('score-panel');
+  var loading = document.getElementById('sp-loading');
+  var overall = document.getElementById('sp-overall');
+  var scoresRow = document.getElementById('sp-scores');
+  var fixesWrap = document.getElementById('sp-fixes-wrap');
+  if (!panel) return;
+
+  panel.classList.add('show');
+  if (loading) loading.style.display = 'flex';
+  if (overall) overall.style.display = 'none';
+  if (scoresRow) scoresRow.style.display = 'none';
+  if (fixesWrap) fixesWrap.style.display = 'none';
+
+  // Set analyse link with pre-filled resume
+  var analyseLink = document.getElementById('sp-analyse-link');
+  if (analyseLink) {
+    var encoded = encodeURIComponent(generatedATS.slice(0, 8000));
+    analyseLink.href = '/analyser/?prefill=' + encoded;
+  }
+
+  try {
+    var res = await fetch('/api/score', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        resume_text: generatedATS,
+        experience_level: document.getElementById('exp-select') ? document.getElementById('exp-select').value : 'mid',
+        mode: 'quick'
+      })
+    });
+
+    if (!res.ok) throw new Error('Score API returned ' + res.status);
+    var data = await res.json();
+    if (data.error) throw new Error(data.error);
+
+    var scores = data.scores || {};
+    var overall_score = scores.overall || 0;
+    var fixes = data.top_fixes || [];
+
+    // Hide loading
+    if (loading) loading.style.display = 'none';
+    if (overall) overall.style.display = 'flex';
+
+    // Draw ring
+    var arc = document.getElementById('sp-arc');
+    var valEl = document.getElementById('sp-overall-val');
+    var verdictEl = document.getElementById('sp-verdict');
+    if (arc && valEl) {
+      var col = overall_score >= 75 ? '#00C896' : overall_score >= 55 ? '#FBBF24' : '#FF6B6B';
+      var circumference = 131.9;
+      arc.style.stroke = col;
+      arc.style.strokeDashoffset = circumference - (overall_score / 100) * circumference;
+      valEl.textContent = overall_score;
+      valEl.style.color = col;
+    }
+    if (verdictEl) {
+      verdictEl.textContent = overall_score >= 75 ? 'Strong resume' : overall_score >= 55 ? 'Needs improvement' : 'Significant gaps';
+    }
+
+    // Score cards
+    if (scoresRow) {
+      var dims = [
+        { key: 'content_quality',    label: 'Content',    color: '#8B7CF6' },
+        { key: 'ats_compatibility',  label: 'ATS',        color: '#60A5FA' },
+        { key: 'skills_relevance',   label: 'Skills',     color: '#00C896' },
+        { key: 'structure_readability', label: 'Structure', color: '#2DD4BF' },
+        { key: 'career_narrative',   label: 'Narrative',  color: '#F472B6' },
+      ];
+      scoresRow.innerHTML = dims.map(function(d) {
+        var val = scores[d.key] || 0;
+        var col = val >= 75 ? '#00C896' : val >= 55 ? '#FBBF24' : '#FF6B6B';
+        return '<div class="sp-score-card">'
+          + '<div class="sp-score-val" style="color:' + col + '">' + val + '</div>'
+          + '<div class="sp-score-lbl">' + d.label + '</div>'
+          + '</div>';
+      }).join('');
+      scoresRow.style.display = 'grid';
+    }
+
+    // Top fixes
+    if (fixesWrap && fixes.length > 0) {
+      var fixesList = document.getElementById('sp-fixes-list');
+      if (fixesList) {
+        fixesList.innerHTML = fixes.slice(0, 5).map(function(f, i) {
+          return '<div class="sp-fix-row">'
+            + '<div class="sp-fix-num">' + (i + 1) + '</div>'
+            + '<div class="sp-fix-body">'
+            + '<div class="sp-fix-label">' + (f.fix || '') + '</div>'
+            + '<div class="sp-fix-meta">'
+            + '<span class="sp-fix-dim">' + (f.dimension || '') + '</span>'
+            + (f.points_available ? '<span class="sp-fix-pts">+' + f.points_available + ' pts</span>' : '')
+            + '</div>'
+            + '</div></div>';
+        }).join('');
+      }
+      fixesWrap.style.display = 'block';
+    }
+
+    // Scroll panel into view
+    panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+  } catch (err) {
+    console.error('Score failed:', err);
+    if (loading) loading.style.display = 'none';
+    // Silently fail — don't block the user
+    panel.classList.remove('show');
+  }
 }
 
 </script>
