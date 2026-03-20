@@ -375,12 +375,286 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg0); 
   .tpl-preview-frame { height: 280px; }
 }
 
+
+/* ── VERSIONS DASHBOARD ──────────────────────────────────────────────── */
+.versions-screen{position:fixed;inset:0;z-index:150;background:var(--bg0);
+  background-image:radial-gradient(ellipse 80% 60% at 0% 0%,rgba(108,92,231,0.18) 0%,transparent 50%),
+  radial-gradient(ellipse 60% 50% at 100% 100%,rgba(0,200,150,0.05) 0%,transparent 50%);
+  display:flex;flex-direction:column;overflow:hidden;}
+.versions-screen.hidden{display:none;}
+.versions-nav{height:60px;background:rgba(255,255,255,0.97);backdrop-filter:blur(20px);
+  border-bottom:1px solid rgba(0,0,0,0.07);display:flex;align-items:center;
+  padding:0 40px;gap:14px;flex-shrink:0;}
+.versions-logo{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:700;color:#1A1917;letter-spacing:-0.3px;}
+.versions-logo span{color:var(--purple);}
+.versions-body{flex:1;overflow-y:auto;padding:40px 48px;}
+.versions-headline{font-family:'Cormorant Garamond',serif;font-size:clamp(28px,3vw,42px);
+  font-weight:700;color:var(--off);letter-spacing:-1px;margin-bottom:6px;}
+.versions-sub{font-size:14px;color:var(--muted);margin-bottom:36px;max-width:520px;line-height:1.7;}
+.versions-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;max-width:1200px;}
+.ver-card{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);
+  border-radius:16px;padding:22px;cursor:pointer;transition:all 0.2s;position:relative;}
+.ver-card:hover{background:rgba(255,255,255,0.07);border-color:rgba(108,92,231,0.4);transform:translateY(-2px);}
+.ver-card.active-ver{border-color:var(--purple);box-shadow:0 0 0 3px rgba(108,92,231,0.15);}
+.ver-card-new{border-style:dashed;cursor:pointer;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;min-height:160px;gap:10px;}
+.ver-card-new:hover{border-color:var(--purple2);background:rgba(108,92,231,0.06);}
+.ver-new-icon{width:40px;height:40px;border-radius:10px;background:rgba(108,92,231,0.12);
+  border:1px solid rgba(108,92,231,0.25);display:flex;align-items:center;justify-content:center;font-size:20px;}
+.ver-new-label{font-size:13px;font-weight:500;color:var(--purple2);}
+.ver-new-sub{font-size:11px;color:var(--dim);}
+.ver-badge{display:inline-block;font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;margin-bottom:10px;}
+.vb-active{background:rgba(108,92,231,0.15);color:var(--purple2);border:1px solid rgba(108,92,231,0.25);}
+.vb-draft{background:rgba(255,255,255,0.07);color:var(--dim);border:1px solid var(--border);}
+.ver-name{font-size:15px;font-weight:600;color:var(--off);margin-bottom:4px;}
+.ver-role{font-size:12px;color:var(--muted);margin-bottom:12px;}
+.ver-meta{display:flex;justify-content:space-between;align-items:center;margin-top:12px;
+  padding-top:12px;border-top:1px solid var(--border);}
+.ver-date{font-size:11px;color:var(--dim);}
+.ver-actions{display:flex;gap:6px;}
+.ver-btn{font-size:11px;padding:4px 10px;border-radius:6px;border:none;cursor:pointer;
+  font-family:'Inter',sans-serif;font-weight:500;transition:all 0.15s;}
+.ver-btn-open{background:var(--purple);color:#fff;}
+.ver-btn-open:hover{background:var(--purple2);}
+.ver-btn-del{background:rgba(255,107,107,0.1);color:var(--red);border:1px solid rgba(255,107,107,0.2);}
+.ver-btn-del:hover{background:rgba(255,107,107,0.18);}
+.ver-fields{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:4px;}
+.ver-field-tag{font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(255,255,255,0.05);
+  border:1px solid var(--border);color:var(--dim);}
+/* New version modal */
+.ver-modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:300;
+  display:flex;align-items:center;justify-content:center;}
+.ver-modal-bg.hidden{display:none;}
+.ver-modal{background:var(--bg2);border:1px solid var(--border2);border-radius:16px;
+  padding:28px;width:420px;max-width:90vw;}
+.ver-modal-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:700;
+  color:var(--off);margin-bottom:6px;}
+.ver-modal-sub{font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6;}
+.ver-modal input{width:100%;background:rgba(255,255,255,0.06);border:1px solid var(--border2);
+  border-radius:8px;padding:11px 13px;color:var(--white);font-size:14px;font-family:'Inter',sans-serif;
+  outline:none;margin-bottom:12px;}
+.ver-modal input:focus{border-color:var(--purple);box-shadow:0 0 0 3px rgba(108,92,231,0.12);}
+.ver-modal-btns{display:flex;gap:8px;margin-top:4px;}
+.ver-modal-btns button{flex:1;padding:11px;border-radius:8px;font-size:13px;font-weight:600;
+  font-family:'Inter',sans-serif;cursor:pointer;border:none;transition:all 0.15s;}
+.ver-modal-cancel{background:rgba(255,255,255,0.07);color:var(--muted);}
+.ver-modal-cancel:hover{background:rgba(255,255,255,0.12);}
+.ver-modal-create{background:var(--purple);color:#fff;}
+.ver-modal-create:hover{background:var(--purple2);}
+@media(max-width:900px){.versions-body{padding:28px 20px;}}
+
 /* end resume doc styles */
+
+/* ── MY RESUMES DASHBOARD ─────────────────────────────────── */
+.rf-dashboard{position:fixed;inset:0;z-index:300;background:var(--bg0);
+  background-image:radial-gradient(ellipse 70% 50% at 15% 0%,rgba(124,111,224,0.14) 0%,transparent 60%),
+  radial-gradient(ellipse 50% 40% at 90% 100%,rgba(38,208,206,0.07) 0%,transparent 60%);
+  display:flex;flex-direction:column;overflow:hidden;}
+.rf-dashboard.hidden{display:none;}
+.rf-dash-nav{height:58px;background:rgba(7,5,15,0.92);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,0.07);
+  display:flex;align-items:center;padding:0 36px;gap:12px;flex-shrink:0;}
+.rf-dash-logo{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:700;color:var(--off);letter-spacing:-0.3px;}
+.rf-dash-logo span{color:var(--purple2);}
+.rf-dash-ai{font-size:10px;font-weight:600;padding:3px 8px;border-radius:5px;background:rgba(124,111,224,0.15);color:var(--purple2);border:1px solid rgba(124,111,224,0.3);letter-spacing:0.05em;}
+.rf-dash-body{flex:1;overflow-y:auto;padding:40px 48px;}
+.rf-dash-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:32px;}
+.rf-dash-title{font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:700;color:var(--off);letter-spacing:-1px;margin-bottom:6px;}
+.rf-dash-sub{font-size:14px;color:var(--muted);}
+.rf-btn-new{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#7C6FE0,#4834d4);color:#fff;
+  font-size:14px;font-weight:600;font-family:'Inter',sans-serif;padding:12px 24px;border:none;border-radius:10px;
+  cursor:pointer;transition:all 0.2s;box-shadow:0 4px 15px rgba(0,0,0,0.3);}
+.rf-btn-new:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(124,111,224,0.4);}
+.rf-versions-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-bottom:32px;}
+.rf-ver-card{background:rgba(255,255,255,0.035);border:1px solid rgba(255,255,255,0.08);border-radius:16px;
+  padding:20px;cursor:pointer;transition:all 0.2s;position:relative;overflow:hidden;}
+.rf-ver-card:hover{border-color:rgba(124,111,224,0.4);background:rgba(124,111,224,0.06);transform:translateY(-2px);}
+.rf-ver-card.rf-active{border-color:var(--purple2);box-shadow:0 0 0 3px rgba(124,111,224,0.15);}
+.rf-ver-card.rf-add{border:1.5px dashed rgba(255,255,255,0.15);display:flex;flex-direction:column;align-items:center;
+  justify-content:center;min-height:160px;gap:10px;cursor:pointer;}
+.rf-ver-card.rf-add:hover{border-color:var(--purple2);background:rgba(124,111,224,0.05);}
+.rf-add-icon{width:40px;height:40px;border-radius:10px;background:rgba(124,111,224,0.12);border:1px solid rgba(124,111,224,0.25);
+  display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--purple2);}
+.rf-add-text{font-size:13px;font-weight:500;color:var(--purple2);}
+.rf-add-hint{font-size:11px;color:var(--dim);}
+.rf-ver-badge{display:inline-block;font-size:10px;font-weight:600;padding:3px 10px;border-radius:20px;margin-bottom:12px;}
+.rfb-purple{background:rgba(124,111,224,0.15);color:var(--purple2);border:1px solid rgba(124,111,224,0.25);}
+.rfb-teal{background:rgba(38,208,206,0.12);color:var(--teal);border:1px solid rgba(38,208,206,0.25);}
+.rfb-amber{background:rgba(246,192,69,0.12);color:var(--amber);border:1px solid rgba(246,192,69,0.25);}
+.rfb-green{background:rgba(0,245,212,0.1);color:var(--green);border:1px solid rgba(0,245,212,0.2);}
+.rfb-blue{background:rgba(96,165,250,0.12);color:var(--blue);border:1px solid rgba(96,165,250,0.25);}
+.rf-ver-name{font-size:16px;font-weight:600;color:var(--off);margin-bottom:4px;letter-spacing:-0.3px;}
+.rf-ver-meta{font-size:12px;color:var(--muted);margin-bottom:14px;}
+.rf-ver-stats{display:flex;gap:12px;margin-bottom:14px;}
+.rf-ver-stat{font-size:11px;color:var(--dim);display:flex;align-items:center;gap:4px;}
+.rf-ver-stat strong{color:var(--muted);font-weight:500;}
+.rf-ver-actions{display:flex;gap:6px;border-top:1px solid rgba(255,255,255,0.06);padding-top:12px;}
+.rf-act-btn{flex:1;padding:7px;border:1px solid rgba(255,255,255,0.1);border-radius:7px;background:transparent;
+  color:var(--muted);font-size:11px;font-weight:500;font-family:'Inter',sans-serif;cursor:pointer;transition:all 0.15s;}
+.rf-act-btn:hover{background:rgba(255,255,255,0.06);color:var(--off);}
+.rf-act-btn.rf-act-open{background:rgba(124,111,224,0.12);color:var(--purple2);border-color:rgba(124,111,224,0.25);}
+.rf-act-btn.rf-act-open:hover{background:rgba(124,111,224,0.2);}
+.rf-act-btn.rf-act-del{color:var(--red);border-color:rgba(245,101,101,0.2);}
+.rf-act-btn.rf-act-del:hover{background:rgba(245,101,101,0.08);}
+.rf-active-pill{position:absolute;top:14px;right:14px;font-size:10px;font-weight:600;
+  padding:3px 8px;border-radius:20px;background:rgba(124,111,224,0.2);color:var(--purple2);}
+.rf-master-bar{background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.07);border-radius:12px;
+  padding:16px 20px;margin-bottom:28px;display:flex;align-items:center;gap:16px;}
+.rf-master-icon{width:36px;height:36px;border-radius:9px;background:rgba(124,111,224,0.12);
+  border:1px solid rgba(124,111,224,0.22);display:flex;align-items:center;justify-content:center;
+  font-size:16px;flex-shrink:0;}
+.rf-master-text{flex:1;}
+.rf-master-title{font-size:13px;font-weight:600;color:var(--off);margin-bottom:2px;}
+.rf-master-sub{font-size:12px;color:var(--muted);}
+.rf-master-status{font-size:11px;font-weight:500;padding:4px 10px;border-radius:20px;}
+.rf-ms-empty{background:rgba(246,192,69,0.1);color:var(--amber);}
+.rf-ms-saved{background:rgba(0,245,212,0.1);color:var(--green);}
+/* Save bar inside builder */
+.rf-save-bar{display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(124,111,224,0.06);
+  border:1px solid rgba(124,111,224,0.15);border-radius:var(--r);margin-bottom:14px;}
+.rf-save-name-input{flex:1;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);
+  border-radius:7px;padding:7px 10px;color:var(--off);font-size:12px;font-family:'Inter',sans-serif;outline:none;}
+.rf-save-name-input:focus{border-color:var(--purple2);}
+.rf-save-name-input::placeholder{color:var(--dim);}
+.rf-btn-save{padding:7px 14px;border:none;border-radius:7px;background:var(--purple);color:#fff;
+  font-size:12px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;transition:all 0.15s;white-space:nowrap;}
+.rf-btn-save:hover{background:var(--purple2);}
+.rf-autosave-dot{width:7px;height:7px;border-radius:50%;background:var(--green);flex-shrink:0;
+  animation:rfpulse 2s ease-in-out infinite;}
+@keyframes rfpulse{0%,100%{opacity:0.5;transform:scale(0.9)}50%{opacity:1;transform:scale(1)}}
+.rf-autosave-lbl{font-size:11px;color:var(--muted);}
+/* New version modal */
+.rf-modal-bg{position:fixed;inset:0;z-index:400;background:rgba(0,0,0,0.7);
+  display:flex;align-items:center;justify-content:center;}
+.rf-modal-bg.hidden{display:none;}
+.rf-modal{background:var(--bg2);border:1px solid rgba(255,255,255,0.12);border-radius:20px;
+  padding:28px 32px;width:440px;max-width:90vw;}
+.rf-modal-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:700;color:var(--off);
+  margin-bottom:6px;letter-spacing:-0.5px;}
+.rf-modal-sub{font-size:13px;color:var(--muted);margin-bottom:24px;}
+.rf-modal-field{margin-bottom:16px;}
+.rf-modal-label{font-size:11px;font-weight:600;color:var(--dim);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;}
+.rf-modal-input{width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);
+  border-radius:8px;padding:10px 12px;color:var(--off);font-size:13px;font-family:'Inter',sans-serif;outline:none;}
+.rf-modal-input:focus{border-color:var(--purple2);}
+.rf-label-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.rf-label-opt{padding:8px 10px;border:1px solid rgba(255,255,255,0.1);border-radius:8px;background:transparent;
+  color:var(--muted);font-size:12px;font-family:'Inter',sans-serif;cursor:pointer;text-align:center;
+  transition:all 0.15s;}
+.rf-label-opt:hover{border-color:var(--border2);color:var(--off);}
+.rf-label-opt.selected{background:rgba(124,111,224,0.15);border-color:rgba(124,111,224,0.4);color:var(--purple2);}
+.rf-modal-btns{display:flex;gap:8px;margin-top:24px;}
+.rf-modal-cancel{flex:1;padding:11px;border:1px solid rgba(255,255,255,0.1);border-radius:8px;
+  background:transparent;color:var(--muted);font-size:13px;font-family:'Inter',sans-serif;cursor:pointer;}
+.rf-modal-create{flex:2;padding:11px;border:none;border-radius:8px;
+  background:linear-gradient(135deg,#7C6FE0,#4834d4);color:#fff;font-size:13px;font-weight:600;
+  font-family:'Inter',sans-serif;cursor:pointer;transition:all 0.15s;}
+.rf-modal-create:hover{transform:translateY(-1px);}
+
 </style>
 </head>
 <body>
 
 <!-- NAV -->
+
+
+<!-- ── MY RESUMES DASHBOARD ──────────────────────────────────────────── -->
+<div class="rf-dashboard" id="rf-dashboard">
+  <div class="rf-dash-nav">
+    <div class="rf-dash-logo">Resume<span>Forge</span></div>
+    <span class="rf-dash-ai">AI POWERED</span>
+    <div style="margin-left:auto;display:flex;gap:10px;align-items:center;">
+      <a href="/" style="font-size:12px;color:var(--muted);text-decoration:none;padding:6px 12px;border-radius:6px;transition:all 0.15s;" onmouseover="this.style.background='rgba(124,111,224,0.12)'" onmouseout="this.style.background='transparent'">← Home</a>
+      <a href="/analyser/" style="font-size:12px;color:var(--muted);text-decoration:none;padding:6px 12px;border-radius:6px;border:1px solid rgba(255,255,255,0.1);transition:all 0.15s;" onmouseover="this.style.borderColor='rgba(124,111,224,0.4)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)'">✦ Analyse Resume</a>
+    </div>
+  </div>
+  <div class="rf-dash-body">
+    <div class="rf-dash-header">
+      <div>
+        <div class="rf-dash-title">My Resumes</div>
+        <div class="rf-dash-sub">All your resume versions in one place. Edit once, update everywhere.</div>
+      </div>
+      <button class="rf-btn-new" onclick="showNewVersionModal()">+ New Version</button>
+    </div>
+
+    <!-- Master Profile status bar -->
+    <div class="rf-master-bar" id="rf-master-bar">
+      <div class="rf-master-icon">◈</div>
+      <div class="rf-master-text">
+        <div class="rf-master-title">Master Profile</div>
+        <div class="rf-master-sub" id="rf-master-sub">Your complete career data — all versions pull from this</div>
+      </div>
+      <span class="rf-master-status rf-ms-empty" id="rf-master-status">Not saved yet</span>
+    </div>
+
+    <!-- Versions grid -->
+    <div class="rf-versions-grid" id="rf-versions-grid">
+      <!-- populated by JS -->
+    </div>
+  </div>
+</div>
+
+<!-- New Version Modal -->
+<div class="rf-modal-bg hidden" id="rf-modal-bg">
+  <div class="rf-modal">
+    <div class="rf-modal-title">Create new version</div>
+    <div class="rf-modal-sub">Give it a name and label. You can always change it later.</div>
+    <div class="rf-modal-field">
+      <div class="rf-modal-label">Version name</div>
+      <input class="rf-modal-input" id="rf-modal-name" placeholder="e.g. Data Analyst — Naukri" maxlength="50">
+    </div>
+    <div class="rf-modal-field">
+      <div class="rf-modal-label">Label / Role type</div>
+      <div class="rf-label-grid" id="rf-label-grid">
+        <button class="rf-label-opt selected" data-label="Product">Product</button>
+        <button class="rf-label-opt" data-label="Data">Data</button>
+        <button class="rf-label-opt" data-label="Engineering">Engineering</button>
+        <button class="rf-label-opt" data-label="Corporate">Corporate</button>
+        <button class="rf-label-opt" data-label="Senior">Senior</button>
+        <button class="rf-label-opt" data-label="Fresher">Fresher</button>
+      </div>
+    </div>
+    <div class="rf-modal-field">
+      <div class="rf-modal-label">Start from</div>
+      <select class="rf-modal-input" id="rf-modal-source">
+        <option value="blank">Blank — start fresh</option>
+        <option value="master">Master Profile — copy my saved data</option>
+      </select>
+    </div>
+    <div class="rf-modal-btns">
+      <button class="rf-modal-cancel" onclick="hideNewVersionModal()">Cancel</button>
+      <button class="rf-modal-create" onclick="createNewVersion()">Create Version →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── VERSIONS DASHBOARD ─────────────────────────────────────────────── -->
+<div class="versions-screen" id="versions-screen">
+  <div class="versions-nav">
+    <div class="versions-logo">Resume<span>Forge</span></div>
+    <span style="font-size:10px;font-weight:600;padding:3px 8px;border-radius:5px;background:#F0EDFF;color:#6C5CE7;border:1px solid rgba(108,92,231,0.2);letter-spacing:0.05em;">AI POWERED</span>
+  </div>
+  <div class="versions-body">
+    <div class="versions-headline">My Resumes</div>
+    <div class="versions-sub">Each version is a separate resume tailored for a specific role. Your master profile data is shared across all versions — update once, applies everywhere.</div>
+    <div class="versions-grid" id="versions-grid"></div>
+  </div>
+</div>
+
+<!-- ── NEW VERSION MODAL ───────────────────────────────────────────────── -->
+<div class="ver-modal-bg hidden" id="ver-modal-bg">
+  <div class="ver-modal">
+    <div class="ver-modal-title">Create new resume</div>
+    <div class="ver-modal-sub">Give it a name so you remember what role it's for. You can always rename it later.</div>
+    <input type="text" id="ver-name-input" placeholder="e.g. Product Manager — Flipkart" maxlength="60"
+      onkeydown="if(event.key==='Enter')createVersion()">
+    <input type="text" id="ver-role-input" placeholder="Target role (optional) e.g. Senior PM" maxlength="60"
+      onkeydown="if(event.key==='Enter')createVersion()">
+    <div class="ver-modal-btns">
+      <button class="ver-modal-cancel" onclick="closeVerModal()">Cancel</button>
+      <button class="ver-modal-create" onclick="createVersion()">Create Resume →</button>
+    </div>
+  </div>
+</div>
 
 <!-- ── TEMPLATE PICKER SCREEN ──────────────────────────────────────── -->
 <div class="tpl-picker" id="tpl-picker">
@@ -497,8 +771,9 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg0); 
 <nav class="nav">
   <div class="nav-logo">Resume<span>Forge</span></div><span style="font-size:10px;font-weight:600;padding:3px 8px;border-radius:5px;background:#F0EDFF;color:#6C5CE7;border:1px solid rgba(108,92,231,0.2);letter-spacing:0.05em;">AI POWERED</span>
   <div class="nav-right">
-    <a href="/" class="nav-home">← Home</a>
-    <button class="change-tpl-btn" onclick="showTemplatePicker()" id="change-tpl-btn" style="display:none;">✦ Change Template</button>
+    <a href="/" class="nav-home">← Home</a><button class="change-tpl-btn" onclick="saveCurrentToVersion();showVersionsDashboard();" style="display:inline-flex;">⊞ My Resumes</button>
+    <button style="font-size:11px;color:var(--purple2);background:rgba(124,111,224,0.1);border:1px solid rgba(124,111,224,0.2);border-radius:6px;padding:5px 11px;cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.15s;" onclick="showDashboard()" id="rf-back-btn">⊞ My Resumes</button>
+    <button class="change-tpl-btn" onclick="showTemplatePicker()" id="change-tpl-btn" style="display:none;">✦ Change Template</button><span id="save-indicator" style="font-size:11px;color:#00C896;opacity:0;transition:opacity 0.4s;margin-left:4px;font-weight:500;"></span>
     <span class="nav-badge" id="market-chip">🇮🇳 India</span>
     <span class="nav-badge-blue" id="mode-chip">Form Builder</span>
   </div>
@@ -541,6 +816,13 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg0); 
     </div>
 
     <div class="sidebar-actions">
+      <!-- RF Save bar -->
+      <div class="rf-save-bar" id="rf-save-bar" style="display:none;">
+        <span class="rf-autosave-dot"></span>
+        <span class="rf-autosave-lbl" id="rf-autosave-lbl">Unsaved</span>
+        <input class="rf-save-name-input" id="rf-version-name-input" placeholder="Version name..." maxlength="50">
+        <button class="rf-btn-save" onclick="saveCurrentVersion()">Save</button>
+      </div>
       <button class="btn btn-primary" onclick="generateResume()">⚡ Generate with AI</button>
       <div class="export-row">
         <button class="btn btn-secondary btn-sm" onclick="exportPDF()" style="flex:1">⬇ PDF</button>
@@ -900,6 +1182,427 @@ Looking for senior dev roles in product companies"></textarea>
 <script>
 // ── STATE ──────────────────────────────────────────────────────────────
 
+// ── AUTOSAVE SYSTEM ────────────────────────────────────────────────────
+const SAVE_KEY = 'rf_builder_autosave';
+const SAVE_FIELDS = [
+  'f-name','f-title','f-email','f-phone','f-location','f-linkedin',
+  'f-portfolio','f-years','f-ctc','f-ectc','f-nationality','f-dob',
+  'f-eu-nationality','f-summary','f-naukri-headline','f-tech-skills',
+  'f-soft-skills','f-tools','f-ai-tools','f-languages','f-certs',
+  'f-projects','f-awards'
+];
+const SAVE_SELECTS = ['f-visa','f-driving','f-work-auth','exp-select'];
+
+let saveTimer = null;
+
+function autosave() {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    const payload = { ts: Date.now(), market: currentMarket, mode: currentMode, template: currentTemplate };
+    SAVE_FIELDS.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) payload[id] = el.value;
+    });
+    SAVE_SELECTS.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) payload[id] = el.value;
+    });
+    // Save experience entries
+    const expCards = document.querySelectorAll('.entry-card[id^="exp-"]');
+    payload.experiences = Array.from(expCards).map(card => ({
+      id: card.id,
+      title: card.querySelector('.exp-title')?.value || '',
+      company: card.querySelector('.exp-company')?.value || '',
+      location: card.querySelector('.exp-location')?.value || '',
+      startMonth: card.querySelector('.exp-start-month')?.value || '',
+      startYear: card.querySelector('.exp-start-year')?.value || '',
+      endMonth: card.querySelector('.exp-end-month')?.value || '',
+      endYear: card.querySelector('.exp-end-year')?.value || '',
+      current: card.querySelector('.exp-current')?.checked || false,
+      bullets: card.querySelector('.exp-bullets')?.value || ''
+    }));
+    // Save education entries
+    const eduCards = document.querySelectorAll('.entry-card[id^="edu-"]');
+    payload.educations = Array.from(eduCards).map(card => ({
+      id: card.id,
+      degree: card.querySelector('.edu-degree')?.value || '',
+      institution: card.querySelector('.edu-institution')?.value || '',
+      location: card.querySelector('.edu-location')?.value || '',
+      year: card.querySelector('.edu-year')?.value || '',
+      cgpa: card.querySelector('.edu-cgpa')?.value || ''
+    }));
+    try {
+      localStorage.setItem(SAVE_KEY, JSON.stringify(payload));
+      showSaveIndicator();
+    } catch(e) {}
+  }, 800);
+}
+
+function showSaveIndicator() {
+  const el = document.getElementById('save-indicator');
+  if (!el) return;
+  el.textContent = '✓ Saved';
+  el.style.opacity = '1';
+  clearTimeout(el._timer);
+  el._timer = setTimeout(() => { el.style.opacity = '0'; }, 2000);
+}
+
+function restoreAutosave() {
+  try {
+    const raw = localStorage.getItem(SAVE_KEY);
+    if (!raw) return;
+    const payload = JSON.parse(raw);
+    if (!payload.ts) return;
+
+    // Restore market
+    if (payload.market) {
+      const btn = document.querySelector(`.market-btn[onclick*="'${payload.market}'"]`);
+      if (btn) { document.querySelectorAll('.market-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); setMarket(payload.market, btn); }
+    }
+    // Restore mode
+    if (payload.mode) {
+      const modeBtn = document.querySelector(`.mode-tab[onclick*="'${payload.mode}'"]`);
+      if (modeBtn) setMode(payload.mode, modeBtn);
+    }
+    // Restore template
+    if (payload.template) currentTemplate = payload.template;
+
+    // Restore simple fields
+    SAVE_FIELDS.forEach(id => {
+      const el = document.getElementById(id);
+      if (el && payload[id] !== undefined) el.value = payload[id];
+    });
+    SAVE_SELECTS.forEach(id => {
+      const el = document.getElementById(id);
+      if (el && payload[id]) el.value = payload[id];
+    });
+
+    // Restore experience entries
+    if (payload.experiences && payload.experiences.length > 0) {
+      const list = document.getElementById('experience-list');
+      if (list) {
+        list.innerHTML = '';
+        payload.experiences.forEach((exp, i) => {
+          addExperienceEntry();
+          const cards = document.querySelectorAll('.entry-card[id^="exp-"]');
+          const card = cards[cards.length - 1];
+          if (!card) return;
+          if (card.querySelector('.exp-title')) card.querySelector('.exp-title').value = exp.title;
+          if (card.querySelector('.exp-company')) card.querySelector('.exp-company').value = exp.company;
+          if (card.querySelector('.exp-location')) card.querySelector('.exp-location').value = exp.location;
+          if (card.querySelector('.exp-start-month')) card.querySelector('.exp-start-month').value = exp.startMonth;
+          if (card.querySelector('.exp-start-year')) card.querySelector('.exp-start-year').value = exp.startYear;
+          if (card.querySelector('.exp-end-month')) card.querySelector('.exp-end-month').value = exp.endMonth;
+          if (card.querySelector('.exp-end-year')) card.querySelector('.exp-end-year').value = exp.endYear;
+          if (card.querySelector('.exp-current')) card.querySelector('.exp-current').checked = exp.current;
+          if (card.querySelector('.exp-bullets')) card.querySelector('.exp-bullets').value = exp.bullets;
+        });
+      }
+    }
+
+    // Restore education entries
+    if (payload.educations && payload.educations.length > 0) {
+      const list = document.getElementById('education-list');
+      if (list) {
+        list.innerHTML = '';
+        payload.educations.forEach(edu => {
+          addEducationEntry();
+          const cards = document.querySelectorAll('.entry-card[id^="edu-"]');
+          const card = cards[cards.length - 1];
+          if (!card) return;
+          if (card.querySelector('.edu-degree')) card.querySelector('.edu-degree').value = edu.degree;
+          if (card.querySelector('.edu-institution')) card.querySelector('.edu-institution').value = edu.institution;
+          if (card.querySelector('.edu-location')) card.querySelector('.edu-location').value = edu.location;
+          if (card.querySelector('.edu-year')) card.querySelector('.edu-year').value = edu.year;
+          if (card.querySelector('.edu-cgpa')) card.querySelector('.edu-cgpa').value = edu.cgpa;
+        });
+      }
+    }
+
+    const mins = Math.round((Date.now() - payload.ts) / 60000);
+    const timeStr = mins < 1 ? 'just now' : mins < 60 ? `${mins}m ago` : `${Math.round(mins/60)}h ago`;
+    showToast(`Resume restored — last saved ${timeStr}`, 'success');
+    markFilled('personal');
+  } catch(e) {}
+}
+
+function clearAutosave() {
+  localStorage.removeItem(SAVE_KEY);
+}
+
+// ── VERSIONS MANAGER ───────────────────────────────────────────────────
+const VER_KEY = 'rf_versions';
+const ACTIVE_VER_KEY = 'rf_active_version';
+
+function getVersions() {
+  try { return JSON.parse(localStorage.getItem(VER_KEY) || '[]'); } catch { return []; }
+}
+function saveVersions(versions) {
+  localStorage.setItem(VER_KEY, JSON.stringify(versions));
+}
+function getActiveVersionId() {
+  return localStorage.getItem(ACTIVE_VER_KEY) || null;
+}
+function setActiveVersionId(id) {
+  localStorage.setItem(ACTIVE_VER_KEY, id);
+}
+
+function showVersionsDashboard() {
+  document.getElementById('versions-screen').classList.remove('hidden');
+  renderVersionsGrid();
+}
+function hideVersionsDashboard() {
+  document.getElementById('versions-screen').classList.add('hidden');
+}
+
+function renderVersionsGrid() {
+  const versions = getVersions();
+  const activeId = getActiveVersionId();
+  const grid = document.getElementById('versions-grid');
+
+  let html = versions.map(ver => {
+    const isActive = ver.id === activeId;
+    const date = new Date(ver.updatedAt || ver.createdAt);
+    const dateStr = date.toLocaleDateString('en-GB', {day:'numeric',month:'short',year:'numeric'});
+    const fields = [
+      ver.data?.name ? '👤 ' + ver.data.name : null,
+      ver.data?.email ? '✉ Contact' : null,
+      ver.data?.summary ? '📝 Summary' : null,
+      ver.data?.experience?.length ? `💼 ${ver.data.experience.length} role${ver.data.experience.length>1?'s':''}` : null,
+    ].filter(Boolean);
+
+    return `<div class="ver-card ${isActive?'active-ver':''}" onclick="openVersion('${ver.id}')">
+      <span class="ver-badge ${isActive?'vb-active':'vb-draft'}">${isActive?'● Active':'○ Draft'}</span>
+      <div class="ver-name">${ver.name}</div>
+      <div class="ver-role">${ver.targetRole || 'No target role set'}</div>
+      <div class="ver-fields">${fields.map(f=>`<span class="ver-field-tag">${f}</span>`).join('')}</div>
+      <div class="ver-meta">
+        <div class="ver-date">Updated ${dateStr}</div>
+        <div class="ver-actions">
+          <button class="ver-btn ver-btn-open" onclick="event.stopPropagation();openVersion('${ver.id}')">Open</button>
+          <button class="ver-btn ver-btn-del" onclick="event.stopPropagation();deleteVersion('${ver.id}')">✕</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Add "new version" card
+  html += `<div class="ver-card ver-card-new" onclick="showVerModal()">
+    <div class="ver-new-icon">+</div>
+    <div class="ver-new-label">New Resume Version</div>
+    <div class="ver-new-sub">Start fresh or copy from active version</div>
+  </div>`;
+
+  grid.innerHTML = html;
+}
+
+function showVerModal() {
+  document.getElementById('ver-modal-bg').classList.remove('hidden');
+  document.getElementById('ver-name-input').value = '';
+  document.getElementById('ver-role-input').value = '';
+  setTimeout(() => document.getElementById('ver-name-input').focus(), 50);
+}
+function closeVerModal() {
+  document.getElementById('ver-modal-bg').classList.add('hidden');
+}
+
+function createVersion() {
+  const name = document.getElementById('ver-name-input').value.trim();
+  if (!name) { document.getElementById('ver-name-input').focus(); return; }
+  const role = document.getElementById('ver-role-input').value.trim();
+  const versions = getVersions();
+  const activeId = getActiveVersionId();
+  const activeVer = versions.find(v => v.id === activeId);
+
+  const newVer = {
+    id: 'ver_' + Date.now(),
+    name,
+    targetRole: role,
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+    template: activeVer?.template || 'classic',
+    market: activeVer?.market || 'india',
+    data: activeVer?.data || {}
+  };
+
+  versions.push(newVer);
+  saveVersions(versions);
+  closeVerModal();
+  openVersion(newVer.id);
+}
+
+function openVersion(id) {
+  const versions = getVersions();
+  const ver = versions.find(v => v.id === id);
+  if (!ver) return;
+
+  // Save current state back to currently active version before switching
+  saveCurrentToVersion();
+
+  setActiveVersionId(id);
+  currentTemplate = ver.template || 'classic';
+  currentMarket = ver.market || 'india';
+
+  // Restore market UI
+  document.querySelectorAll('.market-btn').forEach(b => b.classList.remove('active'));
+  const mBtn = document.querySelector(`.market-btn[onclick*="'${currentMarket}'"]`);
+  if (mBtn) { mBtn.classList.add('active'); setMarket(currentMarket, mBtn); }
+
+  // Restore form fields from version data
+  if (ver.data && Object.keys(ver.data).length > 0) {
+    restoreFormFromData(ver.data);
+  } else {
+    clearFormFields();
+  }
+
+  hideVersionsDashboard();
+  document.getElementById('tpl-picker').classList.remove('hidden');
+  document.getElementById('tpl-selected-name').textContent = getTemplateDisplayName(currentTemplate);
+  // Pre-select template
+  document.querySelectorAll('.tpl-option').forEach(o => {
+    o.classList.toggle('selected', o.dataset.id === currentTemplate);
+  });
+
+  showToast(`Opened: ${ver.name}`, 'success');
+}
+
+function deleteVersion(id) {
+  if (!confirm('Delete this resume version? This cannot be undone.')) return;
+  let versions = getVersions();
+  versions = versions.filter(v => v.id !== id);
+  saveVersions(versions);
+  const activeId = getActiveVersionId();
+  if (activeId === id) localStorage.removeItem(ACTIVE_VER_KEY);
+  renderVersionsGrid();
+}
+
+function saveCurrentToVersion() {
+  const activeId = getActiveVersionId();
+  if (!activeId) return;
+  const versions = getVersions();
+  const idx = versions.findIndex(v => v.id === activeId);
+  if (idx < 0) return;
+  versions[idx].data = collectFormDataForSave();
+  versions[idx].template = currentTemplate;
+  versions[idx].market = currentMarket;
+  versions[idx].updatedAt = Date.now();
+  saveVersions(versions);
+}
+
+function collectFormDataForSave() {
+  const data = {};
+  SAVE_FIELDS.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) data[id.replace('f-','')] = el.value;
+  });
+  // Experience
+  data.experience = Array.from(document.querySelectorAll('.entry-card[id^="exp-"]')).map(card => ({
+    title: card.querySelector('.exp-title')?.value || '',
+    company: card.querySelector('.exp-company')?.value || '',
+    location: card.querySelector('.exp-location')?.value || '',
+    startMonth: card.querySelector('.exp-start-month')?.value || '',
+    startYear: card.querySelector('.exp-start-year')?.value || '',
+    endMonth: card.querySelector('.exp-end-month')?.value || '',
+    endYear: card.querySelector('.exp-end-year')?.value || '',
+    current: card.querySelector('.exp-current')?.checked || false,
+    bullets: card.querySelector('.exp-bullets')?.value || ''
+  }));
+  // Education
+  data.education = Array.from(document.querySelectorAll('.entry-card[id^="edu-"]')).map(card => ({
+    degree: card.querySelector('.edu-degree')?.value || '',
+    institution: card.querySelector('.edu-institution')?.value || '',
+    location: card.querySelector('.edu-location')?.value || '',
+    year: card.querySelector('.edu-year')?.value || '',
+    cgpa: card.querySelector('.edu-cgpa')?.value || ''
+  }));
+  return data;
+}
+
+function restoreFormFromData(data) {
+  const fieldMap = {
+    'name':'f-name','title':'f-title','email':'f-email','phone':'f-phone',
+    'location':'f-location','linkedin':'f-linkedin','portfolio':'f-portfolio',
+    'years':'f-years','ctc':'f-ctc','ectc':'f-ectc','nationality':'f-nationality',
+    'dob':'f-dob','eu-nationality':'f-eu-nationality','summary':'f-summary',
+    'naukri-headline':'f-naukri-headline','tech-skills':'f-tech-skills',
+    'soft-skills':'f-soft-skills','tools':'f-tools','ai-tools':'f-ai-tools',
+    'languages':'f-languages','certs':'f-certs','projects':'f-projects','awards':'f-awards'
+  };
+  Object.entries(fieldMap).forEach(([key, id]) => {
+    const el = document.getElementById(id);
+    if (el && data[key] !== undefined) el.value = data[key];
+  });
+  // Experience
+  if (data.experience?.length) {
+    const list = document.getElementById('experience-list');
+    if (list) {
+      list.innerHTML = '';
+      data.experience.forEach(() => addExperienceEntry());
+      const cards = document.querySelectorAll('.entry-card[id^="exp-"]');
+      data.experience.forEach((exp, i) => {
+        const card = cards[i];
+        if (!card) return;
+        if (card.querySelector('.exp-title')) card.querySelector('.exp-title').value = exp.title||'';
+        if (card.querySelector('.exp-company')) card.querySelector('.exp-company').value = exp.company||'';
+        if (card.querySelector('.exp-location')) card.querySelector('.exp-location').value = exp.location||'';
+        if (card.querySelector('.exp-start-month')) card.querySelector('.exp-start-month').value = exp.startMonth||'';
+        if (card.querySelector('.exp-start-year')) card.querySelector('.exp-start-year').value = exp.startYear||'';
+        if (card.querySelector('.exp-end-month')) card.querySelector('.exp-end-month').value = exp.endMonth||'';
+        if (card.querySelector('.exp-end-year')) card.querySelector('.exp-end-year').value = exp.endYear||'';
+        if (card.querySelector('.exp-current')) card.querySelector('.exp-current').checked = exp.current||false;
+        if (card.querySelector('.exp-bullets')) card.querySelector('.exp-bullets').value = exp.bullets||'';
+      });
+    }
+  }
+  // Education
+  if (data.education?.length) {
+    const list = document.getElementById('education-list');
+    if (list) {
+      list.innerHTML = '';
+      data.education.forEach(() => addEducationEntry());
+      const cards = document.querySelectorAll('.entry-card[id^="edu-"]');
+      data.education.forEach((edu, i) => {
+        const card = cards[i];
+        if (!card) return;
+        if (card.querySelector('.edu-degree')) card.querySelector('.edu-degree').value = edu.degree||'';
+        if (card.querySelector('.edu-institution')) card.querySelector('.edu-institution').value = edu.institution||'';
+        if (card.querySelector('.edu-location')) card.querySelector('.edu-location').value = edu.location||'';
+        if (card.querySelector('.edu-year')) card.querySelector('.edu-year').value = edu.year||'';
+        if (card.querySelector('.edu-cgpa')) card.querySelector('.edu-cgpa').value = edu.cgpa||'';
+      });
+    }
+  }
+  markFilled('personal');
+}
+
+function clearFormFields() {
+  SAVE_FIELDS.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  const expList = document.getElementById('experience-list');
+  if (expList) { expList.innerHTML = ''; addExperienceEntry(); }
+  const eduList = document.getElementById('education-list');
+  if (eduList) { eduList.innerHTML = ''; addEducationEntry(); }
+}
+
+function getTemplateDisplayName(id) {
+  const names = {classic:'India Standard',modern:'Tech Pro',corporate:'Corporate',
+    executive:'Executive',fresher:'Campus',creative:'Creative',iit:'Premier Institute'};
+  return names[id] || 'India Standard';
+}
+
+// Hook autosave to also save to active version
+const _origAutosave = autosave;
+function autosave() {
+  _origAutosave();
+  // Debounce version save too
+  clearTimeout(autosave._verTimer);
+  autosave._verTimer = setTimeout(saveCurrentToVersion, 1200);
+}
+
+
+
 // ── TEMPLATE PICKER ────────────────────────────────────────────────────
 const SAMPLE_DATA = {
   market: 'india',
@@ -997,6 +1700,23 @@ function pickerSelect(id, card) {
 }
 
 function confirmTemplate() {
+  // If no version exists yet, create a default one
+  const versions = getVersions();
+  if (versions.length === 0) {
+    const newVer = {
+      id: 'ver_' + Date.now(),
+      name: 'My Resume',
+      targetRole: '',
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      template: currentTemplate,
+      market: currentMarket,
+      data: {}
+    };
+    versions.push(newVer);
+    saveVersions(versions);
+    setActiveVersionId(newVer.id);
+  }
   // Hide picker, show builder
   document.getElementById('tpl-picker').classList.add('hidden');
   document.getElementById('change-tpl-btn').style.display = 'inline-flex';
@@ -1013,8 +1733,25 @@ function showTemplatePicker() {
 
 // Render previews once templates are defined (after page load)
 window.addEventListener('DOMContentLoaded', () => {
-  // Small delay to ensure render functions are ready
   setTimeout(renderPickerPreviews, 100);
+  document.querySelectorAll('input,textarea,select').forEach(el => el.addEventListener('input', autosave));
+  document.querySelectorAll('input,textarea,select').forEach(el => el.addEventListener('change', autosave));
+  // Show versions dashboard if versions exist, else show template picker
+  const versions = getVersions();
+  if (versions.length > 0) {
+    // Hide template picker, show versions dashboard
+    document.getElementById('tpl-picker').classList.add('hidden');
+    showVersionsDashboard();
+  }
+  // If an active version exists, restore its data after a tick
+  const activeId = getActiveVersionId();
+  if (activeId) {
+    setTimeout(() => {
+      const vers = getVersions();
+      const ver = vers.find(v => v.id === activeId);
+      if (ver?.data && Object.keys(ver.data).length > 0) restoreFormFromData(ver.data);
+    }, 300);
+  }
 });
 
 
@@ -2092,6 +2829,8 @@ function showToast(msg, type) {
 
 // Initialize — show India fields by default
 document.querySelectorAll('.india-field').forEach(el => el.style.display = 'flex');
+// Boot versions manager
+setTimeout(rfInit, 50);
 
 // ── COMPLETENESS CHECKER ───────────────────────────────────────────────
 function runCompletenessCheck(data) {
@@ -2304,7 +3043,348 @@ function renderChecklist(data) {
   document.getElementById('checklist-panel').scrollIntoView({behavior:'smooth', block:'start'});
 }
 
+
+// ═══════════════════════════════════════════════════════════════
+// RESUMEFORGE — VERSIONS MANAGER
+// Uses localStorage. No backend required.
+// rf_master    = complete career data object
+// rf_versions  = array of version objects
+// rf_active_id = currently active version id
+// ═══════════════════════════════════════════════════════════════
+
+const RF_MASTER_KEY   = 'rf_master';
+const RF_VERSIONS_KEY = 'rf_versions';
+const RF_ACTIVE_KEY   = 'rf_active_id';
+const BADGE_COLORS    = ['rfb-purple','rfb-teal','rfb-amber','rfb-green','rfb-blue'];
+let rfSelectedLabel   = 'Product';
+let rfAutoSaveTimer   = null;
+
+// ── INIT ────────────────────────────────────────────────────────
+function rfInit() {
+  const versions = rfGetVersions();
+  const master   = rfGetMaster();
+  if (versions.length === 0 && !master) {
+    showDashboard();
+  } else if (versions.length === 0) {
+    showDashboard();
+  } else {
+    showDashboard();
+  }
+  rfRenderDashboard();
+  document.getElementById('rf-save-bar').style.display = 'flex';
+  rfSetupAutosave();
+}
+
+// ── STORAGE HELPERS ─────────────────────────────────────────────
+function rfGetVersions() {
+  try { return JSON.parse(localStorage.getItem(RF_VERSIONS_KEY)) || []; }
+  catch { return []; }
+}
+function rfSaveVersions(v) { localStorage.setItem(RF_VERSIONS_KEY, JSON.stringify(v)); }
+function rfGetMaster()   { try { return JSON.parse(localStorage.getItem(RF_MASTER_KEY)); } catch { return null; } }
+function rfSaveMaster(d) { localStorage.setItem(RF_MASTER_KEY, JSON.stringify(d)); }
+function rfGetActiveId() { return localStorage.getItem(RF_ACTIVE_KEY) || null; }
+function rfSetActiveId(id) { localStorage.setItem(RF_ACTIVE_KEY, id); }
+
+// ── DASHBOARD ───────────────────────────────────────────────────
+function showDashboard() {
+  document.getElementById('rf-dashboard').classList.remove('hidden');
+  rfRenderDashboard();
+}
+function hideDashboard() {
+  document.getElementById('rf-dashboard').classList.add('hidden');
+}
+function rfRenderDashboard() {
+  const versions  = rfGetVersions();
+  const master    = rfGetMaster();
+  const activeId  = rfGetActiveId();
+  const grid      = document.getElementById('rf-versions-grid');
+
+  // Master bar
+  const statusEl  = document.getElementById('rf-master-status');
+  const subEl     = document.getElementById('rf-master-sub');
+  if (master && master.name) {
+    statusEl.textContent = '✓ Saved';
+    statusEl.className   = 'rf-master-status rf-ms-saved';
+    subEl.textContent    = master.name + ' · ' + (master.experience?.length || 0) + ' roles · updated ' + rfTimeAgo(master.savedAt);
+  } else {
+    statusEl.textContent = 'Not saved yet';
+    statusEl.className   = 'rf-master-status rf-ms-empty';
+  }
+
+  // Version cards
+  let cardsHTML = '';
+  versions.forEach((v, i) => {
+    const isActive  = v.id === activeId;
+    const badgeCls  = BADGE_COLORS[i % BADGE_COLORS.length];
+    const expCount  = (v.data?.experience || []).filter(e => e.title).length;
+    const skillCount = (v.data?.techSkills || '').split(',').filter(s => s.trim()).length;
+    cardsHTML += `
+    <div class="rf-ver-card${isActive ? ' rf-active' : ''}" onclick="openVersion('${v.id}')">
+      ${isActive ? '<div class="rf-active-pill">Active</div>' : ''}
+      <div class="rf-ver-badge ${badgeCls}">${v.label || 'General'}</div>
+      <div class="rf-ver-name">${rfEsc(v.name)}</div>
+      <div class="rf-ver-meta">Template: ${v.template || 'India Standard'} · ${rfTimeAgo(v.updatedAt)}</div>
+      <div class="rf-ver-stats">
+        <div class="rf-ver-stat"><strong>${expCount}</strong> roles</div>
+        <div class="rf-ver-stat"><strong>${skillCount}</strong> skills</div>
+        <div class="rf-ver-stat">Market: <strong>${(v.data?.market || 'india').toUpperCase()}</strong></div>
+      </div>
+      <div class="rf-ver-actions" onclick="event.stopPropagation()">
+        <button class="rf-act-btn rf-act-open" onclick="openVersion('${v.id}')">Open</button>
+        <button class="rf-act-btn" onclick="duplicateVersion('${v.id}')">Duplicate</button>
+        <button class="rf-act-btn rf-act-del" onclick="deleteVersion('${v.id}')">Delete</button>
+      </div>
+    </div>`;
+  });
+
+  // Add new card
+  cardsHTML += `
+  <div class="rf-ver-card rf-add" onclick="showNewVersionModal()">
+    <div class="rf-add-icon">+</div>
+    <div class="rf-add-text">New version</div>
+    <div class="rf-add-hint">Product, Data, Senior…</div>
+  </div>`;
+
+  grid.innerHTML = cardsHTML;
+
+  // Update version name input
+  const activeVer = versions.find(v => v.id === activeId);
+  if (activeVer) {
+    const inp = document.getElementById('rf-version-name-input');
+    if (inp) inp.value = activeVer.name;
+  }
+}
+
+// ── OPEN VERSION ────────────────────────────────────────────────
+function openVersion(id) {
+  const versions = rfGetVersions();
+  const ver      = versions.find(v => v.id === id);
+  if (!ver) return;
+  rfSetActiveId(id);
+  if (ver.data) rfFillForm(ver.data);
+  // Set template
+  if (ver.template) {
+    currentTemplate = rfTemplateKey(ver.template);
+  }
+  // Update version name input
+  const inp = document.getElementById('rf-version-name-input');
+  if (inp) inp.value = ver.name;
+  rfSetAutosaveLabel('Saved · ' + rfTimeAgo(ver.updatedAt));
+  hideDashboard();
+  // Show template picker step is skipped — go straight to builder
+  document.getElementById('tpl-picker').classList.add('hidden');
+  document.getElementById('change-tpl-btn').style.display = 'flex';
+}
+
+// ── FILL FORM FROM DATA ──────────────────────────────────────────
+function rfFillForm(data) {
+  if (!data) return;
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
+  set('f-name', data.name); set('f-title', data.title);
+  set('f-email', data.email); set('f-phone', data.phone);
+  set('f-location', data.location); set('f-linkedin', data.linkedin);
+  set('f-portfolio', data.portfolio); set('f-years', data.years);
+  set('f-summary', data.summary); set('f-naukri-headline', data.naukri);
+  set('f-tech-skills', data.techSkills); set('f-soft-skills', data.softSkills);
+  set('f-tools', data.tools); set('f-ai-tools', data.aiTools);
+  set('f-certs', data.certs); set('f-projects', data.projects);
+  set('f-awards', data.awards); set('f-ctc', data.ctc); set('f-ectc', data.ectc);
+  set('f-nationality', data.nationality); set('f-languages', data.languages);
+
+  // Set market
+  if (data.market) {
+    document.querySelectorAll('.market-btn').forEach(b => b.classList.remove('active'));
+    const mb = document.querySelector(`.market-btn[onclick*="${data.market}"]`);
+    if (mb) { mb.classList.add('active'); setMarket(data.market, mb); }
+  }
+
+  // Rebuild experience list
+  const expList = document.getElementById('experience-list');
+  if (expList && data.experience?.length) {
+    expList.innerHTML = '';
+    expCount = 0;
+    data.experience.forEach(exp => {
+      addExperience();
+      const cards = expList.querySelectorAll('.entry-card');
+      const card  = cards[cards.length - 1];
+      if (!card) return;
+      const setC = (cls, val) => { const el = card.querySelector(cls); if (el) el.value = val || ''; };
+      setC('.exp-title', exp.title); setC('.exp-company', exp.company);
+      setC('.exp-location', exp.location); setC('.exp-bullets', exp.bullets);
+      const startParts = (exp.start || '').split(' ');
+      const endParts   = (exp.end   || '').split(' ');
+      setC('.exp-start-month', startParts[0]); setC('.exp-start-year', startParts[1]);
+      if (exp.end === 'Present') {
+        const chk = card.querySelector('.exp-current');
+        if (chk) { chk.checked = true; toggleCurrentJob(chk); }
+      } else {
+        setC('.exp-end-month', endParts[0]); setC('.exp-end-year', endParts[1]);
+      }
+    });
+  }
+
+  // Rebuild education list
+  const eduList = document.getElementById('education-list');
+  if (eduList && data.education?.length) {
+    eduList.innerHTML = '';
+    eduCount = 0;
+    data.education.forEach(edu => {
+      addEducation();
+      const cards = eduList.querySelectorAll('.entry-card');
+      const card  = cards[cards.length - 1];
+      if (!card) return;
+      const setC = (cls, val) => { const el = card.querySelector(cls); if (el) el.value = val || ''; };
+      setC('.edu-degree', edu.degree); setC('.edu-institution', edu.institution);
+      setC('.edu-year', edu.year); setC('.edu-cgpa', edu.cgpa);
+      setC('.edu-location', edu.location);
+    });
+  }
+
+  // Mark sections filled
+  ['personal','summary','experience','education','skills'].forEach(s => markFilled(s));
+}
+
+// ── SAVE CURRENT VERSION ─────────────────────────────────────────
+function saveCurrentVersion() {
+  const data     = collectFormData();
+  const name     = document.getElementById('rf-version-name-input')?.value?.trim() || 'My Resume';
+  const versions = rfGetVersions();
+  const activeId = rfGetActiveId();
+  const now      = Date.now();
+
+  if (activeId) {
+    const idx = versions.findIndex(v => v.id === activeId);
+    if (idx >= 0) {
+      versions[idx].data      = data;
+      versions[idx].name      = name;
+      versions[idx].template  = currentTemplate;
+      versions[idx].updatedAt = now;
+      rfSaveVersions(versions);
+      rfSaveMaster(Object.assign({}, data, { savedAt: now }));
+      rfSetAutosaveLabel('Saved just now');
+      showToast('✓ Version saved', 'success');
+      return;
+    }
+  }
+
+  // No active — create new
+  const id = 'v_' + now;
+  versions.push({ id, name, label:'General', template: currentTemplate, data, createdAt: now, updatedAt: now });
+  rfSaveVersions(versions);
+  rfSetActiveId(id);
+  rfSaveMaster(Object.assign({}, data, { savedAt: now }));
+  rfSetAutosaveLabel('Saved just now');
+  showToast('✓ New version saved', 'success');
+}
+
+// ── AUTOSAVE ─────────────────────────────────────────────────────
+function rfSetupAutosave() {
+  document.addEventListener('input', () => {
+    rfSetAutosaveLabel('Unsaved changes');
+    clearTimeout(rfAutoSaveTimer);
+    rfAutoSaveTimer = setTimeout(() => {
+      const activeId = rfGetActiveId();
+      if (!activeId) return;
+      const data     = collectFormData();
+      const versions = rfGetVersions();
+      const idx      = versions.findIndex(v => v.id === activeId);
+      if (idx >= 0) {
+        versions[idx].data      = data;
+        versions[idx].updatedAt = Date.now();
+        rfSaveVersions(versions);
+        rfSaveMaster(Object.assign({}, data, { savedAt: Date.now() }));
+        rfSetAutosaveLabel('Auto-saved');
+      }
+    }, 3000);
+  });
+}
+function rfSetAutosaveLabel(txt) {
+  const el = document.getElementById('rf-autosave-lbl');
+  if (el) el.textContent = txt;
+}
+
+// ── NEW VERSION MODAL ────────────────────────────────────────────
+function showNewVersionModal() {
+  document.getElementById('rf-modal-bg').classList.remove('hidden');
+  document.getElementById('rf-modal-name').focus();
+}
+function hideNewVersionModal() {
+  document.getElementById('rf-modal-bg').classList.add('hidden');
+}
+function createNewVersion() {
+  const name   = document.getElementById('rf-modal-name')?.value?.trim();
+  if (!name) { document.getElementById('rf-modal-name').focus(); return; }
+  const source = document.getElementById('rf-modal-source')?.value || 'blank';
+  const master = rfGetMaster();
+  const id     = 'v_' + Date.now();
+  const now    = Date.now();
+  const data   = (source === 'master' && master) ? Object.assign({}, master) : {};
+  const versions = rfGetVersions();
+  versions.push({ id, name, label: rfSelectedLabel, template: 'classic', data, createdAt: now, updatedAt: now });
+  rfSaveVersions(versions);
+  rfSetActiveId(id);
+  hideNewVersionModal();
+  // Reset modal
+  document.getElementById('rf-modal-name').value = '';
+  // Open the new version
+  openVersion(id);
+}
+
+// Label selector
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.rf-label-opt').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.rf-label-opt').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      rfSelectedLabel = btn.dataset.label;
+    });
+  });
+});
+
+// ── DUPLICATE / DELETE ───────────────────────────────────────────
+function duplicateVersion(id) {
+  const versions = rfGetVersions();
+  const ver      = versions.find(v => v.id === id);
+  if (!ver) return;
+  const newId    = 'v_' + Date.now();
+  const now      = Date.now();
+  versions.push(Object.assign({}, ver, { id: newId, name: ver.name + ' (copy)', createdAt: now, updatedAt: now }));
+  rfSaveVersions(versions);
+  rfRenderDashboard();
+  showToast('✓ Version duplicated', 'success');
+}
+function deleteVersion(id) {
+  if (!confirm('Delete this version? This cannot be undone.')) return;
+  let versions = rfGetVersions();
+  versions     = versions.filter(v => v.id !== id);
+  rfSaveVersions(versions);
+  if (rfGetActiveId() === id) localStorage.removeItem(RF_ACTIVE_KEY);
+  rfRenderDashboard();
+  showToast('Version deleted', '');
+}
+
+// ── HELPERS ──────────────────────────────────────────────────────
+function rfTimeAgo(ts) {
+  if (!ts) return 'never';
+  const sec = Math.round((Date.now() - ts) / 1000);
+  if (sec < 60) return 'just now';
+  if (sec < 3600) return Math.round(sec/60) + 'm ago';
+  if (sec < 86400) return Math.round(sec/3600) + 'h ago';
+  return Math.round(sec/86400) + 'd ago';
+}
+function rfEsc(s) {
+  return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function rfTemplateKey(name) {
+  const map = {'India Standard':'classic','Tech Pro':'modern','Corporate':'corporate',
+    'Executive':'executive','Campus':'fresher','Creative':'creative','Premier Institute':'iit'};
+  return map[name] || name || 'classic';
+}
+
+// ── OVERRIDE confirmTemplate to set activeId if none ─────────────
+const _origConfirmTemplate = typeof confirmTemplate === 'function' ? confirmTemplate : null;
+
 </script>
 </body>
 </html>
-
