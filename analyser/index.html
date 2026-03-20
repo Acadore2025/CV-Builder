@@ -387,31 +387,7 @@ function renderDashboard(d){
 
   // Score breakdown — rubric view
   const db=d.dimension_breakdown||{};
-  const dims=[
-    {key:'content_quality',label:'Content Quality',weight:'28%',color:'var(--purple2)',score:s.content_quality||0},
-    {key:'ats_compatibility',label:'ATS Compatibility',weight:'24%',color:'var(--blue)',score:s.ats_compatibility||0},
-    {key:'skills_relevance',label:'Skills Relevance',weight:'22%',color:'var(--green)',score:s.skills_relevance||0},
-    {key:'market_fit',label:'Market Fit',weight:'10%',color:'var(--amber)',score:s.market_fit||0},
-    {key:'structure_readability',label:'Structure & Readability',weight:'9%',color:'var(--teal)',score:s.structure_readability||0},
-    {key:'career_narrative',label:'Career Narrative',weight:'7%',color:'#F472B6',score:s.career_narrative||0},
-  ];
-  document.getElementById('breakdown-content').innerHTML=dims.map(dim=>{
-    const dd=db[dim.key]||{},chks=dd.checkpoints||[],ko=dd.knockout_applied;
-    return `<div class="dim-card">
-      <div class="dim-header">
-        <div class="dim-name" style="color:${dim.color}">${dim.label}</div>
-        <div class="dim-score-wrap">
-          ${ko?'<span class="ko-cap-pill">KNOCKOUT CAP</span>':''}
-          <div class="dim-score" style="color:${sCol(dim.score)}">${dim.score}</div>
-          <div class="dim-max">/100</div>
-          <div class="dim-weight-pill">${dim.weight}</div>
-        </div>
-      </div>
-      <div class="checkpoint-list">
-        ${chks.map(c=>{const pct=c.max>0?c.earned/c.max:0;const col=cCol(c.earned,c.max);return `<div class="checkpoint"><div class="chk-scores"><div class="chk-earned" style="color:${col}">${c.earned}</div><div class="chk-max">/${c.max}</div></div><div class="chk-body"><div class="chk-name">${c.id} — ${c.name}</div><div class="chk-detail">${c.detail}</div><div class="chk-bar"><div class="chk-bar-fill" style="width:${Math.round(pct*100)}%;background:${col}"></div></div></div></div>`;}).join('')}
-      </div>
-    </div>`;
-  }).join('');
+
 
   // Skills — strong from resume, missing from AI global taxonomy
   const sk=d.skills||{};
