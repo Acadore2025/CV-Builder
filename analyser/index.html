@@ -344,9 +344,10 @@ function sCol(s){return s>=80?'var(--green)':s>=60?'var(--amber)':'var(--red)';}
 function cCol(e,m){const p=m>0?e/m:0;return p>=0.8?'var(--green)':p>=0.5?'var(--amber)':'var(--red)';}
 
 async function runAnalysis(){
-  const resume=document.getElementById('resume-input').value.trim();
-  if(!resume){alert('Please paste or upload your resume first.');return;}
-  const jd=document.getElementById('jd-input')?document.getElementById('jd-input').value.trim():'',level=document.getElementById('exp-select').value;
+  const raw=document.getElementById('resume-input').value.trim();
+  if(!raw){alert('Please paste or upload your resume first.');return;}
+  const resume=raw.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F-\u009F\uFFFD\uFFFE\uFFFF]/g,' ').replace(/\r\n/g,'\n').replace(/\r/g,'\n');
+  const jdRaw=document.getElementById('jd-input')?document.getElementById('jd-input').value.trim():'';const jd=jdRaw.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F-\u009F\uFFFD\uFFFE\uFFFF]/g,' ').replace(/\r\n/g,'\n').replace(/\r/g,'\n');const level=document.getElementById('exp-select').value;
   document.getElementById('empty-state').style.display='none';document.getElementById('dashboard').classList.remove('show');document.getElementById('loading-state').classList.add('show');document.getElementById('analyse-btn').disabled=true;resetProg();
   const steps=[[1,'Scoring content quality...','Bullets, metrics, filler, verbs'],[2,'Checking ATS compatibility...','Structure, keywords, parsing risks'],[3,'Analysing skills gap...','Role-specific skills, market expectations'],[4,'Reviewing structure...','Length, bullets, section order'],[5,'Evaluating career narrative...','Progression, alignment, consistency'],[6,'Generating section feedback...','Section-by-section detailed review'],[7,'Building HR insights...','What recruiters actually see']];
   let si=0;const iv=setInterval(()=>{if(si<steps.length){if(si>0)setDone(si);setRunning(steps[si][0]);document.getElementById('loading-title').textContent=steps[si][1];document.getElementById('loading-sub').textContent=steps[si][2];si++;}else clearInterval(iv);},900);
@@ -420,7 +421,7 @@ async function processFile(file){
   try{const text=ext==='pdf'?await extractPDF(file):await extractDOCX(file);if(!text.trim())throw new Error('No readable text found.');document.getElementById('resume-input').value=text.trim();updateCount();st.style.color='var(--teal)';st.textContent='Text extracted — ready to analyse';setTimeout(()=>st.classList.remove('show'),3000);}
   catch(err){st.style.color='var(--red)';st.textContent=err.message;setTimeout(()=>st.classList.remove('show'),4000);}
 }
-async function extractPDF(file){const buf=await file.arrayBuffer();const pdf=await pdfjsLib.getDocument({data:buf}).promise;let out='';for(let i=1;i<=pdf.numPages;i++){const pg=await pdf.getPage(i);const ct=await pg.getTextContent();out+=ct.items.map(x=>x.str).join(' ')+'\n';}return out;}
+async function extractPDF(file){const buf=await file.arrayBuffer();const pdf=await pdfjsLib.getDocument({data:buf}).promise;let out='';for(let i=1;i<=pdf.numPages;i++){const pg=await pdf.getPage(i);const ct=await pg.getTextContent();out+=ct.items.map(x=>x.str).join(' ')+'\n';}return out.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F-\u009F\uFFFD\uFFFE\uFFFF]/g,' ').replace(/\r\n/g,'\n').replace(/\r/g,'\n');}
 async function extractDOCX(file){const buf=await file.arrayBuffer();const r=await mammoth.extractRawText({arrayBuffer:buf});return r.value;}
 </script>
 </body>
