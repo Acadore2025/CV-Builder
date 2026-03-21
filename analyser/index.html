@@ -241,7 +241,7 @@ textarea::placeholder{color:var(--dim);}select{cursor:pointer;appearance:none;-w
         <div class="prog-item"><div class="p-dot" id="chk-4">4</div><span>Structure & Readability</span></div>
         <div class="prog-item"><div class="p-dot" id="chk-5">5</div><span>Career Narrative</span></div>
         <div class="prog-item"><div class="p-dot" id="chk-6">6</div><span>Section Feedback</span></div>
-        <div class="prog-item"><div class="p-dot" id="chk-7">7</div><span>HR Insights</span></div>
+    
       </div>
     </div>
   </div>
@@ -289,7 +289,7 @@ textarea::placeholder{color:var(--dim);}select{cursor:pointer;appearance:none;-w
           <button class="tab-btn active" data-tab="overview" onclick="showTab('overview',this)">Overview</button>
           <button class="tab-btn" data-tab="skills" onclick="showTab('skills',this)">Skills Gap</button>
           <button class="tab-btn" data-tab="feedback" onclick="showTab('feedback',this)">Section Feedback</button>
-          
+          <button class="tab-btn" data-tab="hr" onclick="showTab('hr',this)">Why HR Ignores You</button>
         </div>
         <div class="tab-panel active" id="tab-overview">
           <div class="g2">
@@ -317,7 +317,11 @@ textarea::placeholder{color:var(--dim);}select{cursor:pointer;appearance:none;-w
         <div class="tab-panel" id="tab-feedback"><div id="section-feedback-list"></div></div>
 
 
-
+        <div class="tab-panel" id="tab-hr">
+          <div class="alert al-r" style="margin-bottom:14px;"><div class="alert-head">Why HR Is Not Calling You Back</div>Real reasons — every point has a specific fix.</div>
+          <div id="hr-reasons"></div>
+          <div class="card" style="margin-top:12px;"><div class="card-head"><div class="card-head-left"><div class="card-ico">◉</div>The HR Mindset — first 6 seconds</div></div><div id="hr-mindset"></div></div>
+        </div>
       </div>
     </div>
   </div>
@@ -331,7 +335,7 @@ function setMode(m,b){currentMode=m;document.querySelectorAll('.mode-tab').forEa
 function updateCount(){document.getElementById('char-count').textContent=document.getElementById('resume-input').value.length.toLocaleString()+' chars';}
 function clearAll(){['resume-input','jd-input'].forEach(id=>document.getElementById(id).value='');document.getElementById('file-input').value='';document.getElementById('upload-fname').classList.remove('show');document.getElementById('upload-prompt').style.display='block';document.getElementById('upload-status').classList.remove('show');updateCount();document.getElementById('empty-state').style.display='flex';document.getElementById('dashboard').classList.remove('show');document.getElementById('loading-state').classList.remove('show');resetProg();baseScores={};}
 function showTab(id,btn){document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));document.getElementById('tab-'+id).classList.add('active');if(btn)btn.classList.add('active');}
-function resetProg(){for(let i=1;i<=7;i++){const e=document.getElementById('chk-'+i);e.className='p-dot';e.textContent=i;}}
+function resetProg(){for(let i=1;i<=6;i++){const e=document.getElementById('chk-'+i);e.className='p-dot';e.textContent=i;}}
 function setRunning(n){const e=document.getElementById('chk-'+n);e.className='p-dot running';e.textContent='';}
 function setDone(n){const e=document.getElementById('chk-'+n);e.className='p-dot done';e.textContent='✓';}
 function drawRing(sc){const c=238.8,a=document.getElementById('score-arc'),col=sc>=75?'#00C896':sc>=55?'#FBBF24':'#FF6B6B';a.style.stroke=col;a.style.strokeDashoffset=c-(sc/100)*c;document.getElementById('d-overall').style.color=col;}
@@ -344,12 +348,12 @@ async function runAnalysis(){
   if(!resume){alert('Please paste or upload your resume first.');return;}
   const jd=document.getElementById('jd-input')?document.getElementById('jd-input').value.trim():'',level=document.getElementById('exp-select').value;
   document.getElementById('empty-state').style.display='none';document.getElementById('dashboard').classList.remove('show');document.getElementById('loading-state').classList.add('show');document.getElementById('analyse-btn').disabled=true;resetProg();
-  const steps=[[1,'Scoring content quality...','Bullets, metrics, filler, verbs'],[2,'Checking ATS compatibility...','Structure, keywords, parsing risks'],[3,'Analysing skills gap...','Role-specific skills, market expectations'],[4,'Reviewing structure...','Length, bullets, section order'],[5,'Evaluating career narrative...','Progression, alignment, consistency'],[6,'Generating section feedback...','Section-by-section detailed review'],[7,'Building HR insights...','What recruiters actually see']];
+  const steps=[[1,'Scoring content quality...','Bullets, metrics, filler, verbs'],[2,'Checking ATS compatibility...','Structure, keywords, parsing risks'],[3,'Analysing skills gap...','Role-specific skills, market expectations'],[4,'Reviewing structure...','Length, bullets, section order'],[5,'Evaluating career narrative...','Progression, alignment, consistency'],[6,'Generating section feedback...','Section-by-section detailed review']];
   let si=0;const iv=setInterval(()=>{if(si<steps.length){if(si>0)setDone(si);setRunning(steps[si][0]);document.getElementById('loading-title').textContent=steps[si][1];document.getElementById('loading-sub').textContent=steps[si][2];si++;}else clearInterval(iv);},900);
   try{
     const res=await fetch('/api/analyse',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({resume_text:resume,experience_level:level,target_role:jd,mode:'full'})});
     const d=await res.json();if(d.error)throw new Error(d.error);
-    clearInterval(iv);for(let i=1;i<=7;i++)setDone(i);
+    clearInterval(iv);for(let i=1;i<=6;i++)setDone(i);
     renderDashboard(d);
   }catch(err){clearInterval(iv);document.getElementById('loading-state').classList.remove('show');document.getElementById('empty-state').style.display='flex';alert('Analysis failed: '+err.message);}
   finally{document.getElementById('analyse-btn').disabled=false;}
