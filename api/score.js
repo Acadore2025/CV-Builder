@@ -28,7 +28,7 @@ module.exports = async function handler(req, res) {
     let clean = raw.replace(/```json/g,'').replace(/```/g,'').trim();
     const s = clean.indexOf('{'), e = clean.lastIndexOf('}');
     if (s<0||e<0) return res.status(500).json({ error: 'No JSON in response' });
-    try { return res.status(200).json(JSON.parse(clean.slice(s,e+1))); }
+    try { let jsonStr=clean.slice(s,e+1);jsonStr=jsonStr.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g,' ');return res.status(200).json(JSON.parse(jsonStr)); }
     catch(err) { return res.status(500).json({ error: 'Parse error: '+err.message }); }
   } catch(err) { return res.status(500).json({ error: err.message }); }
 };
