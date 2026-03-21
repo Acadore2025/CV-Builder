@@ -28,8 +28,21 @@ module.exports = async function handler(req, res) {
     let clean = raw.replace(/```json/g,'').replace(/```/g,'').trim();
     const s = clean.indexOf('{'), e = clean.lastIndexOf('}');
     if (s<0||e<0) return res.status(500).json({ error: 'No JSON in response' });
-    try { let jsonStr=clean.slice(s,e+1);jsonStr=jsonStr.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g,' ');return res.status(200).json(JSON.parse(jsonStr)); }
-    catch(err) { return res.status(500).json({ error: 'Parse error: '+err.message }); }
+    let jsonStr = clean.slice(s, e+1);
+    // Remove all control characters that are illegal in JSON strings
+    jsonStr = jsonStr.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, ' ');
+    // Fix unescaped double quotes inside JSON string values by parsing char by char
+    try { return res.status(200).json(JSON.parse(jsonStr)); }
+    catch(e1) {
+      // Attempt 2: strip everything after the last valid closing of hr_mindset
+      try {
+        const safe = jsonStr.replace(/"(before|after|detail|fix|feedback|hr_mindset|reason|point|impact|why|how|rewritten|original|verdict|check|action|gap|your_advantages)"\s*:\s*"((?:[^"\\]|\\.)*)"/g,
+          (m, key, val) => '"' + key + '":"' + val.replace(/"/g, '\\"').replace(/[\r\n]/g, ' ') + '"');
+        return res.status(200).json(JSON.parse(safe));
+      } catch(e2) {
+        return res.status(500).json({ error: 'Parse error: ' + e1.message });
+      }
+    }
   } catch(err) { return res.status(500).json({ error: err.message }); }
 };
 
@@ -127,6 +140,6 @@ US: No photo(25) + no DOB(20) + no nationality/religion/marital(20) + 1-page if 
 Gulf: Photo present(20) + nationality(20) + visa status(20) + languages(20) + DOB(10) + driving license(10)
 Europe: Work auth stated(25) + language levels shown(25) + no unnecessary personal data(25) + correct length(25)
 
-Return ONLY valid JSON. No markdown. No explanation. No backticks.
+Return ONLY valid JSON. No markdown. No explanation. No backticks. Never use double quotes inside string values — use single quotes or rephrase instead. Never include raw newlines inside string values.
 ${isQuick ? quickJSON : fullJSON}`;
 }
