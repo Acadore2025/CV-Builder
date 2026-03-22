@@ -15,7 +15,7 @@ module.exports = async function handler(req, res) {
     const text = await response.text();
     let data;
     try { data = JSON.parse(text); }
-    catch { return res.status(500).json({ error: 'Unexpected response: ' + text.slice(0,200) }); }
+    catch { return res.status(500).json({ error: 'Unexpected response: ' + text.slice(0, 200) }); }
     return res.status(response.status).json(data);
   } catch (err) {
     return res.status(500).json({ error: err.message });
