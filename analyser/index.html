@@ -5,8 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ResumeForge — Resume Analyser</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 :root{
@@ -306,7 +304,6 @@ textarea::placeholder{color:var(--dim);}select{cursor:pointer;appearance:none;-w
 <script>
 let currentMode='resume',baseScores={};
 window.addEventListener('DOMContentLoaded',()=>{const p=new URLSearchParams(window.location.search).get('prefill');if(p){document.getElementById('resume-input').value=decodeURIComponent(p);document.getElementById('char-count').textContent=decodeURIComponent(p).length.toLocaleString()+' chars';}});
-if(typeof pdfjsLib!=='undefined')pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 function setMode(m,b){currentMode=m;document.querySelectorAll('.mode-tab').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.getElementById('jd-section').style.display=m==='both'?'block':'none';document.getElementById('nav-mode-label').textContent=m==='both'?'Resume + JD':'Resume Only';}
 function updateCount(){document.getElementById('char-count').textContent=document.getElementById('resume-input').value.length.toLocaleString()+' chars';}
 function clearAll(){['resume-input','jd-input'].forEach(id=>document.getElementById(id).value='');document.getElementById('file-input').value='';document.getElementById('upload-fname').classList.remove('show');document.getElementById('upload-prompt').style.display='block';document.getElementById('upload-status').classList.remove('show');updateCount();document.getElementById('empty-state').style.display='flex';document.getElementById('dashboard').classList.remove('show');document.getElementById('loading-state').classList.remove('show');resetProg();baseScores={};}
@@ -371,7 +368,7 @@ function renderDashboard(d){
 
   // Section feedback
   const vc={'Strong':'sb-g','Good':'sb-g','Needs Work':'sb-a','Missing':'sb-r'};
-  document.getElementById('section-feedback-list').innerHTML=(d.section_feedback||[]).map(sf=>`<div class="card"><div class="card-head"><div class="card-head-left">${sf.section}</div><span class="sec-badge ${vc[sf.verdict]||'sb-a'}">${sf.verdict} · ${sf.score}/100</span></div><div class="alert al-a" style="margin-bottom:10px;font-size:12px;">${sf.feedback}</div>${(sf.issues||[]).map(i=>`<div class="row" style="padding:7px 0;"><div class="rb rb-r" style="margin-top:4px;"></div><div class="row-sub">${i}</div></div>`).join('')}${sf.before?`<div style="margin-top:12px;"><div class="diff"><div class="diff-lbl diff-before">Before</div><div class="diff-body">${sf.before}</div></div><div class="diff"><div class="diff-lbl diff-after">After</div><div class="diff-body after">${sf.after}</div></div></div>`:''}</div>`).join('');
+  document.getElementById('section-feedback-list').innerHTML=(d.section_feedback||[]).map(sf=>`<div class="card"><div class="card-head"><div class="card-head-left">${sf.section}</div><span class="sec-badge ${vc[sf.verdict]||'sb-a'}">${sf.verdict} · ${sf.score}/100</span></div><div class="alert al-a" style="margin-bottom:10px;font-size:12px;">${sf.feedback}</div>${sf.before?`<div style="margin-top:12px;"><div class="diff"><div class="diff-lbl diff-before">Before</div><div class="diff-body">${sf.before}</div></div><div class="diff"><div class="diff-lbl diff-after">After</div><div class="diff-body after">${sf.after}</div></div></div>`:''}</div>`).join('');
 
   // HR
   document.getElementById('hr-reasons').innerHTML=(d.hr_reasons||[]).map(r=>`<div class="hr-card"><div class="hr-n">${r.rank}</div><div><div class="hr-title">${r.reason}</div><div class="hr-body">${r.detail}</div><div class="hr-fix">Fix: ${r.fix}</div></div></div>`).join('');
@@ -386,16 +383,71 @@ function handleDragOver(e){e.preventDefault();document.getElementById('upload-zo
 function handleDragLeave(){document.getElementById('upload-zone').classList.remove('drag-over');}
 function handleDrop(e){e.preventDefault();handleDragLeave();const f=e.dataTransfer.files[0];if(f)processFile(f);}
 function handleFileSelect(e){const f=e.target.files[0];if(f)processFile(f);}
-function removeFile(e){e.stopPropagation();document.getElementById('resume-input').value='';document.getElementById('file-input').value='';document.getElementById('upload-fname').classList.remove('show');document.getElementById('upload-prompt').style.display='block';document.getElementById('upload-status').classList.remove('show');updateCount();}
-async function processFile(file){
-  const ext=file.name.split('.').pop().toLowerCase();if(!['pdf','docx'].includes(ext)){alert('Please upload PDF or DOCX.');return;}
-  document.getElementById('upload-prompt').style.display='none';document.getElementById('upload-fname-label').textContent=file.name;document.getElementById('upload-fname').classList.add('show');
-  const st=document.getElementById('upload-status');st.style.color='var(--muted)';st.textContent='Extracting text…';st.classList.add('show');
-  try{const text=ext==='pdf'?await extractPDF(file):await extractDOCX(file);if(!text.trim())throw new Error('No readable text found.');document.getElementById('resume-input').value=text.trim();updateCount();st.style.color='var(--teal)';st.textContent='Text extracted — ready to analyse';setTimeout(()=>st.classList.remove('show'),3000);}
-  catch(err){st.style.color='var(--red)';st.textContent=err.message;setTimeout(()=>st.classList.remove('show'),4000);}
+function removeFile(e){
+  e.stopPropagation();
+  document.getElementById('resume-input').value='';
+  document.getElementById('file-input').value='';
+  document.getElementById('upload-fname').classList.remove('show');
+  document.getElementById('upload-prompt').style.display='block';
+  document.getElementById('upload-status').classList.remove('show');
+  updateCount();
 }
-async function extractPDF(file){const buf=await file.arrayBuffer();const pdf=await pdfjsLib.getDocument({data:buf}).promise;let out='';for(let i=1;i<=pdf.numPages;i++){const pg=await pdf.getPage(i);const ct=await pg.getTextContent();out+=ct.items.map(x=>x.str).join(' ')+'\n';}return out;}
-async function extractDOCX(file){const buf=await file.arrayBuffer();const r=await mammoth.extractRawText({arrayBuffer:buf});return r.value;}
+
+async function processFile(file) {
+  const ext = file.name.split('.').pop().toLowerCase();
+  if (!['pdf','docx'].includes(ext)) { alert('Please upload a PDF or DOCX file.'); return; }
+
+  // Show filename, hide upload prompt
+  document.getElementById('upload-prompt').style.display = 'none';
+  document.getElementById('upload-fname-label').textContent = file.name;
+  document.getElementById('upload-fname').classList.add('show');
+
+  const st = document.getElementById('upload-status');
+  st.style.color = 'var(--muted)';
+  st.textContent = 'Reading document…';
+  st.classList.add('show');
+
+  try {
+    // Convert file to base64
+    const base64 = await fileToBase64(file);
+
+    const mediaType = ext === 'pdf'
+      ? 'application/pdf'
+      : 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+
+    st.textContent = 'Extracting text with AI…';
+
+    const res = await fetch('/api/extract', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ file_data: base64, file_type: mediaType }),
+    });
+
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+    if (!data.text?.trim()) throw new Error('No readable text found in this document.');
+
+    document.getElementById('resume-input').value = data.text.trim();
+    updateCount();
+    st.style.color = 'var(--teal)';
+    st.textContent = 'Text extracted — ready to analyse';
+    setTimeout(() => st.classList.remove('show'), 3000);
+
+  } catch (err) {
+    st.style.color = 'var(--red)';
+    st.textContent = err.message;
+    setTimeout(() => st.classList.remove('show'), 5000);
+  }
+}
+
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload  = () => resolve(reader.result.split(',')[1]); // strip data:...;base64, prefix
+    reader.onerror = () => reject(new Error('Failed to read file'));
+    reader.readAsDataURL(file);
+  });
+}
 </script>
 </body>
 </html>
