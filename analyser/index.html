@@ -91,7 +91,7 @@ textarea::placeholder{color:var(--dim);}select{cursor:pointer;appearance:none;-w
 .ring-text{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
 .ring-val{font-size:22px;font-weight:700;line-height:1;letter-spacing:-1px;transition:color 0.4s;}
 .ring-lbl{font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:0.06em;margin-top:2px;}
-.score-meta{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;}
+.score-meta{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;}
 .meta-card{background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:var(--r);padding:10px 12px;cursor:pointer;transition:border-color 0.15s;}
 .meta-card:hover{border-color:var(--border2);}
 .meta-val{font-size:17px;font-weight:700;line-height:1;letter-spacing:-0.5px;}
@@ -282,6 +282,7 @@ textarea::placeholder{color:var(--dim);}select{cursor:pointer;appearance:none;-w
             <div class="meta-card" onclick="showTab('skills',document.querySelector('[data-tab=skills]'))"><div class="meta-val" id="d-skills" style="color:var(--green)">--</div><div class="meta-lbl">Skills Match</div></div>
             <div class="meta-card" onclick="showTab('feedback',document.querySelector('[data-tab=feedback]'))"><div class="meta-val" id="d-structure" style="color:var(--teal)">--</div><div class="meta-lbl">Readability</div></div>
             <div class="meta-card" onclick="showTab('hr',document.querySelector('[data-tab=hr]'))"><div class="meta-val" id="d-narrative" style="color:#F472B6">--</div><div class="meta-lbl">Narrative</div></div>
+            <div class="meta-card" onclick="showTab('overview',document.querySelector('[data-tab=overview]'))"><div class="meta-val" id="d-standards" style="color:var(--amber)">--</div><div class="meta-lbl">Pro Standards</div></div>
           </div>
         </div>
 
@@ -372,6 +373,7 @@ function renderDashboard(d){
     countUp(document.getElementById('d-skills'),s.skills_relevance||0,'',800);
     countUp(document.getElementById('d-structure'),s.structure_readability||0,'',800);
     countUp(document.getElementById('d-narrative'),s.career_narrative||0,'',800);
+    countUp(document.getElementById('d-standards'),s.professional_standards||0,'',800);
   },200);
 
   // Knockout flags
