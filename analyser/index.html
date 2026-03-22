@@ -55,6 +55,20 @@ textarea::placeholder{color:var(--dim);}select{cursor:pointer;appearance:none;-w
 .upload-or{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:11px;color:var(--dim);}
 .upload-or::before,.upload-or::after{content:'';flex:1;height:1px;background:var(--border);}
 .upload-status{font-size:11px;text-align:center;margin-bottom:6px;min-height:15px;display:none;}.upload-status.show{display:block;}
+.extract-banner{display:none;align-items:center;gap:12px;background:rgba(108,92,231,0.12);border:1px solid rgba(108,92,231,0.3);border-radius:10px;padding:12px 14px;margin-bottom:8px;}
+.extract-banner.show{display:flex;}
+.extract-spinner{width:18px;height:18px;border:2px solid rgba(108,92,231,0.3);border-top-color:var(--purple2);border-radius:50%;animation:spin 0.8s linear infinite;flex-shrink:0;}
+.extract-text{flex:1;}
+.extract-label{font-size:13px;font-weight:600;color:var(--purple2);}
+.extract-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+.extract-done{display:none;align-items:center;gap:10px;background:rgba(0,200,150,0.08);border:1px solid rgba(0,200,150,0.25);border-radius:10px;padding:10px 14px;margin-bottom:8px;}
+.extract-done.show{display:flex;}
+.extract-done-ico{font-size:16px;}
+.extract-done-text{font-size:13px;font-weight:500;color:var(--green);}
+.extract-err{display:none;align-items:center;gap:10px;background:rgba(255,107,107,0.08);border:1px solid rgba(255,107,107,0.25);border-radius:10px;padding:10px 14px;margin-bottom:8px;}
+.extract-err.show{display:flex;}
+.extract-err-ico{font-size:16px;}
+.extract-err-text{font-size:12px;color:var(--red);line-height:1.5;}
 .prog-list{margin-top:14px;padding-top:14px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:7px;}
 .prog-item{display:flex;align-items:center;gap:9px;font-size:12px;color:var(--dim);}
 .p-dot{width:18px;height:18px;border-radius:50%;border:1px solid var(--border2);background:transparent;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:9px;color:var(--dim);transition:all 0.25s;}
@@ -186,6 +200,22 @@ textarea::placeholder{color:var(--dim);}select{cursor:pointer;appearance:none;-w
           <div class="upload-fname" id="upload-fname"><span id="upload-fname-label"></span><button class="upload-rm" onclick="removeFile(event)">✕</button></div>
         </div>
         <div class="upload-status" id="upload-status"></div>
+        <!-- Extraction state banners -->
+        <div class="extract-banner" id="extract-banner">
+          <div class="extract-spinner"></div>
+          <div class="extract-text">
+            <div class="extract-label">AI Extracting Resume…</div>
+            <div class="extract-sub" id="extract-sub">Reading document layout and content</div>
+          </div>
+        </div>
+        <div class="extract-done" id="extract-done">
+          <div class="extract-done-ico">✓</div>
+          <div class="extract-done-text">Extraction complete — ready to analyse</div>
+        </div>
+        <div class="extract-err" id="extract-err">
+          <div class="extract-err-ico">⚠</div>
+          <div class="extract-err-text" id="extract-err-text">Could not read this file.</div>
+        </div>
         <div class="upload-or">or paste below</div>
         <textarea id="resume-input" rows="9" placeholder="Paste your resume here..." oninput="updateCount()"></textarea>
       </div>
@@ -402,20 +432,23 @@ async function processFile(file) {
   document.getElementById('upload-fname-label').textContent = file.name;
   document.getElementById('upload-fname').classList.add('show');
 
-  const st = document.getElementById('upload-status');
-  st.style.color = 'var(--muted)';
-  st.textContent = 'Reading document…';
-  st.classList.add('show');
+  // Reset all banners
+  document.getElementById('extract-banner').classList.remove('show');
+  document.getElementById('extract-done').classList.remove('show');
+  document.getElementById('extract-err').classList.remove('show');
+
+  // Show extracting banner
+  document.getElementById('extract-sub').textContent = 'Reading document layout and content';
+  document.getElementById('extract-banner').classList.add('show');
 
   try {
-    // Convert file to base64
     const base64 = await fileToBase64(file);
+
+    document.getElementById('extract-sub').textContent = 'Analysing structure, fonts and text…';
 
     const mediaType = ext === 'pdf'
       ? 'application/pdf'
       : 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
-
-    st.textContent = 'Extracting text with AI…';
 
     const res = await fetch('/api/extract', {
       method: 'POST',
@@ -429,21 +462,24 @@ async function processFile(file) {
 
     document.getElementById('resume-input').value = data.text.trim();
     updateCount();
-    st.style.color = 'var(--teal)';
-    st.textContent = 'Text extracted — ready to analyse';
-    setTimeout(() => st.classList.remove('show'), 3000);
+
+    // Hide extracting, show done
+    document.getElementById('extract-banner').classList.remove('show');
+    document.getElementById('extract-done').classList.add('show');
+    setTimeout(() => document.getElementById('extract-done').classList.remove('show'), 4000);
 
   } catch (err) {
-    st.style.color = 'var(--red)';
-    st.textContent = err.message;
-    setTimeout(() => st.classList.remove('show'), 5000);
+    document.getElementById('extract-banner').classList.remove('show');
+    document.getElementById('extract-err-text').textContent = err.message;
+    document.getElementById('extract-err').classList.add('show');
+    setTimeout(() => document.getElementById('extract-err').classList.remove('show'), 6000);
   }
 }
 
 function fileToBase64(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-    reader.onload  = () => resolve(reader.result.split(',')[1]); // strip data:...;base64, prefix
+    reader.onload  = () => resolve(reader.result.split(',')[1]);
     reader.onerror = () => reject(new Error('Failed to read file'));
     reader.readAsDataURL(file);
   });
