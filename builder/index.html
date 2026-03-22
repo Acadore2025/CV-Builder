@@ -1548,16 +1548,18 @@ async function generateResume() {
     let result;
     try { result = JSON.parse(rawText); }
     catch { throw new Error('Server returned an unexpected response (HTTP ' + response.status + '). Please try again.'); }
-    const text = result.content?.[0]?.text || '';
+
+    if (result.error) throw new Error(result.error);
+
+    // New generate.js returns _toolResult directly — a valid JS object, no parsing needed.
+    // Fall back to legacy text path if for any reason _toolResult is absent.
+    let aiData = result._toolResult || null;
+    if (!aiData) {
+      const text = result.content?.[0]?.text || '';
+      try { aiData = JSON.parse(text.replace(/```json|```/g, '').trim()); } catch(e) { aiData = null; }
+    }
 
     updateAILoading('Building preview...', 'Rendering your resume');
-
-    let aiData;
-    try {
-      aiData = JSON.parse(text.replace(/```json|```/g, '').trim());
-    } catch(e) {
-      aiData = null;
-    }
 
     const displayData = currentMode === 'form' ? data : { market: currentMarket, name: 'Candidate', title: '', email: '', phone: '', location: '' };
     renderResume(displayData, aiData, text);
