@@ -1539,7 +1539,7 @@ async function generateResume() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
-        max_tokens: 4000,
+        max_tokens: 6000,
         messages: [{ role: 'user', content: prompt }]
       })
     });
@@ -1633,10 +1633,11 @@ function buildResumeData(data, aiData) {
     linkedin:    aiData?.linkedin   || data.linkedin   || '',
     portfolio:   data.portfolio  || '',
     summary:     aiData?.summary    || data.summary    || '',
-    experience:  aiData?.experience || [],
-    education:   aiData?.education  || [],
+    // Fall back to form data if AI returned empty arrays (truncated output)
+    experience:  (aiData?.experience?.length ? aiData.experience : null) || (data.experience?.filter(e=>e.title||e.company) || []),
+    education:   (aiData?.education?.length  ? aiData.education  : null) || (data.education?.filter(e=>e.degree||e.institution) || []),
     skills:      aiData?.skills     || {},
-    certs:       aiData?.certs      || [],
+    certs:       (aiData?.certs?.length      ? aiData.certs      : null) || (data.certs ? data.certs.split('\n').filter(c=>c.trim()) : []),
     projects:    aiData?.projects   || [],
     awards:      aiData?.awards     || [],
     techSkills:  data.techSkills || '',
@@ -2047,10 +2048,11 @@ function renderResume(data, aiData, rawText) {
   const linkedin = aiData?.linkedin || data.linkedin || '';
   const portfolio = data.portfolio || '';
   const summary = aiData?.summary || data.summary || '';
-  const experience = aiData?.experience || [];
-  const education = aiData?.education || [];
+  // Fall back to form data if AI returned empty arrays (truncated/incomplete output)
+  const experience = (aiData?.experience?.length ? aiData.experience : null) || (data.experience?.filter(e=>e.title||e.company) || []);
+  const education  = (aiData?.education?.length  ? aiData.education  : null) || (data.education?.filter(e=>e.degree||e.institution) || []);
   const skills = aiData?.skills || {};
-  const certs = aiData?.certs || [];
+  const certs  = (aiData?.certs?.length ? aiData.certs : null) || (data.certs ? data.certs.split('\n').filter(c=>c.trim()) : []);
   const projects = aiData?.projects || [];
   const awards = aiData?.awards || [];
   const atsKeywords = aiData?.ats_keywords || [];
