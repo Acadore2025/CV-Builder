@@ -3043,8 +3043,9 @@ async function scoreGeneratedResume() {
       })
     });
 
-    if (!res.ok) throw new Error('Score API returned ' + res.status);
-    var data = await res.json();
+    var rawText = await res.text();
+    var data;
+    try { data = JSON.parse(rawText); } catch(e) { throw new Error('Score API returned non-JSON (HTTP ' + res.status + ')'); }
     if (data.error) throw new Error(data.error);
 
     var scores = data.scores || {};
