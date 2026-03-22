@@ -353,7 +353,10 @@ async function runAnalysis(){
   let si=0;const iv=setInterval(()=>{if(si<steps.length){if(si>0)setDone(si);setRunning(steps[si][0]);document.getElementById('loading-title').textContent=steps[si][1];document.getElementById('loading-sub').textContent=steps[si][2];si++;}else clearInterval(iv);},900);
   try{
     const res=await fetch('/api/analyse',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({resume_text:resume,experience_level:level,target_role:jd,mode:'full'})});
-    const d=await res.json();if(d.error)throw new Error(d.error);
+    const raw=await res.text();
+    let d;
+    try{d=JSON.parse(raw);}catch{throw new Error('Server returned an unexpected response (HTTP '+res.status+'). Please try again in a moment.');}
+    if(d.error)throw new Error(d.error);
     clearInterval(iv);for(let i=1;i<=7;i++)setDone(i);
     renderDashboard(d);
   }catch(err){clearInterval(iv);document.getElementById('loading-state').classList.remove('show');document.getElementById('empty-state').style.display='flex';alert('Analysis failed: '+err.message);}
