@@ -7,10 +7,13 @@ module.exports = async function handler(req, res) {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) return res.status(500).json({ error: 'ANTHROPIC_API_KEY not configured' });
 
-  // market removed — global product
   const { resume_text, experience_level, target_role, mode } = req.body;
   if (!resume_text) return res.status(400).json({ error: 'resume_text is required' });
   const isQuick = mode === 'quick';
+
+  // Sanitize resume before embedding in prompt —
+  // strips chars that cause the model to produce broken JSON string values
+  const safeResume = sanitizeResume(resume_text);
 
   try {
     const response = await fetch('https://api.anthropic.com/v1/messages', {
@@ -20,22 +23,103 @@ module.exports = async function handler(req, res) {
         model: 'claude-haiku-4-5-20251001',
         max_tokens: isQuick ? 2000 : 7000,
         temperature: 0,
-        messages: [{ role: 'user', content: buildPrompt(resume_text, experience_level, target_role, isQuick) }]
+        messages: [{ role: 'user', content: buildPrompt(safeResume, experience_level, target_role, isQuick) }]
       })
     });
+
     const text = await response.text();
     let data;
-    try { data = JSON.parse(text); } catch { return res.status(500).json({ error: 'Unexpected response: ' + text.slice(0, 200) }); }
+    try { data = JSON.parse(text); }
+    catch { return res.status(500).json({ error: 'Unexpected response from AI service: ' + text.slice(0, 200) }); }
+
     if (data.error) return res.status(500).json({ error: data.error.message });
+
     const raw = data.content?.[0]?.text || '';
+
+    // Extract JSON block between first { and last }
     let clean = raw.replace(/```json/g, '').replace(/```/g, '').trim();
-    const s = clean.indexOf('{'), e = clean.lastIndexOf('}');
-    if (s < 0 || e < 0) return res.status(500).json({ error: 'No JSON in response' });
-    try { return res.status(200).json(JSON.parse(clean.slice(s, e + 1))); }
-    catch (err) { return res.status(500).json({ error: 'Parse error: ' + err.message }); }
-  } catch (err) { return res.status(500).json({ error: err.message }); }
+    const s = clean.indexOf('{');
+    const e = clean.lastIndexOf('}');
+    if (s < 0 || e < 0) return res.status(500).json({ error: 'No JSON found in AI response' });
+    clean = clean.slice(s, e + 1);
+
+    // Try parsing as-is
+    try {
+      return res.status(200).json(JSON.parse(clean));
+    } catch (_) {
+      // Apply JSON repair for common LLM output issues and retry
+      const repaired = repairJSON(clean);
+      try {
+        return res.status(200).json(JSON.parse(repaired));
+      } catch (err) {
+        return res.status(500).json({ error: 'JSON parse error (even after repair): ' + err.message });
+      }
+    }
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
 };
 
+// ─── Sanitize resume text before embedding in prompt ───────────────────────
+// Keeps all meaningful content but removes characters that cause the model
+// to produce broken JSON when it re-embeds resume excerpts in "before"/"after" fields.
+function sanitizeResume(text) {
+  return text
+    .replace(/\r\n/g, '\n')           // normalise line endings
+    .replace(/\r/g, '\n')
+    .replace(/\t/g, '  ')             // tabs → spaces
+    .replace(/[^\x20-\x7E\n]/g, ' ') // strip non-printable / non-ASCII
+    .replace(/\\/g, '/')              // backslashes → forward slashes
+    .replace(/"{2,}/g, '"')           // collapse consecutive quotes
+    .replace(/\n{3,}/g, '\n\n')       // max two blank lines
+    .trim();
+}
+
+// ─── Repair common JSON issues produced by LLMs ────────────────────────────
+// Handles:
+//   • Bare (unescaped) newlines inside string values
+//   • Bare carriage returns inside string values
+//   • Trailing commas before } or ]
+function repairJSON(str) {
+  // Remove trailing commas
+  str = str.replace(/,\s*([}\]])/g, '$1');
+
+  // Walk char-by-char to escape bare newlines/CRs inside strings
+  let result = '';
+  let inString = false;
+  let escaped = false;
+
+  for (let i = 0; i < str.length; i++) {
+    const ch = str[i];
+
+    if (escaped) {
+      result += ch;
+      escaped = false;
+      continue;
+    }
+
+    if (ch === '\\') {
+      result += ch;
+      escaped = true;
+      continue;
+    }
+
+    if (ch === '"') {
+      inString = !inString;
+      result += ch;
+      continue;
+    }
+
+    if (inString && ch === '\n') { result += '\\n'; continue; }
+    if (inString && ch === '\r') { result += '\\r'; continue; }
+
+    result += ch;
+  }
+
+  return result;
+}
+
+// ─── Prompt builder ────────────────────────────────────────────────────────
 function buildPrompt(resume, level, role, isQuick) {
   const scores_schema = `"scores":{"overall":<0-100>,"ats_compatibility":<0-100>,"content_quality":<0-100>,"skills_relevance":<0-100>,"structure_readability":<0-100>,"career_narrative":<0-100>,"professional_standards":<0-100>}`;
   const knockout_schema = `"knockout_flags":[{"type":"critical|major","dimension":"ats|professional_standards|structure","reason":"exact reason","cap":<number>}]`;
@@ -45,7 +129,14 @@ function buildPrompt(resume, level, role, isQuick) {
 
   const fullJSON = `{${scores_schema},${knockout_schema},"dimension_breakdown":{"ats_compatibility":{"score":<n>,"checkpoints":[{"check":"name","earned":<n>,"max":<n>,"detail":"finding"}]},"content_quality":{"score":<n>,"checkpoints":[{"check":"name","earned":<n>,"max":<n>,"detail":"finding"}]},"skills_relevance":{"score":<n>,"checkpoints":[{"check":"name","earned":<n>,"max":<n>,"detail":"finding"}]},"structure_readability":{"score":<n>,"checkpoints":[{"check":"name","earned":<n>,"max":<n>,"detail":"finding"}]},"career_narrative":{"score":<n>,"checkpoints":[{"check":"name","earned":<n>,"max":<n>,"detail":"finding"}]},"professional_standards":{"score":<n>,"checkpoints":[{"check":"name","earned":<n>,"max":<n>,"detail":"finding"}]}},"top_fixes":[{"priority":1,"fix":"action","dimension":"name","points_available":<n>,"why":"why"},{"priority":2,"fix":"action","dimension":"name","points_available":<n>,"why":"why"},{"priority":3,"fix":"action","dimension":"name","points_available":<n>,"why":"why"},{"priority":4,"fix":"action","dimension":"name","points_available":<n>,"why":"why"},{"priority":5,"fix":"action","dimension":"name","points_available":<n>,"why":"why"}],"quick_wins":[{"action":"action","impact":"impact","ats_pts":<n>,"skills_pts":<n>,"overall_pts":<n>},{"action":"action","impact":"impact","ats_pts":<n>,"skills_pts":<n>,"overall_pts":<n>},{"action":"action","impact":"impact","ats_pts":<n>,"skills_pts":<n>,"overall_pts":<n>}],"overview":{"strengths":[{"point":"title","detail":"explanation"}],"critical_issues":[{"issue":"title","impact":"consequence"}]},"ats":{"verdict":"2 sentences","parsing_risk":"low|medium|high","keywords_found":["k1","k2","k3","k4","k5","k6","k7","k8"],"keywords_missing":["k1","k2","k3","k4","k5","k6","k7","k8"],"parsing_issues":[{"issue":"problem","fix":"fix"}]},"skills":{"categories":[{"name":"Technical Skills","yours":<n>,"required":<n>},{"name":"Leadership","yours":<n>,"required":<n>},{"name":"Domain Knowledge","yours":<n>,"required":<n>},{"name":"Tools & Software","yours":<n>,"required":<n>},{"name":"Soft Skills","yours":<n>,"required":<n>}],"strong_skills":["s1","s2","s3","s4","s5"],"missing_skills":["s1","s2","s3","s4","s5"],"recommendations":[{"skill":"skill","why":"why","how":"how"}]},"section_feedback":[{"section":"Summary","score":<n>,"verdict":"Strong|Good|Needs Work|Missing","feedback":"feedback","issues":["i1"],"before":"excerpt","after":"improved"},{"section":"Work Experience","score":<n>,"verdict":"...","feedback":"...","issues":["..."],"before":"...","after":"..."},{"section":"Education","score":<n>,"verdict":"...","feedback":"...","issues":["..."],"before":"...","after":"..."},{"section":"Skills Section","score":<n>,"verdict":"...","feedback":"...","issues":["..."],"before":"...","after":"..."},{"section":"Certifications","score":<n>,"verdict":"...","feedback":"...","issues":["..."],"before":"...","after":"..."}],"benchmark":{"dimensions":[{"label":"Years of experience","you":<n>,"avg_candidate":<n>,"top_10_pct":<n>},{"label":"Certifications","you":<n>,"avg_candidate":<n>,"top_10_pct":<n>},{"label":"Quantified achievements","you":<n>,"avg_candidate":<n>,"top_10_pct":<n>},{"label":"Skills breadth","you":<n>,"avg_candidate":<n>,"top_10_pct":<n>},{"label":"Resume quality","you":<n>,"avg_candidate":<n>,"top_10_pct":<n>},{"label":"ATS optimisation","you":<n>,"avg_candidate":<n>,"top_10_pct":<n>}],"gaps_vs_top":[{"gap":"gap","how_to_close":"action"}],"your_advantages":["a1","a2","a3"]},"rewrites":[{"section":"Summary","original":"excerpt","rewritten":"improved","why":"why"},{"section":"Experience Bullet 1","original":"original","rewritten":"verb+metric","why":"why"},{"section":"Experience Bullet 2","original":"original","rewritten":"improved","why":"why"},{"section":"Skills Section","original":"original","rewritten":"improved","why":"why"}],"hr_reasons":[{"rank":1,"reason":"reason","detail":"detail","fix":"fix"},{"rank":2,"reason":"...","detail":"...","fix":"..."},{"rank":3,"reason":"...","detail":"...","fix":"..."},{"rank":4,"reason":"...","detail":"...","fix":"..."},{"rank":5,"reason":"...","detail":"...","fix":"..."}],"hr_mindset":"3-4 sentences. Specific. Direct. Honest."}`;
 
-  return `You are a professional resume scoring engine. Apply this rubric precisely. Temperature is 0 — be deterministic.
+  return `You are a professional resume scoring engine. Apply this rubric precisely.
+
+IMPORTANT — JSON OUTPUT RULES:
+- Your entire response must be one valid JSON object and nothing else.
+- Every string value must have ALL special characters properly escaped.
+- Use \\n for newlines, \\" for double-quotes, \\\\ for backslashes within strings.
+- Do NOT include raw (unescaped) newlines or quotes inside any JSON string value.
+- No markdown, no backticks, no explanation outside the JSON.
 
 RESUME:
 ${resume}
@@ -118,6 +209,5 @@ OTHER:
   Consistent date formatting throughout: 15pts
   No grammatical errors or unprofessional language: 15pts
 
-Return ONLY valid JSON. No markdown. No explanation. No backticks.
 ${isQuick ? quickJSON : fullJSON}`;
 }
