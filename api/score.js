@@ -1,19 +1,32 @@
+/**
+ * score.js — Resume Scoring Engine
+ *
+ * Uses the Anthropic Tool Use API to guarantee structured output.
+ * The model fills typed parameters defined in a schema — the API serialises
+ * them. There is no JSON.parse on model output, no repair function, no
+ * sanitize workarounds. If the model call succeeds, the data is valid.
+ */
+
+const CORS = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type',
+};
+
 module.exports = async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  Object.entries(CORS).forEach(([k, v]) => res.setHeader(k, v));
   if (req.method === 'OPTIONS') return res.status(200).end();
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+  if (req.method !== 'POST')    return res.status(405).json({ error: 'Method not allowed' });
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) return res.status(500).json({ error: 'ANTHROPIC_API_KEY not configured' });
 
   const { resume_text, experience_level, target_role, mode } = req.body;
-  if (!resume_text) return res.status(400).json({ error: 'resume_text is required' });
-  const isQuick = mode === 'quick';
+  if (!resume_text?.trim()) return res.status(400).json({ error: 'resume_text is required' });
 
-  const safeResume = sanitizeResume(resume_text);
-  const model = isQuick ? 'claude-haiku-4-5-20251001' : 'claude-sonnet-4-20250514';
+  const isQuick = mode === 'quick';
+  const model   = isQuick ? 'claude-haiku-4-5-20251001' : 'claude-sonnet-4-20250514';
+  const tool    = isQuick ? QUICK_TOOL : FULL_TOOL;
 
   try {
     const response = await fetch('https://api.anthropic.com/v1/messages', {
@@ -21,141 +34,245 @@ module.exports = async function handler(req, res) {
       headers: {
         'Content-Type': 'application/json',
         'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01'
+        'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
         model,
         max_tokens: isQuick ? 2000 : 6000,
         temperature: 0,
-        messages: [{ role: 'user', content: buildPrompt(safeResume, experience_level, target_role, isQuick) }]
-      })
+        tools: [tool],
+        tool_choice: { type: 'tool', name: tool.name },
+        messages: [{
+          role: 'user',
+          content: buildPrompt(resume_text.trim(), experience_level, target_role),
+        }],
+      }),
     });
 
-    const rawText = await response.text();
-    let data;
-    try { data = JSON.parse(rawText); }
-    catch { return res.status(500).json({ error: 'Unexpected response from AI service: ' + rawText.slice(0, 200) }); }
+    // Parse Anthropic envelope
+    let envelope;
+    const raw = await response.text();
+    try { envelope = JSON.parse(raw); }
+    catch { return res.status(500).json({ error: 'Unexpected response from AI service', preview: raw.slice(0, 300) }); }
 
-    if (data.error) return res.status(500).json({ error: data.error.message });
+    if (envelope.error) return res.status(500).json({ error: envelope.error.message });
 
-    const raw = data.content?.[0]?.text || '';
-    let clean = raw.replace(/```json/g, '').replace(/```/g, '').trim();
-    const s = clean.indexOf('{');
-    const e = clean.lastIndexOf('}');
-    if (s < 0 || e < 0) return res.status(500).json({ error: 'No JSON found in AI response' });
-    clean = clean.slice(s, e + 1);
+    // Extract tool_use block — input is already a parsed JS object from the API
+    const toolBlock = (envelope.content || []).find(b => b.type === 'tool_use' && b.name === tool.name);
+    if (!toolBlock) return res.status(500).json({ error: 'Model did not invoke the scoring tool' });
 
-    try {
-      return res.status(200).json(JSON.parse(clean));
-    } catch (_) {
-      const repaired = repairJSON(clean);
-      try {
-        return res.status(200).json(JSON.parse(repaired));
-      } catch (err) {
-        return res.status(500).json({ error: 'JSON parse error (after repair): ' + err.message });
-      }
-    }
+    // toolBlock.input is valid structured data — no JSON.parse, no repair needed
+    return res.status(200).json(toolBlock.input);
+
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
 };
 
-// ─── Sanitize ──────────────────────────────────────────────────────────────
-function sanitizeResume(text) {
-  return text
-    .replace(/\r\n/g, '\n')
-    .replace(/\r/g, '\n')
-    .replace(/\t/g, '  ')
-    .replace(/[^\x20-\x7E\n]/g, ' ')
-    .replace(/\\/g, '/')
-    .replace(/"{2,}/g, '"')
-    .replace(/\n{3,}/g, '\n\n')
-    .trim();
-}
+// ══════════════════════════════════════════════════════════════════════════════
+// TOOL DEFINITIONS
+// The schema enforces types. The model cannot return a string where an
+// integer is expected, cannot omit required fields, cannot embed raw
+// newlines or unescaped quotes in string values — the API handles all of it.
+// ══════════════════════════════════════════════════════════════════════════════
 
-// ─── JSON repair ───────────────────────────────────────────────────────────
-function repairJSON(str) {
-  str = str.replace(/,\s*([}\]])/g, '$1');
-  let result = '';
-  let inString = false;
-  let escaped = false;
-  for (let i = 0; i < str.length; i++) {
-    const ch = str[i];
-    if (escaped) { result += ch; escaped = false; continue; }
-    if (ch === '\\') { result += ch; escaped = true; continue; }
-    if (ch === '"') { inString = !inString; result += ch; continue; }
-    if (inString && ch === '\n') { result += '\\n'; continue; }
-    if (inString && ch === '\r') { result += '\\r'; continue; }
-    result += ch;
-  }
-  return result;
-}
+const SCORE_PROPS = {
+  overall:                { type: 'integer', description: 'Weighted overall 0-100' },
+  ats_compatibility:      { type: 'integer', description: 'ATS compatibility 0-100' },
+  content_quality:        { type: 'integer', description: 'Content quality 0-100' },
+  skills_relevance:       { type: 'integer', description: 'Skills relevance 0-100' },
+  structure_readability:  { type: 'integer', description: 'Structure and readability 0-100' },
+  career_narrative:       { type: 'integer', description: 'Career narrative 0-100' },
+  professional_standards: { type: 'integer', description: 'Professional standards 0-100' },
+};
 
-// ─── Prompt ────────────────────────────────────────────────────────────────
-function buildPrompt(resume, level, role, isQuick) {
+const KNOCKOUT_ITEM = {
+  type: 'object',
+  properties: {
+    type:      { type: 'string', enum: ['critical', 'major'] },
+    dimension: { type: 'string' },
+    reason:    { type: 'string' },
+    cap:       { type: 'integer' },
+  },
+  required: ['type', 'dimension', 'reason', 'cap'],
+};
 
-  const scores_schema = `"scores":{"overall":<0-100>,"ats_compatibility":<0-100>,"content_quality":<0-100>,"skills_relevance":<0-100>,"structure_readability":<0-100>,"career_narrative":<0-100>,"professional_standards":<0-100>}`;
-  const knockout_schema = `"knockout_flags":[{"type":"critical|major","dimension":"ats|professional_standards|structure","reason":"exact reason","cap":<number>}]`;
-  const fixes_schema = `"top_fixes":[{"priority":1,"fix":"action","dimension":"name","points_available":<n>,"why":"why"},{"priority":2,"fix":"action","dimension":"name","points_available":<n>,"why":"why"},{"priority":3,"fix":"action","dimension":"name","points_available":<n>,"why":"why"}]`;
+const FIX_ITEM = {
+  type: 'object',
+  properties: {
+    priority:         { type: 'integer' },
+    fix:              { type: 'string' },
+    dimension:        { type: 'string' },
+    points_available: { type: 'integer' },
+    why:              { type: 'string' },
+  },
+  required: ['priority', 'fix', 'dimension', 'points_available', 'why'],
+};
 
-  const quickJSON = `{${scores_schema},${knockout_schema},${fixes_schema}}`;
+// Quick: scores + flags + top fixes only (Haiku)
+const QUICK_TOOL = {
+  name: 'score_resume_quick',
+  description: 'Score a resume quickly — return scores, knockout flags, and top 3 fixes.',
+  input_schema: {
+    type: 'object',
+    properties: {
+      scores:         { type: 'object', properties: SCORE_PROPS, required: Object.keys(SCORE_PROPS) },
+      knockout_flags: { type: 'array', items: KNOCKOUT_ITEM },
+      top_fixes:      { type: 'array', items: FIX_ITEM, maxItems: 3 },
+    },
+    required: ['scores', 'knockout_flags', 'top_fixes'],
+  },
+};
 
-  // fullJSON contains ONLY fields that renderDashboard() in analyser/index.html actually reads.
-  // Removed: dimension_breakdown, benchmark, rewrites, quick_wins, ats object, skills.categories
-  const fullJSON = `{${scores_schema},${knockout_schema},${fixes_schema.replace(']', ',{"priority":4,"fix":"action","dimension":"name","points_available":<n>,"why":"why"},{"priority":5,"fix":"action","dimension":"name","points_available":<n>,"why":"why"}]')},"overview":{"strengths":[{"point":"title","detail":"explanation"},{"point":"title","detail":"explanation"}],"critical_issues":[{"issue":"title","impact":"consequence"},{"issue":"title","impact":"consequence"}]},"skills":{"strong_skills":["s1","s2","s3","s4","s5"],"missing_skills":["s1","s2","s3","s4","s5"],"recommendations":[{"skill":"skill","why":"why","how":"how"},{"skill":"skill","why":"why","how":"how"}]},"section_feedback":[{"section":"Summary","score":<n>,"verdict":"Strong|Good|Needs Work|Missing","feedback":"feedback","issues":["issue1"],"before":"paraphrase current state — do not copy verbatim","after":"paraphrase improved version"},{"section":"Work Experience","score":<n>,"verdict":"Strong|Good|Needs Work|Missing","feedback":"feedback","issues":["issue1"],"before":"paraphrase current state","after":"paraphrase improved version"},{"section":"Education","score":<n>,"verdict":"Strong|Good|Needs Work|Missing","feedback":"feedback","issues":["issue1"],"before":"paraphrase current state","after":"paraphrase improved version"},{"section":"Skills Section","score":<n>,"verdict":"Strong|Good|Needs Work|Missing","feedback":"feedback","issues":["issue1"],"before":"paraphrase current state","after":"paraphrase improved version"},{"section":"Certifications","score":<n>,"verdict":"Strong|Good|Needs Work|Missing","feedback":"feedback","issues":["issue1"],"before":"paraphrase current state","after":"paraphrase improved version"}],"hr_reasons":[{"rank":1,"reason":"reason","detail":"detail","fix":"fix"},{"rank":2,"reason":"reason","detail":"detail","fix":"fix"},{"rank":3,"reason":"reason","detail":"detail","fix":"fix"},{"rank":4,"reason":"reason","detail":"detail","fix":"fix"},{"rank":5,"reason":"reason","detail":"detail","fix":"fix"}],"hr_mindset":"3-4 sentences. Specific. Direct. Honest."}`;
+// Full: complete 7-dimension analysis (Sonnet)
+const FULL_TOOL = {
+  name: 'score_resume_full',
+  description: 'Full 7-dimension resume analysis.',
+  input_schema: {
+    type: 'object',
+    properties: {
 
-  return `You are a professional resume scoring engine. Apply this rubric precisely.
+      scores: {
+        type: 'object',
+        properties: SCORE_PROPS,
+        required: Object.keys(SCORE_PROPS),
+      },
 
-=== STRICT JSON OUTPUT RULES ===
-1. Respond with ONE valid JSON object and nothing else — no markdown, no backticks, no commentary.
-2. NEVER copy text verbatim from the resume into any JSON string value.
-   In "before", "after", "feedback", "detail" fields: write your OWN words. Do not paste resume text.
-3. All string values: no double quotes, no backslashes, no raw newlines inside them.
+      knockout_flags: { type: 'array', items: KNOCKOUT_ITEM },
 
-=== RESUME ===
+      top_fixes: { type: 'array', items: FIX_ITEM, maxItems: 5 },
+
+      overview: {
+        type: 'object',
+        properties: {
+          strengths: {
+            type: 'array', maxItems: 4,
+            items: {
+              type: 'object',
+              properties: { point: { type: 'string' }, detail: { type: 'string' } },
+              required: ['point', 'detail'],
+            },
+          },
+          critical_issues: {
+            type: 'array', maxItems: 4,
+            items: {
+              type: 'object',
+              properties: { issue: { type: 'string' }, impact: { type: 'string' } },
+              required: ['issue', 'impact'],
+            },
+          },
+        },
+        required: ['strengths', 'critical_issues'],
+      },
+
+      skills: {
+        type: 'object',
+        properties: {
+          strong_skills:   { type: 'array', items: { type: 'string' }, maxItems: 8 },
+          missing_skills:  { type: 'array', items: { type: 'string' }, maxItems: 8 },
+          recommendations: {
+            type: 'array', maxItems: 3,
+            items: {
+              type: 'object',
+              properties: {
+                skill: { type: 'string' },
+                why:   { type: 'string' },
+                how:   { type: 'string' },
+              },
+              required: ['skill', 'why', 'how'],
+            },
+          },
+        },
+        required: ['strong_skills', 'missing_skills', 'recommendations'],
+      },
+
+      section_feedback: {
+        type: 'array', maxItems: 5,
+        items: {
+          type: 'object',
+          properties: {
+            section:  { type: 'string' },
+            score:    { type: 'integer' },
+            verdict:  { type: 'string', enum: ['Strong', 'Good', 'Needs Work', 'Missing'] },
+            feedback: { type: 'string' },
+            before:   { type: 'string', description: 'Your paraphrase of current state — do not copy resume text' },
+            after:    { type: 'string', description: 'Your paraphrase of improved version' },
+          },
+          required: ['section', 'score', 'verdict', 'feedback', 'before', 'after'],
+        },
+      },
+
+      hr_reasons: {
+        type: 'array', maxItems: 5,
+        items: {
+          type: 'object',
+          properties: {
+            rank:   { type: 'integer' },
+            reason: { type: 'string' },
+            detail: { type: 'string' },
+            fix:    { type: 'string' },
+          },
+          required: ['rank', 'reason', 'detail', 'fix'],
+        },
+      },
+
+      hr_mindset: {
+        type: 'string',
+        description: '3-4 sentences. What the recruiter thinks in first 6 seconds. Specific and direct.',
+      },
+
+    },
+    required: ['scores', 'knockout_flags', 'top_fixes', 'overview', 'skills', 'section_feedback', 'hr_reasons', 'hr_mindset'],
+  },
+};
+
+// ══════════════════════════════════════════════════════════════════════════════
+// PROMPT — no JSON schema block needed; the tool schema handles structure
+// ══════════════════════════════════════════════════════════════════════════════
+function buildPrompt(resume, level, role) {
+  return `You are a professional resume scoring engine. Score the resume below using the rubric precisely.
+
+RESUME:
 ${resume}
 
 EXPERIENCE LEVEL: ${level || 'mid'}
 TARGET ROLE: ${role || 'Not specified'}
 
-=== WEIGHTS ===
+SCORING WEIGHTS:
 Content Quality 28% | ATS Compatibility 24% | Skills Relevance 22% | Professional Standards 10% | Structure 9% | Career Narrative 7%
-FORMULA: overall = round( (ats×0.24)+(content×0.28)+(skills×0.22)+(structure×0.09)+(narrative×0.07)+(professional_standards×0.10) )
+FORMULA: overall = round((ats×0.24)+(content×0.28)+(skills×0.22)+(structure×0.09)+(narrative×0.07)+(professional_standards×0.10))
 
 === DIMENSION 1: ATS COMPATIBILITY ===
 KNOCKOUT (apply before other scoring):
-  Tables/multi-column/text-boxes → score=35 cap, knockout critical
-  Non-standard headings (My Journey/Career Story etc) → score=60 cap, knockout major
-  Contact in header/footer only → score=60 cap, knockout major
+  Tables/multi-column/text-boxes detected → score cap 35, knockout critical
+  Non-standard headings (My Journey etc) → score cap 60, knockout major
+  Contact only in header/footer → score cap 60, knockout major
 CHECKPOINTS:
   No tables/columns/text-boxes: 15pts
-  Standard headings (Experience,Education,Skills,Summary,Certifications): 10pts
+  Standard headings (Experience, Education, Skills, Summary, Certifications): 10pts
   No images/graphics: 10pts
   Consistent parseable dates: 8pts
   Contact in plain text body: 8pts
   No special char bullets: 7pts
-  Plain text readable: 7pts
   Keywords match role+seniority (0-20): 20pts
   Clean LinkedIn URL: 5pts
-  No "References available": -5pts if present
-  No "Objective Statement": -5pts if present
-  Keyword stuffing: -5 per keyword 5+ times (max -15)
+  No "References available": -5 if present
+  No "Objective Statement": -5 if present
 
 === DIMENSION 2: CONTENT QUALITY ===
-  Action verb + quantified metric → 20pts/bullet (best 5, max 40pts)
-  Action verb only → 5pts/bullet | No action verb → 0pts
-  No filler phrases (responsible for/helped/worked on/assisted/involved in): 15pts (-3 each, max -15)
+  Action verb + quantified metric in same bullet → 8pts/bullet (best 5, max 40pts)
+  Action verb only, no metric → 2pts/bullet
+  Filler phrases (responsible for/helped/worked on/assisted in): -3 each, max -15
   Specific summary (role+years+domain+achievement): 15pts
   Consistent tense: 10pts
   No personal pronouns: 8pts (-2 each, max -8)
-  Verb variety (-5 if same verb 3+ bullets; -10 if 4+)
   No spelling errors: 7pts
 
 === DIMENSION 3: SKILLS RELEVANCE ===
   Core technical skills for role (0-30): 30pts
   Specific not vague (Python not Programming): 20pts
   No outdated padding: 15pts
-  Modern tools for role: 20pts
+  Modern tools for the role: 20pts
   Skills categorised: 15pts
 
 === DIMENSION 4: STRUCTURE & READABILITY ===
@@ -179,5 +296,5 @@ CHECKPOINTS:
   Consistent date format: 15pts
   No grammatical errors: 15pts
 
-${isQuick ? quickJSON : fullJSON}`;
+Write your own assessments — do not copy or quote phrases from the resume.`;
 }
