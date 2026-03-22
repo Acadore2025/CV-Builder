@@ -2873,33 +2873,32 @@ async function handleTemplateUpload(event) {
   }
 
   customTemplateName = file.name;
-  setUploadStatus('Extracting text...', '');
+  setUploadStatus('Reading template with AI...', '');
   document.getElementById('tpl-upload-icon').textContent = '⏳';
 
   try {
-    let text = '';
-    if (ext === 'pdf') {
-      text = await extractTemplatePDF(file);
-    } else {
-      text = await extractTemplateDOCX(file);
-    }
+    const base64 = await fileToBase64Builder(file);
+    const mediaType = ext === 'pdf'
+      ? 'application/pdf'
+      : 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
 
-    if (!text.trim()) {
-      setUploadStatus('Could not read text from this file', 'err');
-      document.getElementById('tpl-upload-icon').textContent = '📄';
-      return;
-    }
+    const res = await fetch('/api/extract', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ file_data: base64, file_type: mediaType }),
+    });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+    if (!data.text?.trim()) throw new Error('Could not read text from this file');
 
-    customTemplateText = text.trim();
+    customTemplateText = data.text.trim();
 
-    // Update UI
     document.getElementById('tpl-upload-icon').textContent = '✓';
     document.getElementById('tpl-upload-hint').style.display = 'none';
     document.getElementById('tpl-upload-fname').style.display = 'block';
     document.getElementById('tpl-upload-fname').textContent = file.name;
     setUploadStatus('Template ready — AI will match this style', 'ok');
 
-    // Select this card
     document.querySelectorAll('.tpl-option').forEach(function(c) { c.classList.remove('selected'); });
     var card = document.querySelector('.tpl-upload-card');
     if (card) card.classList.add('selected');
@@ -2919,22 +2918,13 @@ function setUploadStatus(msg, cls) {
   el.className = 'tpl-upload-status' + (cls ? ' ' + cls : '');
 }
 
-async function extractTemplatePDF(file) {
-  var buf = await file.arrayBuffer();
-  var pdf = await pdfjsLib.getDocument({ data: buf }).promise;
-  var out = '';
-  for (var i = 1; i <= pdf.numPages; i++) {
-    var pg = await pdf.getPage(i);
-    var ct = await pg.getTextContent();
-    out += ct.items.map(function(x) { return x.str; }).join(' ') + '\n';
-  }
-  return out;
-}
-
-async function extractTemplateDOCX(file) {
-  var buf = await file.arrayBuffer();
-  var r = await mammoth.extractRawText({ arrayBuffer: buf });
-  return r.value;
+function fileToBase64Builder(file) {
+  return new Promise(function(resolve, reject) {
+    var reader = new FileReader();
+    reader.onload  = function() { resolve(reader.result.split(',')[1]); };
+    reader.onerror = function() { reject(new Error('Failed to read file')); };
+    reader.readAsDataURL(file);
+  });
 }
 
 // ── Override buildPrompt to include custom template style ─────
