@@ -1492,22 +1492,11 @@ ${data.naukri ? 'Naukri Headline: ' + data.naukri : ''}
 
 INSTRUCTIONS:
 1. Include EVERY experience role and EVERY bullet point from the input — do not drop any role or bullet
-2. If a role has many bullets (4+), preserve all of them in the output array — summarise long bullets to under 25 words each but keep ALL of them
+2. If a role has many bullets (4+), preserve all of them — summarise long bullets to under 25 words each but keep ALL of them
 3. Enhance bullet points with stronger action verbs and quantified metrics where plausible
 4. Rewrite the summary to be compelling and results-focused
 5. Ensure ATS-safe language with relevant keywords for the role
-6. Preserve the candidate's authentic voice — don't make it sound generic
-7. Return ONLY a JSON object (no markdown, no backticks) with this exact structure:
-{
-  "summary": "enhanced summary text",
-  "experience": [{"title":"","company":"","start":"","end":"","location":"","bullets":["bullet1","bullet2","bullet3","bullet4"]}],
-  "education": [{"degree":"","institution":"","year":"","cgpa":"","location":""}],
-  "skills": {"technical":["skill1"],"soft":["skill1"],"tools":["tool1"],"ai":["tool1"],"languages":["lang1"]},
-  "certs": ["cert1"],
-  "projects": [{"name":"","description":"","impact":""}],
-  "awards": ["award1"],
-  "ats_keywords": ["keyword1","keyword2","keyword3","keyword4","keyword5","keyword6","keyword7","keyword8"]
-}`;
+6. Preserve the candidate's authentic voice — don't make it sound generic`;
 }
 
 // ── GENERATE RESUME ────────────────────────────────────────────────────
@@ -1551,18 +1540,18 @@ async function generateResume() {
 
     if (result.error) throw new Error(result.error);
 
-    // New generate.js returns _toolResult directly — a valid JS object, no parsing needed.
-    // Fall back to legacy text path if for any reason _toolResult is absent.
+    // generate.js returns _toolResult — a valid JS object from Tool Use API, no parsing needed.
     let aiData = result._toolResult || null;
     if (!aiData) {
-      const text = result.content?.[0]?.text || '';
-      try { aiData = JSON.parse(text.replace(/```json|```/g, '').trim()); } catch(e) { aiData = null; }
+      // Fallback: legacy text path
+      const legacyText = result.content?.[0]?.text || '';
+      try { aiData = JSON.parse(legacyText.replace(/```json|```/g, '').trim()); } catch(e) { aiData = null; }
     }
 
     updateAILoading('Building preview...', 'Rendering your resume');
 
     const displayData = currentMode === 'form' ? data : { market: currentMarket, name: 'Candidate', title: '', email: '', phone: '', location: '' };
-    renderResume(displayData, aiData, text);
+    renderResume(displayData, aiData, '');
     hideAILoading();
     showToast('Resume generated successfully!', 'success');
     // Score the generated resume inline
@@ -1607,17 +1596,7 @@ Rules:
 1. Extract all info from the pasted text
 2. Enhance every bullet with stronger verbs and add plausible metrics
 3. Rewrite summary to be compelling and market-targeted
-4. Preserve authentic voice — no generic AI language
-5. Return ONLY a JSON object with this structure (no markdown):
-{
-  "name": "", "title": "", "email": "", "phone": "", "location": "", "linkedin": "",
-  "summary": "",
-  "experience": [{"title":"","company":"","start":"","end":"","location":"","bullets":["b1","b2","b3"]}],
-  "education": [{"degree":"","institution":"","year":"","cgpa":"","location":""}],
-  "skills": {"technical":["s1"],"soft":["s1"],"tools":["t1"],"ai":[],"languages":[]},
-  "certs": [], "projects": [], "awards": [],
-  "ats_keywords": ["k1","k2","k3","k4","k5","k6"]
-}`;
+4. Preserve authentic voice — no generic AI language`;
 }
 
 async function runAIRewrite() { await generateResume(); }
@@ -2937,23 +2916,15 @@ function fileToBase64Builder(file) {
 
     if (currentTemplate !== 'custom' || !customTemplateText) return base;
 
-    // Inject style reference into the prompt
-    var styleSection = '\n\nCUSTOM TEMPLATE REFERENCE:\n' +
+    // Inject style reference at end of prompt
+    return base + '\n\nCUSTOM TEMPLATE REFERENCE:\n' +
       'The user has uploaded their own resume template. Analyse the structure, section order, ' +
       'formatting style and tone of the following extracted text, then rebuild the resume ' +
       'following the EXACT same layout — same section names, same order, same level of detail per section. ' +
       'Preserve their personal style while enhancing the content quality.\n\n' +
       '--- UPLOADED TEMPLATE START ---\n' +
       customTemplateText.slice(0, 3000) +
-      '\n--- UPLOADED TEMPLATE END ---\n' +
-      '\nReturn the JSON in the standard format. The section order in experience/education/skills ' +
-      'arrays must match the order found in the uploaded template.';
-
-    // Insert before the final "Return ONLY a JSON" instruction
-    return base.replace(
-      'Return ONLY a JSON object',
-      styleSection + '\n\nReturn ONLY a JSON object'
-    );
+      '\n--- UPLOADED TEMPLATE END ---';
   };
 })();
 
