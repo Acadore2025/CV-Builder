@@ -275,6 +275,7 @@ nav{
 }
 .stat-item-num span{color:var(--purple2);}
 .stat-item-lbl{font-size:12px;color:var(--muted);font-weight:400;}
+.stat-item-note{font-size:10px;color:rgba(232,228,255,0.3);margin-top:3px;font-style:italic;}
 
 /* FOOTER */
 footer{
@@ -314,7 +315,7 @@ footer{
   <div class="nav-links">
     <a href="/builder/" class="nav-link">Resume Builder</a>
     <a href="/analyser/" class="nav-link">Resume Analyser</a>
-    <a href="/builder/" class="nav-cta">Get Started →</a>
+    <a href="#tools" class="nav-cta">Get Started →</a>
   </div>
 </nav>
 
@@ -331,12 +332,7 @@ footer{
       <a href="/builder/" class="btn-green">Build My Resume →</a>
       <a href="/analyser/" class="btn-outline">Analyse My Resume</a>
     </div>
-    <div class="markets-row">
-      <span class="market-chip">🇮🇳 India — CGPA, CTC, Naukri</span>
-      <span class="market-chip">🇺🇸 US — ATS, 1-page</span>
-      <span class="market-chip">🇦🇪 Gulf — Photo, Visa</span>
-      <span class="market-chip">🇪🇺 Europe — Europass</span>
-    </div>
+
   </div>
   <div class="hero-right">
     <div class="stat-card">
@@ -356,14 +352,18 @@ footer{
 
 <!-- STATS ROW -->
 <div class="stats-row">
-  <div class="stat-item"><div class="stat-item-num">100<span>+</span></div><div class="stat-item-lbl">Resume Templates</div></div>
+  <div class="stat-item">
+    <div class="stat-item-num">7</div>
+    <div class="stat-item-lbl">Resume Templates</div>
+    <div class="stat-item-note">More arriving shortly</div>
+  </div>
   <div class="stat-item"><div class="stat-item-num">7</div><div class="stat-item-lbl">Analysis Dimensions</div></div>
   <div class="stat-item"><div class="stat-item-num">4</div><div class="stat-item-lbl">Global Job Markets</div></div>
   <div class="stat-item"><div class="stat-item-num">0<span>₹</span></div><div class="stat-item-lbl">Cost to Export</div></div>
 </div>
 
 <!-- TOOLS -->
-<section class="tools-section">
+<section class="tools-section" id="tools">
   <div class="section-eyebrow">Two powerful tools</div>
   <div class="section-title">Everything you need<br>to land the job.</div>
   <p class="section-sub">Build from scratch with AI or analyse your existing resume — both tools are completely free.</p>
