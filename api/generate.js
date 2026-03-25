@@ -1,9 +1,6 @@
 /**
  * generate.js — Resume Generator
- *
- * Uses Tool Use API to guarantee a valid structured resume object.
- * The builder frontend receives a typed JS object directly — no JSON.parse,
- * no repair, no silent truncation risk.
+ * Uses Tool Use API for guaranteed structured output.
  */
 
 const CORS = {
@@ -18,10 +15,7 @@ const RESUME_TOOL = {
   input_schema: {
     type: 'object',
     properties: {
-      summary: {
-        type: 'string',
-        description: 'Enhanced professional summary — compelling, results-focused, role-targeted.',
-      },
+      summary:    { type: 'string', description: 'Enhanced professional summary — compelling, results-focused.' },
       experience: {
         type: 'array',
         items: {
@@ -62,16 +56,12 @@ const RESUME_TOOL = {
         },
         required: ['technical', 'soft', 'tools'],
       },
-      certs:       { type: 'array', items: { type: 'string' } },
+      certs:        { type: 'array', items: { type: 'string' } },
       projects: {
         type: 'array',
         items: {
           type: 'object',
-          properties: {
-            name:        { type: 'string' },
-            description: { type: 'string' },
-            impact:      { type: 'string' },
-          },
+          properties: { name: { type: 'string' }, description: { type: 'string' }, impact: { type: 'string' } },
           required: ['name'],
         },
       },
@@ -90,27 +80,34 @@ module.exports = async function handler(req, res) {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) return res.status(500).json({ error: 'ANTHROPIC_API_KEY not configured' });
 
-  // Accept either a pre-built prompt string (from builder) or raw messages array
-  const { messages, model, max_tokens } = req.body;
+  const { messages } = req.body;
   if (!messages?.length) return res.status(400).json({ error: 'messages is required' });
+
+  // BUG-002 FIX: AbortController with 55s timeout
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 55000);
 
   try {
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
+      signal: controller.signal,
       headers: {
         'Content-Type': 'application/json',
         'x-api-key': apiKey,
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
-        model:       model || 'claude-sonnet-4-20250514',
-        max_tokens:  max_tokens || 6000,
+        // BUG-001 FIX: correct model string
+        model: 'claude-sonnet-4-5-20251001',
+        max_tokens: 6000,
         temperature: 0.3,
         tools: [RESUME_TOOL],
         tool_choice: { type: 'tool', name: 'build_resume' },
         messages,
       }),
     });
+
+    clearTimeout(timeout);
 
     let envelope;
     const raw = await response.text();
@@ -122,14 +119,14 @@ module.exports = async function handler(req, res) {
     const toolBlock = (envelope.content || []).find(b => b.type === 'tool_use' && b.name === 'build_resume');
     if (!toolBlock) return res.status(500).json({ error: 'Model did not invoke the build_resume tool' });
 
-    // Return structured resume data — already a valid JS object, no parsing needed
-    // Wrap in content array to stay compatible with builder's result.content[0].text pattern
-    return res.status(200).json({
-      content: [{ type: 'tool_result', data: toolBlock.input }],
-      _toolResult: toolBlock.input,  // direct access for new code
-    });
+    // BUG-005 FIX: return toolBlock.input directly — clean, no dual-format confusion
+    return res.status(200).json(toolBlock.input);
 
   } catch (err) {
+    clearTimeout(timeout);
+    if (err.name === 'AbortError') {
+      return res.status(504).json({ error: 'Generation timed out. Please try again.' });
+    }
     return res.status(500).json({ error: err.message });
   }
 };
