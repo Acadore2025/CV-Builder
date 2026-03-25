@@ -1,1 +1,8 @@
-
+{
+  "rewrites": [
+    { "source": "/builder", "destination": "/builder/index.html" },
+    { "source": "/builder/", "destination": "/builder/index.html" },
+    { "source": "/analyser", "destination": "/analyser/index.html" },
+    { "source": "/analyser/", "destination": "/analyser/index.html" }
+  ]
+}
