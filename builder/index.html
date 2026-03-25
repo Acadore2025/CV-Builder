@@ -1523,15 +1523,21 @@ async function generateResume() {
 
     updateAILoading('Crafting your content...', 'Enhancing bullet points with AI');
 
+    // BUG-002 FIX: 55s timeout — Vercel kills at 60s, user sees proper error not infinite spinner
+    const genCtrl = new AbortController();
+    const genTimeout = setTimeout(() => genCtrl.abort(), 55000);
+
     const response = await fetch('/api/generate', {
       method: 'POST',
+      signal: genCtrl.signal,
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
+        model: 'claude-sonnet-4-5-20251001',
         max_tokens: 6000,
         messages: [{ role: 'user', content: prompt }]
       })
     });
+    clearTimeout(genTimeout);
 
     const rawText = await response.text();
     let result;
@@ -1540,12 +1546,11 @@ async function generateResume() {
 
     if (result.error) throw new Error(result.error);
 
-    // generate.js returns _toolResult — a valid JS object from Tool Use API, no parsing needed.
-    let aiData = result._toolResult || null;
-    if (!aiData) {
-      // Fallback: legacy text path
-      const legacyText = result.content?.[0]?.text || '';
-      try { aiData = JSON.parse(legacyText.replace(/```json|```/g, '').trim()); } catch(e) { aiData = null; }
+    // BUG-005 FIX: generate.js now returns toolBlock.input directly
+    const aiData = result;
+    // BUG-008 FIX: explicit null guard — never show a blank resume silently
+    if (!aiData || !aiData.summary) {
+      throw new Error('AI returned incomplete data. Please try again.');
     }
 
     updateAILoading('Building preview...', 'Rendering your resume');
@@ -1562,7 +1567,11 @@ async function generateResume() {
 
   } catch(err) {
     hideAILoading();
-    showToast('Generation failed. Please try again.', 'error');
+    if (err.name === 'AbortError') {
+      showToast('Generation timed out. Please try again.', 'error');
+    } else {
+      showToast('Generation failed: ' + err.message, 'error');
+    }
     console.error(err);
   }
 }
@@ -2841,13 +2850,13 @@ function pickerSelectUpload(card) {
   document.getElementById('tpl-upload-input').click();
 }
 
-async function handleTemplateUpload(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-
+async function processFile(file) {
   const ext = file.name.split('.').pop().toLowerCase();
-  if (!['pdf', 'docx'].includes(ext)) {
-    setUploadStatus('Only PDF or DOCX files supported', 'err');
+  if (!['pdf','docx'].includes(ext)) { showToast('Please upload a PDF or DOCX file.', 'error'); return; }
+
+  // File size check (3MB limit)
+  if (file.size > 3 * 1024 * 1024) {
+    setUploadStatus('File too large (max 3MB). Compress at smallpdf.com and retry.', 'err');
     return;
   }
 
@@ -3001,8 +3010,12 @@ async function scoreGeneratedResume() {
   }
 
   try {
+    // BUG-002 FIX: 55s timeout on score call
+    const scoreCtrl = new AbortController();
+    const scoreTimeout = setTimeout(() => scoreCtrl.abort(), 55000);
     var res = await fetch('/api/score', {
       method: 'POST',
+      signal: scoreCtrl.signal,
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         resume_text: generatedATS,
@@ -3010,6 +3023,7 @@ async function scoreGeneratedResume() {
         mode: 'quick'
       })
     });
+    clearTimeout(scoreTimeout);
 
     var rawText = await res.text();
     var data;
