@@ -236,6 +236,11 @@ textarea::placeholder{color:var(--dim);}select{cursor:pointer;appearance:none;-w
         </div>
       </div>
       <button class="btn-primary" id="analyse-btn" onclick="runAnalysis()">Analyse Resume</button>
+      <!-- BUG-006 FIX: error banner replaces alert() — visible on all devices including iOS Safari -->
+      <div id="err-banner" style="display:none;margin-top:10px;background:rgba(255,107,107,0.08);border:1px solid rgba(255,107,107,0.3);border-left:4px solid var(--red);border-radius:10px;padding:12px 14px;">
+        <div style="font-size:12px;font-weight:600;color:var(--red);margin-bottom:3px;">Analysis Error</div>
+        <div id="err-text" style="font-size:12px;color:#FCA5A5;line-height:1.5;"></div>
+      </div>
       <button class="btn-ghost" onclick="clearAll()">Clear everything</button>
       <div class="prog-list">
         <div class="prog-item"><div class="p-dot" id="chk-1">1</div><span>Content Quality</span></div>
@@ -346,20 +351,41 @@ function countUp(el,to,sf,ms){const t=performance.now();requestAnimationFrame(fu
 
 async function runAnalysis(){
   const resume=document.getElementById('resume-input').value.trim();
-  if(!resume){alert('Please paste or upload your resume first.');return;}
+  if(!resume){
+    document.getElementById('err-text').textContent='Please paste or upload your resume first.';
+    document.getElementById('err-banner').style.display='block';
+    setTimeout(()=>document.getElementById('err-banner').style.display='none',5000);
+    return;
+  }
   const jd=document.getElementById('jd-input')?document.getElementById('jd-input').value.trim():'',level=document.getElementById('exp-select').value;
   document.getElementById('empty-state').style.display='none';document.getElementById('dashboard').classList.remove('show');document.getElementById('loading-state').classList.add('show');document.getElementById('analyse-btn').disabled=true;resetProg();
   const steps=[[1,'Scoring content quality...','Bullets, metrics, filler, verbs'],[2,'Checking ATS compatibility...','Structure, keywords, parsing risks'],[3,'Analysing skills gap...','Role-specific skills, market expectations'],[4,'Reviewing structure...','Length, bullets, section order'],[5,'Evaluating career narrative...','Progression, alignment, consistency'],[6,'Generating section feedback...','Section-by-section detailed review'],[7,'Building HR insights...','What recruiters actually see']];
   let si=0;const iv=setInterval(()=>{if(si<steps.length){if(si>0)setDone(si);setRunning(steps[si][0]);document.getElementById('loading-title').textContent=steps[si][1];document.getElementById('loading-sub').textContent=steps[si][2];si++;}else clearInterval(iv);},900);
+
+  // BUG-002 FIX: AbortController — 55s timeout
+  const ctrl=new AbortController();
+  const timer=setTimeout(()=>ctrl.abort(),55000);
+
   try{
-    const res=await fetch('/api/analyse',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({resume_text:resume,experience_level:level,target_role:jd,mode:'full'})});
+    const res=await fetch('/api/analyse',{method:'POST',signal:ctrl.signal,headers:{'Content-Type':'application/json'},body:JSON.stringify({resume_text:resume,experience_level:level,target_role:jd,mode:'full'})});
+    clearTimeout(timer);
     const raw=await res.text();
     let d;
-    try{d=JSON.parse(raw);}catch{throw new Error('Server returned an unexpected response (HTTP '+res.status+'). Please try again in a moment.');}
+    try{d=JSON.parse(raw);}catch{throw new Error('Server returned an unexpected response (HTTP '+res.status+'). Please try again.');}
     if(d.error)throw new Error(d.error);
     clearInterval(iv);for(let i=1;i<=7;i++)setDone(i);
     renderDashboard(d);
-  }catch(err){clearInterval(iv);document.getElementById('loading-state').classList.remove('show');document.getElementById('empty-state').style.display='flex';alert('Analysis failed: '+err.message);}
+  }catch(err){
+    clearTimeout(timer);
+    clearInterval(iv);
+    document.getElementById('loading-state').classList.remove('show');
+    document.getElementById('empty-state').style.display='flex';
+    // BUG-006 FIX: replace alert() with visible banner (alert() is blocked on iOS Safari)
+    const msg = err.name==='AbortError' ? 'Analysis timed out. Try again with a shorter resume.' : 'Analysis failed: '+err.message;
+    document.getElementById('err-text').textContent=msg;
+    document.getElementById('err-banner').style.display='block';
+    setTimeout(()=>document.getElementById('err-banner').style.display='none',8000);
+  }
   finally{document.getElementById('analyse-btn').disabled=false;}
 }
 
@@ -425,36 +451,48 @@ function removeFile(e){
 
 async function processFile(file) {
   const ext = file.name.split('.').pop().toLowerCase();
-  if (!['pdf','docx'].includes(ext)) { alert('Please upload a PDF or DOCX file.'); return; }
+  if (!['pdf','docx'].includes(ext)) {
+    document.getElementById('extract-err-text').textContent = 'Please upload a PDF or DOCX file.';
+    document.getElementById('extract-err').classList.add('show');
+    setTimeout(() => document.getElementById('extract-err').classList.remove('show'), 5000);
+    return;
+  }
 
-  // Show filename, hide upload prompt
+  // File size check (3MB limit)
+  if (file.size > 3 * 1024 * 1024) {
+    document.getElementById('extract-err-text').textContent = 'File too large (max 3MB). Compress at smallpdf.com and retry.';
+    document.getElementById('extract-err').classList.add('show');
+    setTimeout(() => document.getElementById('extract-err').classList.remove('show'), 8000);
+    return;
+  }
+
   document.getElementById('upload-prompt').style.display = 'none';
   document.getElementById('upload-fname-label').textContent = file.name;
   document.getElementById('upload-fname').classList.add('show');
-
-  // Reset all banners
   document.getElementById('extract-banner').classList.remove('show');
   document.getElementById('extract-done').classList.remove('show');
   document.getElementById('extract-err').classList.remove('show');
-
-  // Show extracting banner
-  document.getElementById('extract-sub').textContent = 'Reading document layout and content';
+  document.getElementById('extract-sub').textContent = ext === 'docx' ? 'Reading DOCX content…' : 'Reading document layout and content';
   document.getElementById('extract-banner').classList.add('show');
+
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 55000);
 
   try {
     const base64 = await fileToBase64(file);
-
-    document.getElementById('extract-sub').textContent = 'Analysing structure, fonts and text…';
-
     const mediaType = ext === 'pdf'
       ? 'application/pdf'
       : 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
 
+    document.getElementById('extract-sub').textContent = ext === 'docx' ? 'Extracting text from DOCX…' : 'Analysing structure, fonts and text…';
+
     const res = await fetch('/api/extract', {
       method: 'POST',
+      signal: ctrl.signal,
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ file_data: base64, file_type: mediaType }),
     });
+    clearTimeout(timer);
 
     const data = await res.json();
     if (data.error) throw new Error(data.error);
@@ -462,15 +500,15 @@ async function processFile(file) {
 
     document.getElementById('resume-input').value = data.text.trim();
     updateCount();
-
-    // Hide extracting, show done
     document.getElementById('extract-banner').classList.remove('show');
     document.getElementById('extract-done').classList.add('show');
     setTimeout(() => document.getElementById('extract-done').classList.remove('show'), 4000);
 
   } catch (err) {
+    clearTimeout(timer);
     document.getElementById('extract-banner').classList.remove('show');
-    document.getElementById('extract-err-text').textContent = err.message;
+    const msg = err.name === 'AbortError' ? 'Extraction timed out. Try a smaller file.' : err.message;
+    document.getElementById('extract-err-text').textContent = msg;
     document.getElementById('extract-err').classList.add('show');
     setTimeout(() => document.getElementById('extract-err').classList.remove('show'), 6000);
   }
