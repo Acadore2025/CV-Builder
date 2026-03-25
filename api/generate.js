@@ -98,7 +98,7 @@ module.exports = async function handler(req, res) {
       },
       body: JSON.stringify({
         // BUG-001 FIX: correct model string
-        model: 'claude-sonnet-4-5-20251001',
+        model: 'claude-sonnet-4-6',
         max_tokens: 6000,
         temperature: 0.3,
         tools: [RESUME_TOOL],
