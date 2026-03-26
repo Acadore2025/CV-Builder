@@ -282,6 +282,12 @@ select option{background:var(--bg-surface);color:var(--text-primary);}
         <div class="loading-sub" id="loading-sub">Checking each checkpoint</div>
         <div class="loading-dots"><span></span><span></span><span></span></div>
       </div>
+      <div id="right-error-state" style="display:none;flex-direction:column;align-items:center;justify-content:center;min-height:65vh;gap:20px;text-align:center;padding:40px;">
+        <div style="width:72px;height:72px;border-radius:20px;background:var(--red-light);border:1px solid rgba(255,107,107,0.25);display:flex;align-items:center;justify-content:center;font-size:32px;">⚠️</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:700;color:var(--text-primary);">Analysis Failed</div>
+        <div id="right-error-msg" style="font-size:13px;color:var(--red);max-width:420px;line-height:1.7;background:var(--red-light);border:1px solid rgba(255,107,107,0.25);border-radius:12px;padding:14px 18px;"></div>
+        <button onclick="document.getElementById('right-error-state').style.display='none';document.getElementById('empty-state').style.display='flex';" style="padding:10px 24px;border:1px solid var(--border-medium);border-radius:10px;background:white;color:var(--text-secondary);font-size:13px;font-weight:500;font-family:'Inter',sans-serif;cursor:pointer;">← Try Again</button>
+      </div>
       <div class="dashboard" id="dashboard">
         <div id="knockout-container"></div>
         <div class="score-banner">
@@ -349,7 +355,7 @@ let currentMode='resume',baseScores={};
 window.addEventListener('DOMContentLoaded',()=>{const p=new URLSearchParams(window.location.search).get('prefill');if(p){document.getElementById('resume-input').value=decodeURIComponent(p);document.getElementById('char-count').textContent=decodeURIComponent(p).length.toLocaleString()+' chars';}});
 function setMode(m,b){currentMode=m;document.querySelectorAll('.mode-tab').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.getElementById('jd-section').style.display=m==='both'?'block':'none';document.getElementById('nav-mode-label').textContent=m==='both'?'Resume + JD':'Resume Only';}
 function updateCount(){document.getElementById('char-count').textContent=document.getElementById('resume-input').value.length.toLocaleString()+' chars';}
-function clearAll(){['resume-input','jd-input'].forEach(id=>document.getElementById(id).value='');document.getElementById('file-input').value='';document.getElementById('upload-fname').classList.remove('show');document.getElementById('upload-prompt').style.display='block';document.getElementById('upload-status').classList.remove('show');updateCount();document.getElementById('empty-state').style.display='flex';document.getElementById('dashboard').classList.remove('show');document.getElementById('loading-state').classList.remove('show');resetProg();baseScores={};}
+function clearAll(){['resume-input','jd-input'].forEach(id=>document.getElementById(id).value='');document.getElementById('file-input').value='';document.getElementById('upload-fname').classList.remove('show');document.getElementById('upload-prompt').style.display='block';document.getElementById('upload-status').classList.remove('show');updateCount();document.getElementById('empty-state').style.display='flex';document.getElementById('dashboard').classList.remove('show');document.getElementById('loading-state').classList.remove('show');document.getElementById('right-error-state').style.display='none';resetProg();baseScores={};}
 function showTab(id,btn){document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));document.getElementById('tab-'+id).classList.add('active');if(btn)btn.classList.add('active');}
 function resetProg(){for(let i=1;i<=7;i++){const e=document.getElementById('chk-'+i);e.className='p-dot';e.textContent=i;}}
 function setRunning(n){const e=document.getElementById('chk-'+n);e.className='p-dot running';e.textContent='';}
@@ -382,19 +388,27 @@ async function runAnalysis(){
     try{d=JSON.parse(raw);}catch{throw new Error('Server returned an unexpected response (HTTP '+res.status+'). Please try again.');}
     if(d.error)throw new Error(d.error);
     clearInterval(iv);for(let i=1;i<=7;i++)setDone(i);
-    renderDashboard(d);
+    try{
+      renderDashboard(d);
+    }catch(renderErr){
+      console.error('renderDashboard error:',renderErr);
+      showRightPanelError('Dashboard render error: '+renderErr.message+'. Please try again or contact support.');
+    }
   }catch(err){
     clearTimeout(timer);
     clearInterval(iv);
-    document.getElementById('loading-state').classList.remove('show');
-    document.getElementById('empty-state').style.display='flex';
-    // BUG-006 FIX: replace alert() with visible banner (alert() is blocked on iOS Safari)
-    const msg = err.name==='AbortError' ? 'Analysis timed out. Try again with a shorter resume.' : 'Analysis failed: '+err.message;
-    document.getElementById('err-text').textContent=msg;
-    document.getElementById('err-banner').style.display='block';
-    setTimeout(()=>document.getElementById('err-banner').style.display='none',8000);
+    const msg=err.name==='AbortError'?'Analysis timed out (55s). The server may be busy — please try again.':'Analysis failed: '+err.message;
+    showRightPanelError(msg);
   }
   finally{document.getElementById('analyse-btn').disabled=false;}
+}
+
+function showRightPanelError(msg){
+  document.getElementById('loading-state').classList.remove('show');
+  document.getElementById('dashboard').classList.remove('show');
+  document.getElementById('empty-state').style.display='none';
+  document.getElementById('right-error-msg').textContent=msg;
+  document.getElementById('right-error-state').style.display='flex';
 }
 
 
