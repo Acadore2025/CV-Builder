@@ -14,7 +14,6 @@
 }
 
 :root {
-  /* Light theme colors */
   --bg-page: #F8FAFF;
   --bg-surface: #FFFFFF;
   --bg-card: #FFFFFF;
@@ -70,7 +69,6 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -87,14 +85,12 @@ body {
   background: var(--text-secondary);
 }
 
-/* Focus States */
 *:focus-visible {
   outline: 2px solid var(--purple);
   outline-offset: 2px;
   border-radius: 4px;
 }
 
-/* Navigation */
 nav {
   height: 64px;
   background: rgba(255, 255, 255, 0.98);
@@ -163,14 +159,12 @@ nav {
   font-weight: 500;
 }
 
-/* Layout */
 .layout {
   display: grid;
   grid-template-columns: 360px 1fr;
   height: calc(100vh - 64px);
 }
 
-/* Left Panel */
 .panel-left {
   background: var(--bg-sidebar);
   border-right: 1px solid var(--border-light);
@@ -181,7 +175,6 @@ nav {
   padding: 24px;
 }
 
-/* Mode Tabs */
 .mode-tabs {
   display: flex;
   background: var(--bg-surface);
@@ -213,7 +206,6 @@ nav {
   box-shadow: var(--shadow-sm);
 }
 
-/* Form Elements */
 .flabel {
   font-size: 11px;
   font-weight: 600;
@@ -277,7 +269,6 @@ select option {
   margin-bottom: 16px;
 }
 
-/* Buttons */
 .btn-primary {
   width: 100%;
   padding: 14px 20px;
@@ -344,7 +335,6 @@ select option {
   border-color: var(--purple);
 }
 
-/* Upload Zone */
 .upload-zone {
   border: 1px dashed var(--border-medium);
   border-radius: var(--radius-md);
@@ -438,7 +428,6 @@ select option {
   background: var(--border-light);
 }
 
-/* Extraction Status */
 .extract-banner, .extract-done, .extract-err {
   display: none;
   align-items: center;
@@ -515,7 +504,6 @@ select option {
   line-height: 1.5;
 }
 
-/* Progress List */
 .prog-list {
   margin-top: 20px;
   padding-top: 16px;
@@ -571,7 +559,6 @@ select option {
   50% { opacity: 1; transform: scale(1.05); }
 }
 
-/* Right Panel */
 .panel-right {
   overflow-y: auto;
   background: var(--bg-page);
@@ -581,7 +568,6 @@ select option {
   padding: 32px 36px;
 }
 
-/* Empty State */
 .empty-state {
   display: flex;
   flex-direction: column;
@@ -639,7 +625,6 @@ select option {
   box-shadow: var(--shadow-sm);
 }
 
-/* Loading State */
 .loading-state {
   display: none;
   flex-direction: column;
@@ -695,7 +680,6 @@ select option {
   50% { opacity: 1; }
 }
 
-/* Dashboard */
 .dashboard {
   display: none;
 }
@@ -704,7 +688,6 @@ select option {
   display: block;
 }
 
-/* Knockout Banner */
 .knockout-banner {
   background: var(--red-light);
   border: 1px solid rgba(255, 107, 107, 0.3);
@@ -728,7 +711,6 @@ select option {
   padding-left: 4px;
 }
 
-/* Score Banner */
 .score-banner {
   background: linear-gradient(135deg, var(--bg-surface) 0%, #FFFFFF 100%);
   border: 1px solid var(--border-light);
@@ -828,7 +810,6 @@ select option {
   margin-top: 5px;
 }
 
-/* Tabs */
 .tabs {
   display: flex;
   border-bottom: 1px solid var(--border-light);
@@ -880,7 +861,6 @@ select option {
   }
 }
 
-/* Cards */
 .card {
   background: var(--bg-surface);
   border: 1px solid var(--border-light);
@@ -927,14 +907,12 @@ select option {
   color: var(--text-secondary);
 }
 
-/* Grid */
 .g2 {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
 }
 
-/* Tags */
 .tag-row {
   display: flex;
   flex-wrap: wrap;
@@ -967,7 +945,6 @@ select option {
   border: 1px solid rgba(108, 92, 231, 0.2);
 }
 
-/* Rows */
 .row {
   display: flex;
   gap: 12px;
@@ -1017,7 +994,6 @@ select option {
   line-height: 1.6;
 }
 
-/* Section Badges */
 .sec-badge {
   font-size: 10px;
   font-weight: 600;
@@ -1029,7 +1005,6 @@ select option {
 .sb-a { background: var(--amber-light); color: var(--amber); }
 .sb-r { background: var(--red-light); color: var(--red); }
 
-/* Alerts */
 .alert {
   border-radius: var(--radius-md);
   padding: 14px 16px;
@@ -1062,7 +1037,6 @@ select option {
   color: var(--purple);
 }
 
-/* Diff Sections */
 .diff {
   border-radius: var(--radius-md);
   overflow: hidden;
@@ -1103,7 +1077,6 @@ select option {
   background: var(--green-light);
 }
 
-/* HR Cards */
 .hr-card {
   background: var(--red-light);
   border: 1px solid rgba(255, 107, 107, 0.15);
@@ -1144,7 +1117,6 @@ select option {
   font-weight: 500;
 }
 
-/* Fix Rows */
 .fix-row {
   display: flex;
   gap: 14px;
@@ -1210,7 +1182,6 @@ select option {
   border: 1px solid rgba(0, 200, 150, 0.2);
 }
 
-/* Error Banner */
 .err-banner {
   display: none;
   margin-top: 12px;
@@ -1238,16 +1209,13 @@ select option {
   line-height: 1.5;
 }
 
-/* Responsive */
 @media (max-width: 960px) {
   .layout {
     grid-template-columns: 300px 1fr;
   }
-  
   .right-inner {
     padding: 24px;
   }
-  
   .score-meta {
     grid-template-columns: repeat(3, 1fr);
   }
@@ -1258,22 +1226,18 @@ select option {
     grid-template-columns: 1fr;
     height: auto;
   }
-  
   .panel-left {
     border-right: none;
     border-bottom: 1px solid var(--border-light);
   }
-  
   .score-banner {
     grid-template-columns: 1fr;
     text-align: center;
     padding: 24px;
   }
-  
   .ring-wrap {
     margin: 0 auto;
   }
-  
   .g2 {
     grid-template-columns: 1fr;
   }
@@ -1283,23 +1247,18 @@ select option {
   nav {
     padding: 0 16px;
   }
-  
   .nav-chip {
     display: none;
   }
-  
   .right-inner {
     padding: 20px;
   }
-  
   .score-meta {
     grid-template-columns: repeat(2, 1fr);
   }
-  
   .tabs {
     gap: 0;
   }
-  
   .tab-btn {
     padding: 8px 14px;
     font-size: 12px;
@@ -1321,8 +1280,8 @@ select option {
   <div class="panel-left">
     <div class="left-inner">
       <div class="mode-tabs">
-        <button class="mode-tab active" onclick="setMode('resume',this)">Resume Only</button>
-        <button class="mode-tab" onclick="setMode('both',this)">Resume + JD</button>
+        <button class="mode-tab active" data-mode="resume" onclick="setMode('resume', this)">Resume Only</button>
+        <button class="mode-tab" data-mode="both" onclick="setMode('both', this)">Resume + JD</button>
       </div>
       
       <div class="field">
@@ -1368,14 +1327,12 @@ select option {
 
       <div class="field">
         <div class="flabel">Experience Level</div>
-        <div class="sel-wrap">
-          <select id="exp-select">
-            <option value="fresher">Fresher / Entry Level (0–2 yrs)</option>
-            <option value="mid" selected>Mid Level (2–7 years)</option>
-            <option value="senior">Senior (7–15 years)</option>
-            <option value="executive">Executive / Leadership (15+ years)</option>
-          </select>
-        </div>
+        <select id="exp-select">
+          <option value="fresher">Fresher / Entry Level (0–2 yrs)</option>
+          <option value="mid" selected>Mid Level (2–7 years)</option>
+          <option value="senior">Senior (7–15 years)</option>
+          <option value="executive">Executive / Leadership (15+ years)</option>
+        </select>
       </div>
       
       <button class="btn-primary" id="analyse-btn" onclick="runAnalysis()">Analyse Resume</button>
@@ -1436,27 +1393,27 @@ select option {
             </div>
           </div>
           <div class="score-meta">
-            <div class="meta-card" onclick="showTab('overview',document.querySelector('[data-tab=overview]'))">
+            <div class="meta-card" data-tab="overview">
               <div class="meta-val" id="d-content" style="color: var(--purple)">--</div>
               <div class="meta-lbl">Content</div>
             </div>
-            <div class="meta-card" onclick="showTab('overview',document.querySelector('[data-tab=overview]'))">
+            <div class="meta-card" data-tab="overview">
               <div class="meta-val" id="d-ats" style="color: var(--blue)">--</div>
               <div class="meta-lbl">ATS</div>
             </div>
-            <div class="meta-card" onclick="showTab('skills',document.querySelector('[data-tab=skills]'))">
+            <div class="meta-card" data-tab="skills">
               <div class="meta-val" id="d-skills" style="color: var(--green)">--</div>
               <div class="meta-lbl">Skills</div>
             </div>
-            <div class="meta-card" onclick="showTab('feedback',document.querySelector('[data-tab=feedback]'))">
+            <div class="meta-card" data-tab="feedback">
               <div class="meta-val" id="d-structure" style="color: var(--teal)">--</div>
               <div class="meta-lbl">Structure</div>
             </div>
-            <div class="meta-card" onclick="showTab('hr',document.querySelector('[data-tab=hr]'))">
+            <div class="meta-card" data-tab="hr">
               <div class="meta-val" id="d-narrative" style="color: var(--pink)">--</div>
               <div class="meta-lbl">Narrative</div>
             </div>
-            <div class="meta-card" onclick="showTab('overview',document.querySelector('[data-tab=overview]'))">
+            <div class="meta-card" data-tab="overview">
               <div class="meta-val" id="d-standards" style="color: var(--amber)">--</div>
               <div class="meta-lbl">Standards</div>
             </div>
@@ -1464,10 +1421,10 @@ select option {
         </div>
 
         <div class="tabs">
-          <button class="tab-btn active" data-tab="overview" onclick="showTab('overview',this)">Overview</button>
-          <button class="tab-btn" data-tab="skills" onclick="showTab('skills',this)">Skills Gap</button>
-          <button class="tab-btn" data-tab="feedback" onclick="showTab('feedback',this)">Section Feedback</button>
-          <button class="tab-btn" data-tab="hr" onclick="showTab('hr',this)">Why HR Ignores You</button>
+          <button class="tab-btn active" data-tab="overview">Overview</button>
+          <button class="tab-btn" data-tab="skills">Skills Gap</button>
+          <button class="tab-btn" data-tab="feedback">Section Feedback</button>
+          <button class="tab-btn" data-tab="hr">Why HR Ignores You</button>
         </div>
         
         <div class="tab-panel active" id="tab-overview">
@@ -1550,6 +1507,22 @@ window.addEventListener('DOMContentLoaded', () => {
     document.getElementById('resume-input').value = decodeURIComponent(p);
     document.getElementById('char-count').textContent = decodeURIComponent(p).length.toLocaleString() + ' chars';
   }
+  
+  // Initialize tab click handlers
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const tabId = btn.getAttribute('data-tab');
+      showTab(tabId);
+    });
+  });
+  
+  // Initialize meta-card click handlers
+  document.querySelectorAll('.meta-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const tabId = card.getAttribute('data-tab');
+      showTab(tabId);
+    });
+  });
 });
 
 function setMode(m, btn) {
@@ -1581,11 +1554,20 @@ function clearAll() {
   baseScores = {};
 }
 
-function showTab(id, btn) {
-  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('tab-' + id).classList.add('active');
-  if (btn) btn.classList.add('active');
+function showTab(tabId) {
+  // Update tab panels
+  document.querySelectorAll('.tab-panel').forEach(panel => {
+    panel.classList.remove('active');
+  });
+  document.getElementById('tab-' + tabId).classList.add('active');
+  
+  // Update tab buttons
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.classList.remove('active');
+    if (btn.getAttribute('data-tab') === tabId) {
+      btn.classList.add('active');
+    }
+  });
 }
 
 function resetProg() {
@@ -1726,38 +1708,47 @@ function renderDashboard(d) {
     `<div class="knockout-banner"><div class="knockout-title">⚠️ Knockout Flags — Capping your score</div>${kos.map(k => `<div class="knockout-item">• <strong>${k.dimension.toUpperCase()}</strong>: ${k.reason}</div>`).join('')}</div>` : '';
   
   document.getElementById('ov-strengths').innerHTML = (d.overview?.strengths || []).map(x => 
-    `<div class="row"><div class="rb rb-g"></div><div><div class="row-title">${x.point}</div><div class="row-sub">${x.detail}</div></div></div>`
+    `<div class="row"><div class="rb rb-g"></div><div><div class="row-title">${escapeHtml(x.point)}</div><div class="row-sub">${escapeHtml(x.detail)}</div></div></div>`
   ).join('');
   document.getElementById('ov-issues').innerHTML = (d.overview?.critical_issues || []).map(x => 
-    `<div class="row"><div class="rb rb-r"></div><div><div class="row-title">${x.issue}</div><div class="row-sub-r">${x.impact}</div></div></div>`
+    `<div class="row"><div class="rb rb-r"></div><div><div class="row-title">${escapeHtml(x.issue)}</div><div class="row-sub-r">${escapeHtml(x.impact)}</div></div></div>`
   ).join('');
   
   document.getElementById('top-fixes').innerHTML = (d.top_fixes || []).map((q, i) => 
-    `<div class="fix-row"><div class="fix-num">${i + 1}</div><div><div class="fix-label">${q.fix}</div><div class="fix-meta"><span class="fix-dim">${q.dimension}</span>${q.why ? `<span class="fix-why">${q.why}</span>` : ''}<span class="fix-pts">+${q.points_available || 0} pts</span></div></div></div>`
+    `<div class="fix-row"><div class="fix-num">${i + 1}</div><div><div class="fix-label">${escapeHtml(q.fix)}</div><div class="fix-meta"><span class="fix-dim">${escapeHtml(q.dimension)}</span>${q.why ? `<span class="fix-why">${escapeHtml(q.why)}</span>` : ''}<span class="fix-pts">+${q.points_available || 0} pts</span></div></div></div>`
   ).join('');
   
   const sk = d.skills || {};
-  document.getElementById('skills-strong').innerHTML = (sk.strong_skills || []).map(s => `<span class="tag tg">${s}</span>`).join('') || '<span style="font-size: 12px; color: var(--text-muted);">No skills detected</span>';
-  document.getElementById('skills-missing').innerHTML = (sk.missing_skills || []).map(s => `<span class="tag tr">${s}</span>`).join('') || '<span style="font-size: 12px; color: var(--text-muted);">—</span>';
+  document.getElementById('skills-strong').innerHTML = (sk.strong_skills || []).map(s => `<span class="tag tg">${escapeHtml(s)}</span>`).join('') || '<span style="font-size: 12px; color: var(--text-muted);">No skills detected</span>';
+  document.getElementById('skills-missing').innerHTML = (sk.missing_skills || []).map(s => `<span class="tag tr">${escapeHtml(s)}</span>`).join('') || '<span style="font-size: 12px; color: var(--text-muted);">—</span>';
   document.getElementById('skills-recs').innerHTML = (sk.recommendations || []).map(r => 
-    `<div class="row"><div class="rb rb-a"></div><div><div class="row-title">${r.skill}</div><div class="row-sub">${r.why}</div><div class="row-sub-a">How: ${r.how}</div></div></div>`
+    `<div class="row"><div class="rb rb-a"></div><div><div class="row-title">${escapeHtml(r.skill)}</div><div class="row-sub">${escapeHtml(r.why)}</div><div class="row-sub-a">How: ${escapeHtml(r.how)}</div></div></div>`
   ).join('');
   
   const vc = { 'Strong': 'sb-g', 'Good': 'sb-g', 'Needs Work': 'sb-a', 'Missing': 'sb-r' };
   document.getElementById('section-feedback-list').innerHTML = (d.section_feedback || []).map(sf => 
-    `<div class="card"><div class="card-head"><div class="card-head-left">${sf.section}</div><span class="sec-badge ${vc[sf.verdict] || 'sb-a'}">${sf.verdict} · ${sf.score}/100</span></div><div class="alert al-a" style="margin-bottom: 10px; font-size: 12px;">${sf.feedback}</div>${sf.before ? `<div style="margin-top: 12px;"><div class="diff"><div class="diff-lbl diff-before">Before</div><div class="diff-body">${sf.before}</div></div><div class="diff"><div class="diff-lbl diff-after">After</div><div class="diff-body after">${sf.after}</div></div></div>` : ''}</div>`
+    `<div class="card"><div class="card-head"><div class="card-head-left">${escapeHtml(sf.section)}</div><span class="sec-badge ${vc[sf.verdict] || 'sb-a'}">${sf.verdict} · ${sf.score}/100</span></div><div class="alert al-a" style="margin-bottom: 10px; font-size: 12px;">${escapeHtml(sf.feedback)}</div>${sf.before ? `<div style="margin-top: 12px;"><div class="diff"><div class="diff-lbl diff-before">Before</div><div class="diff-body">${escapeHtml(sf.before)}</div></div><div class="diff"><div class="diff-lbl diff-after">After</div><div class="diff-body after">${escapeHtml(sf.after)}</div></div></div>` : ''}</div>`
   ).join('');
   
   document.getElementById('hr-reasons').innerHTML = (d.hr_reasons || []).map(r => 
-    `<div class="hr-card"><div class="hr-n">${r.rank}</div><div><div class="hr-title">${r.reason}</div><div class="hr-body">${r.detail}</div><div class="hr-fix">Fix: ${r.fix}</div></div></div>`
+    `<div class="hr-card"><div class="hr-n">${r.rank}</div><div><div class="hr-title">${escapeHtml(r.reason)}</div><div class="hr-body">${escapeHtml(r.detail)}</div><div class="hr-fix">Fix: ${escapeHtml(r.fix)}</div></div></div>`
   ).join('');
-  document.getElementById('hr-mindset').innerHTML = `<div style="font-size: 13px; color: var(--text-secondary); line-height: 1.8;">${d.hr_mindset || ''}</div>`;
+  document.getElementById('hr-mindset').innerHTML = `<div style="font-size: 13px; color: var(--text-secondary); line-height: 1.8;">${escapeHtml(d.hr_mindset || '')}</div>`;
   
   document.getElementById('dashboard').classList.add('show');
   document.getElementById('dashboard').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-// File upload handlers
+function escapeHtml(str) {
+  if (!str) return '';
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 function handleDragOver(e) { e.preventDefault(); document.getElementById('upload-zone').classList.add('drag-over'); }
 function handleDragLeave() { document.getElementById('upload-zone').classList.remove('drag-over'); }
 function handleDrop(e) { e.preventDefault(); handleDragLeave(); const f = e.dataTransfer.files[0]; if (f) processFile(f); }
