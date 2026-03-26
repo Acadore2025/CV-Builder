@@ -299,20 +299,20 @@ select option{background:var(--bg-surface);color:var(--text-primary);}
             <div class="ring-text"><div class="ring-val" id="d-overall">--</div><div class="ring-lbl">Overall</div></div>
           </div>
           <div class="score-meta">
-            <div class="meta-card" onclick="showTab('skills',document.querySelector('[data-tab=skills]'))"><div class="meta-val" id="d-content" style="color:var(--purple2)">--</div><div class="meta-lbl">Content Quality</div></div>
-            <div class="meta-card" onclick="showTab('skills',document.querySelector('[data-tab=skills]'))"><div class="meta-val" id="d-ats" style="color:var(--blue)">--</div><div class="meta-lbl">ATS Score</div></div>
-            <div class="meta-card" onclick="showTab('skills',document.querySelector('[data-tab=skills]'))"><div class="meta-val" id="d-skills" style="color:var(--green)">--</div><div class="meta-lbl">Skills Match</div></div>
-            <div class="meta-card" onclick="showTab('feedback',document.querySelector('[data-tab=feedback]'))"><div class="meta-val" id="d-structure" style="color:var(--teal)">--</div><div class="meta-lbl">Readability</div></div>
-            <div class="meta-card" onclick="showTab('hr',document.querySelector('[data-tab=hr]'))"><div class="meta-val" id="d-narrative" style="color:#F472B6">--</div><div class="meta-lbl">Narrative</div></div>
-            <div class="meta-card" onclick="showTab('overview',document.querySelector('[data-tab=overview]'))"><div class="meta-val" id="d-standards" style="color:var(--amber)">--</div><div class="meta-lbl">Pro Standards</div></div>
+            <div class="meta-card" onclick="showTab('skills')"><div class="meta-val" id="d-content" style="color:var(--purple2)">--</div><div class="meta-lbl">Content Quality</div></div>
+            <div class="meta-card" onclick="showTab('skills')"><div class="meta-val" id="d-ats" style="color:var(--blue)">--</div><div class="meta-lbl">ATS Score</div></div>
+            <div class="meta-card" onclick="showTab('skills')"><div class="meta-val" id="d-skills" style="color:var(--green)">--</div><div class="meta-lbl">Skills Match</div></div>
+            <div class="meta-card" onclick="showTab('feedback')"><div class="meta-val" id="d-structure" style="color:var(--teal)">--</div><div class="meta-lbl">Readability</div></div>
+            <div class="meta-card" onclick="showTab('hr')"><div class="meta-val" id="d-narrative" style="color:#F472B6">--</div><div class="meta-lbl">Narrative</div></div>
+            <div class="meta-card" onclick="showTab('overview')"><div class="meta-val" id="d-standards" style="color:var(--amber)">--</div><div class="meta-lbl">Pro Standards</div></div>
           </div>
         </div>
 
         <div class="tabs">
-          <button class="tab-btn active" data-tab="overview" onclick="showTab('overview',this)">Overview</button>
-          <button class="tab-btn" data-tab="skills" onclick="showTab('skills',this)">Skills Gap</button>
-          <button class="tab-btn" data-tab="feedback" onclick="showTab('feedback',this)">Section Feedback</button>
-          <button class="tab-btn" data-tab="hr" onclick="showTab('hr',this)">Why HR Ignores You</button>
+          <button class="tab-btn active" data-tab="overview" onclick="showTab('overview')">Overview</button>
+          <button class="tab-btn" data-tab="skills" onclick="showTab('skills')">Skills Gap</button>
+          <button class="tab-btn" data-tab="feedback" onclick="showTab('feedback')">Section Feedback</button>
+          <button class="tab-btn" data-tab="hr" onclick="showTab('hr')">Why HR Ignores You</button>
         </div>
         <div class="tab-panel active" id="tab-overview">
           <div class="g2">
@@ -356,7 +356,7 @@ window.addEventListener('DOMContentLoaded',()=>{const p=new URLSearchParams(wind
 function setMode(m,b){currentMode=m;document.querySelectorAll('.mode-tab').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.getElementById('jd-section').style.display=m==='both'?'block':'none';document.getElementById('nav-mode-label').textContent=m==='both'?'Resume + JD':'Resume Only';}
 function updateCount(){document.getElementById('char-count').textContent=document.getElementById('resume-input').value.length.toLocaleString()+' chars';}
 function clearAll(){['resume-input','jd-input'].forEach(id=>document.getElementById(id).value='');document.getElementById('file-input').value='';document.getElementById('upload-fname').classList.remove('show');document.getElementById('upload-prompt').style.display='block';document.getElementById('upload-status').classList.remove('show');updateCount();document.getElementById('empty-state').style.display='flex';document.getElementById('dashboard').classList.remove('show');document.getElementById('loading-state').classList.remove('show');document.getElementById('right-error-state').style.display='none';resetProg();baseScores={};}
-function showTab(id,btn){document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));document.getElementById('tab-'+id).classList.add('active');if(btn)btn.classList.add('active');}
+function showTab(id){document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.tab-btn').forEach(b=>{b.classList.remove('active');if(b.getAttribute('data-tab')===id)b.classList.add('active');});document.getElementById('tab-'+id).classList.add('active');}
 function resetProg(){for(let i=1;i<=7;i++){const e=document.getElementById('chk-'+i);e.className='p-dot';e.textContent=i;}}
 function setRunning(n){const e=document.getElementById('chk-'+n);e.className='p-dot running';e.textContent='';}
 function setDone(n){const e=document.getElementById('chk-'+n);e.className='p-dot done';e.textContent='✓';}
