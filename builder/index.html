@@ -196,11 +196,11 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg-pag
 .toast.success { background: rgba(0,200,150,0.15); border-color: rgba(0,200,150,0.3); color: var(--green); }
 
 /* Loading overlay */
-.ai-loading { background: rgba(248,250,255,0.95); backdrop-filter: blur(16px); position: fixed; inset: 0; z-index: 9998; display: none; align-items: center; justify-content: center; flex-direction: column; gap: 16px; }
+.ai-loading { background: rgba(15, 27, 45, 0.75); backdrop-filter: blur(8px); position: fixed; inset: 0; z-index: 9998; display: none; align-items: center; justify-content: center; flex-direction: column; gap: 16px; }
 .ai-loading.show { display: flex; }
-.ai-loading-text { color: var(--text-primary); font-size: 16px; font-weight: 500; }
-.ai-loading-sub { color: var(--text-secondary); font-size: 13px; }
-.ai-spinner { width: 44px; height: 44px; border: 3px solid var(--border-medium); border-top-color: var(--purple); border-radius: 50%; animation: spin 0.9s linear infinite; }
+.ai-loading-text { color: #E8E4FF; font-size: 16px; font-weight: 500; }
+.ai-loading-sub { color: rgba(232,228,255,0.65); font-size: 13px; }
+.ai-spinner { width: 44px; height: 44px; border: 3px solid rgba(108,92,231,0.3); border-top-color: var(--purple); border-radius: 50%; animation: spin 0.9s linear infinite; }
 .dot-pulse { display: flex; gap: 6px; }
 .dot-pulse span { width: 7px; height: 7px; border-radius: 50%; background: var(--purple); animation: dp 1.2s ease-in-out infinite; }
 .dot-pulse span:nth-child(2) { animation-delay: 0.2s; }
@@ -527,7 +527,6 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg-pag
 
 /* end resume doc styles */
 </style>
-<script src="https://unpkg.com/docx@8.5.0/build/index.js"></script>
 </head>
 <body>
 
@@ -2303,175 +2302,97 @@ function exportPDF() {
   showToast('Preparing PDF — print dialog will open shortly', 'success');
 }
 
-async function exportDOCX() {
-  if (!lastResumeData) { showToast('Generate your resume first', 'error'); return; }
-  if (typeof docx === 'undefined') { showToast('DOCX library not loaded — check your connection', 'error'); return; }
-
-  const { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType, BorderStyle, TableRow, TableCell, Table, WidthType, ShadingType } = docx;
+function exportDOCX() {
+  if (!lastResumeData || !generatedHTML) { showToast('Generate your resume first', 'error'); return; }
   const d = lastResumeData;
 
-  const NAVY  = '0F1B2D';
-  const GOLD  = 'C9953A';
-  const GRAY  = '4A5568';
-  const BLACK = '1A1A2E';
+  // Build a Word-compatible HTML document using the resume's own CSS variables
+  const wordHTML = `<!DOCTYPE html>
+<html xmlns:o="urn:schemas-microsoft-com:office:office"
+      xmlns:w="urn:schemas-microsoft-com:office:word"
+      xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta charset="UTF-8">
+<title>${d.name || 'Resume'}</title>
+<!--[if gte mso 9]>
+<xml><w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom></w:WordDocument></xml>
+<![endif]-->
+<style>
+  @page { margin: 2cm; size: A4; }
+  body { font-family: Calibri, Arial, sans-serif; font-size: 11pt; color: #1A1A2E; line-height: 1.5; }
+  h1.resume-name { font-family: Georgia, serif; font-size: 26pt; font-weight: bold; color: #0F1B2D; margin: 0 0 4pt 0; border-left: 4pt solid #C9953A; padding-left: 10pt; }
+  .resume-title { font-size: 13pt; color: #C9953A; font-weight: bold; margin: 2pt 0 8pt 0; padding-left: 14pt; }
+  .resume-contact { font-size: 10pt; color: #4A5568; border-bottom: 2pt solid #0F1B2D; padding-bottom: 8pt; margin-bottom: 14pt; }
+  h2.section-title { font-size: 10pt; font-weight: bold; text-transform: uppercase; letter-spacing: 1pt; color: #0F1B2D; border-bottom: 1pt solid #E2D9CE; padding-bottom: 3pt; margin: 16pt 0 8pt 0; }
+  .exp-role { font-size: 12pt; font-weight: bold; color: #1A1A2E; margin: 0; }
+  .exp-company { font-size: 11pt; color: #C9953A; font-weight: bold; margin: 1pt 0; }
+  .exp-dates { font-size: 9pt; color: #8A9BB0; font-style: italic; margin-bottom: 4pt; }
+  ul { margin: 4pt 0 8pt 0; padding-left: 16pt; }
+  li { font-size: 10.5pt; color: #4A5568; margin-bottom: 3pt; }
+  .edu-degree { font-size: 12pt; font-weight: bold; color: #1A1A2E; }
+  .edu-inst { font-size: 11pt; color: #C9953A; }
+  .edu-meta { font-size: 9pt; color: #8A9BB0; font-style: italic; }
+  .skills-text { font-size: 10.5pt; color: #4A5568; line-height: 1.7; }
+  .cert-item { font-size: 10.5pt; color: #4A5568; margin-bottom: 3pt; }
+  p { margin: 4pt 0; font-size: 10.5pt; color: #4A5568; line-height: 1.6; }
+</style>
+</head>
+<body>
+<h1 class="resume-name">${d.name || ''}</h1>
+${d.title ? `<div class="resume-title">${d.title}</div>` : ''}
+<div class="resume-contact">
+  ${[d.email, d.phone, d.location, d.linkedin].filter(Boolean).join(' &nbsp;|&nbsp; ')}
+</div>
 
-  // Helper: section heading paragraph
-  function sectionHeading(text) {
-    return new Paragraph({
-      children: [new TextRun({ text: text.toUpperCase(), bold: true, size: 20, color: NAVY, font: 'Calibri' })],
-      spacing: { before: 240, after: 60 },
-      border: { bottom: { style: BorderStyle.SINGLE, size: 6, color: NAVY } },
-    });
-  }
+${d.summary ? `<h2 class="section-title">Professional Summary</h2><p>${d.summary}</p>` : ''}
 
-  // Helper: bullet point
-  function bullet(text) {
-    return new Paragraph({
-      bullet: { level: 0 },
-      children: [new TextRun({ text: text.replace(/^[•\-]\s*/, ''), size: 20, color: GRAY, font: 'Calibri' })],
-      spacing: { after: 40 },
-    });
-  }
+${d.experience?.length ? `
+<h2 class="section-title">Work Experience</h2>
+${d.experience.map(exp => {
+  const bullets = Array.isArray(exp.bullets)
+    ? exp.bullets
+    : (exp.bullets || '').split('
+').filter(b => b.trim());
+  const dates = [exp.start && exp.end ? exp.start + ' – ' + exp.end : (exp.start || ''), exp.location].filter(Boolean).join('  |  ');
+  return `<div style="margin-bottom:12pt;">
+    <div class="exp-role">${exp.title || ''}</div>
+    ${exp.company ? `<div class="exp-company">${exp.company}</div>` : ''}
+    ${dates ? `<div class="exp-dates">${dates}</div>` : ''}
+    ${bullets.length ? `<ul>${bullets.map(b => `<li>${b.replace(/^[•\-]\s*/, '')}</li>`).join('')}</ul>` : ''}
+  </div>`;
+}).join('')}` : ''}
 
-  // Helper: plain paragraph
-  function para(text, opts = {}) {
-    return new Paragraph({
-      children: [new TextRun({ text, size: opts.size || 20, bold: opts.bold || false, color: opts.color || GRAY, font: 'Calibri', italics: opts.italic || false })],
-      spacing: { after: opts.spaceAfter || 60 },
-      alignment: opts.align || AlignmentType.LEFT,
-    });
-  }
+${d.education?.length ? `
+<h2 class="section-title">Education</h2>
+${d.education.map(edu => `<div style="margin-bottom:10pt;">
+  <div class="edu-degree">${edu.degree || ''}</div>
+  ${edu.institution ? `<div class="edu-inst">${edu.institution}</div>` : ''}
+  <div class="edu-meta">${[edu.year, edu.cgpa ? 'CGPA: ' + edu.cgpa : (edu.gpa ? 'GPA: ' + edu.gpa : ''), edu.location].filter(Boolean).join('  |  ')}</div>
+</div>`).join('')}` : ''}
 
-  const sections = [];
+${(() => {
+  const tech = [...(d.skills?.technical || []), ...(d.skills?.tools || []), ...(d.skills?.ai || [])].filter(Boolean);
+  return tech.length ? `<h2 class="section-title">Technical Skills</h2><p class="skills-text">${tech.join('  ·  ')}</p>` : '';
+})()}
 
-  // ── HEADER ──────────────────────────────────────────────────────
-  sections.push(new Paragraph({
-    children: [new TextRun({ text: d.name || '', bold: true, size: 52, color: NAVY, font: 'Cormorant Garamond' })],
-    alignment: AlignmentType.LEFT,
-    spacing: { after: 60 },
-  }));
+${d.skills?.soft?.length ? `<h2 class="section-title">Core Competencies</h2><p class="skills-text">${d.skills.soft.join('  ·  ')}</p>` : ''}
 
-  if (d.title) {
-    sections.push(new Paragraph({
-      children: [new TextRun({ text: d.title, size: 26, color: GOLD, bold: true, font: 'Calibri' })],
-      spacing: { after: 80 },
-    }));
-  }
+${(() => {
+  const certs = Array.isArray(d.certs) ? d.certs : (d.certs ? d.certs.split('
+').filter(c=>c.trim()) : []);
+  return certs.length ? `<h2 class="section-title">Certifications</h2>${certs.map(c=>`<div class="cert-item">• ${c}</div>`).join('')}` : '';
+})()}
 
-  const contactParts = [d.email, d.phone, d.location].filter(Boolean);
-  if (d.linkedin) contactParts.push(d.linkedin);
-  sections.push(new Paragraph({
-    children: contactParts.map((part, i) => [
-      new TextRun({ text: part, size: 18, color: GRAY, font: 'Calibri' }),
-      i < contactParts.length - 1 ? new TextRun({ text: '  |  ', size: 18, color: '999999', font: 'Calibri' }) : null
-    ].filter(Boolean)).flat(),
-    spacing: { after: 60 },
-    border: { bottom: { style: BorderStyle.SINGLE, size: 12, color: NAVY } },
-  }));
+${d.projects?.length ? `<h2 class="section-title">Projects</h2>${(Array.isArray(d.projects)?d.projects:[]).map(p => typeof p==='string' ? `<div class="cert-item">• ${p}</div>` : `<div style="margin-bottom:8pt;"><div class="exp-role">${p.name||''}</div>${p.description?`<p>${p.description}</p>`:''}</div>`).join('')}` : ''}
 
-  // ── PROFESSIONAL SUMMARY ─────────────────────────────────────────
-  if (d.summary) {
-    sections.push(sectionHeading('Professional Summary'));
-    sections.push(para(d.summary, { spaceAfter: 80 }));
-  }
+${d.awards?.length ? `<h2 class="section-title">Awards & Recognition</h2>${(Array.isArray(d.awards)?d.awards:[]).map(a => `<div class="cert-item">• ${typeof a==='string'?a:(a.name||'')+(a.description?': '+a.description:'')}</div>`).join('')}` : ''}
 
-  // ── WORK EXPERIENCE ──────────────────────────────────────────────
-  if (d.experience?.length) {
-    sections.push(sectionHeading('Work Experience'));
-    d.experience.forEach(exp => {
-      const bullets = Array.isArray(exp.bullets)
-        ? exp.bullets
-        : (exp.bullets || '').split('\n').filter(b => b.trim());
+</body></html>`;
 
-      // Role title + company on same line
-      sections.push(new Paragraph({
-        children: [
-          new TextRun({ text: exp.title || '', bold: true, size: 22, color: BLACK, font: 'Calibri' }),
-          exp.company ? new TextRun({ text: '  ·  ' + exp.company, size: 22, color: GOLD, font: 'Calibri' }) : null,
-        ].filter(Boolean),
-        spacing: { before: 160, after: 40 },
-      }));
-
-      // Date + location
-      const dateParts = [exp.start && exp.end ? exp.start + ' – ' + exp.end : (exp.start || ''), exp.location].filter(Boolean);
-      if (dateParts.length) {
-        sections.push(para(dateParts.join('  |  '), { size: 18, italic: true, color: '8A99AE', spaceAfter: 60 }));
-      }
-
-      bullets.forEach(b => sections.push(bullet(b)));
-    });
-  }
-
-  // ── EDUCATION ───────────────────────────────────────────────────
-  if (d.education?.length) {
-    sections.push(sectionHeading('Education'));
-    d.education.forEach(edu => {
-      sections.push(new Paragraph({
-        children: [
-          new TextRun({ text: edu.degree || '', bold: true, size: 22, color: BLACK, font: 'Calibri' }),
-          edu.institution ? new TextRun({ text: '  ·  ' + edu.institution, size: 22, color: GOLD, font: 'Calibri' }) : null,
-        ].filter(Boolean),
-        spacing: { before: 120, after: 40 },
-      }));
-      const subParts = [edu.year, edu.cgpa ? 'CGPA: ' + edu.cgpa : (edu.gpa ? 'GPA: ' + edu.gpa : ''), edu.location].filter(Boolean);
-      if (subParts.length) sections.push(para(subParts.join('  |  '), { size: 18, italic: true, color: '8A99AE', spaceAfter: 80 }));
-    });
-  }
-
-  // ── SKILLS ──────────────────────────────────────────────────────
-  const techAll = [...(d.skills?.technical || []), ...(d.skills?.tools || []), ...(d.skills?.ai || [])].filter(Boolean);
-  if (techAll.length) {
-    sections.push(sectionHeading('Technical Skills'));
-    sections.push(para(techAll.join('  ·  '), { spaceAfter: 80 }));
-  }
-  if (d.skills?.soft?.length) {
-    sections.push(sectionHeading('Core Competencies'));
-    sections.push(para(d.skills.soft.join('  ·  '), { spaceAfter: 80 }));
-  }
-
-  // ── CERTIFICATIONS ───────────────────────────────────────────────
-  const certs = Array.isArray(d.certs) ? d.certs : (d.certs ? d.certs.split('\n').filter(c=>c.trim()) : []);
-  if (certs.length) {
-    sections.push(sectionHeading('Certifications'));
-    certs.forEach(c => sections.push(bullet(c)));
-  }
-
-  // ── PROJECTS ────────────────────────────────────────────────────
-  if (d.projects?.length) {
-    sections.push(sectionHeading('Projects'));
-    (Array.isArray(d.projects) ? d.projects : []).forEach(p => {
-      if (typeof p === 'string') { sections.push(bullet(p)); return; }
-      if (p.name) sections.push(new Paragraph({ children: [new TextRun({ text: p.name, bold: true, size: 22, color: BLACK, font: 'Calibri' })], spacing: { before: 120, after: 40 } }));
-      if (p.description) sections.push(para(p.description, { spaceAfter: 60 }));
-    });
-  }
-
-  // ── AWARDS ──────────────────────────────────────────────────────
-  if (d.awards?.length) {
-    sections.push(sectionHeading('Awards & Recognition'));
-    (Array.isArray(d.awards) ? d.awards : []).forEach(a => {
-      if (typeof a === 'string') sections.push(bullet(a));
-      else if (a.name) sections.push(bullet(a.name + (a.description ? ': ' + a.description : '')));
-    });
-  }
-
-  // ── BUILD DOC ────────────────────────────────────────────────────
-  const doc = new Document({
-    styles: {
-      default: {
-        document: {
-          run: { font: 'Calibri', size: 20, color: GRAY },
-          paragraph: { spacing: { line: 276 } }
-        }
-      }
-    },
-    sections: [{ properties: { page: { margin: { top: 720, right: 720, bottom: 720, left: 720 } } }, children: sections }]
-  });
-
-  const blob = await Packer.toBlob(doc);
+  const blob = new Blob([wordHTML], { type: 'application/msword' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = (d.name ? d.name.replace(/\s+/g, '_') : 'resume') + '_' + currentMarket + '.docx';
+  a.download = (d.name ? d.name.replace(/\s+/g, '_') : 'resume') + '_' + currentMarket + '.doc';
   a.click();
   showToast('Word document downloaded — open in Microsoft Word to edit!', 'success');
 }
