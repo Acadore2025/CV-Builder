@@ -144,7 +144,7 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg-pag
 .preview-btn.ats:hover { background: #E5E3DE; }
 
 /* Resume preview */
-#resume-preview { background: var(--white); margin: 20px 28px; border-radius: 12px; box-shadow: 0 8px 40px rgba(0,0,0,0.3); overflow: hidden; min-height: 500px; }
+#resume-preview { background: #ffffff; margin: 20px 28px; border-radius: 12px; box-shadow: 0 8px 40px rgba(0,0,0,0.3); overflow: hidden; min-height: 500px; }
 .resume-loading { display: flex; align-items: center; justify-content: center; height: 300px; flex-direction: column; gap: 12px; color: var(--text3); font-size: 13px; font-family:'Inter',sans-serif; }
 .spinner { width: 28px; height: 28px; border: 2px solid var(--border-medium); border-top-color: var(--purple); border-radius: 50%; animation: spin 0.8s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
@@ -2304,93 +2304,138 @@ function exportPDF() {
 
 function exportDOCX() {
   if (!lastResumeData || !generatedHTML) { showToast('Generate your resume first', 'error'); return; }
-  const d = lastResumeData;
+  var d = lastResumeData;
+  var NL = '\n';
 
-  // Build a Word-compatible HTML document using the resume's own CSS variables
-  const wordHTML = `<!DOCTYPE html>
-<html xmlns:o="urn:schemas-microsoft-com:office:office"
-      xmlns:w="urn:schemas-microsoft-com:office:word"
-      xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<meta charset="UTF-8">
-<title>${d.name || 'Resume'}</title>
-<!--[if gte mso 9]>
-<xml><w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom></w:WordDocument></xml>
-<![endif]-->
-<style>
-  @page { margin: 2cm; size: A4; }
-  body { font-family: Calibri, Arial, sans-serif; font-size: 11pt; color: #1A1A2E; line-height: 1.5; }
-  h1.resume-name { font-family: Georgia, serif; font-size: 26pt; font-weight: bold; color: #0F1B2D; margin: 0 0 4pt 0; border-left: 4pt solid #C9953A; padding-left: 10pt; }
-  .resume-title { font-size: 13pt; color: #C9953A; font-weight: bold; margin: 2pt 0 8pt 0; padding-left: 14pt; }
-  .resume-contact { font-size: 10pt; color: #4A5568; border-bottom: 2pt solid #0F1B2D; padding-bottom: 8pt; margin-bottom: 14pt; }
-  h2.section-title { font-size: 10pt; font-weight: bold; text-transform: uppercase; letter-spacing: 1pt; color: #0F1B2D; border-bottom: 1pt solid #E2D9CE; padding-bottom: 3pt; margin: 16pt 0 8pt 0; }
-  .exp-role { font-size: 12pt; font-weight: bold; color: #1A1A2E; margin: 0; }
-  .exp-company { font-size: 11pt; color: #C9953A; font-weight: bold; margin: 1pt 0; }
-  .exp-dates { font-size: 9pt; color: #8A9BB0; font-style: italic; margin-bottom: 4pt; }
-  ul { margin: 4pt 0 8pt 0; padding-left: 16pt; }
-  li { font-size: 10.5pt; color: #4A5568; margin-bottom: 3pt; }
-  .edu-degree { font-size: 12pt; font-weight: bold; color: #1A1A2E; }
-  .edu-inst { font-size: 11pt; color: #C9953A; }
-  .edu-meta { font-size: 9pt; color: #8A9BB0; font-style: italic; }
-  .skills-text { font-size: 10.5pt; color: #4A5568; line-height: 1.7; }
-  .cert-item { font-size: 10.5pt; color: #4A5568; margin-bottom: 3pt; }
-  p { margin: 4pt 0; font-size: 10.5pt; color: #4A5568; line-height: 1.6; }
-</style>
-</head>
-<body>
-<h1 class="resume-name">${d.name || ''}</h1>
-${d.title ? `<div class="resume-title">${d.title}</div>` : ''}
-<div class="resume-contact">
-  ${[d.email, d.phone, d.location, d.linkedin].filter(Boolean).join(' &nbsp;|&nbsp; ')}
-</div>
+  function splitBullets(b) {
+    if (!b) return [];
+    if (Array.isArray(b)) return b;
+    return b.split('\n').filter(function(s){ return s.trim(); });
+  }
+  function splitLines(s) {
+    if (!s) return [];
+    if (Array.isArray(s)) return s;
+    return s.split('\n').filter(function(c){ return c.trim(); });
+  }
 
-${d.summary ? `<h2 class="section-title">Professional Summary</h2><p>${d.summary}</p>` : ''}
+  var css = [
+    '@page { margin: 2cm; size: A4; }',
+    'body { font-family: Calibri, Arial, sans-serif; font-size: 11pt; color: #1A1A2E; line-height: 1.5; }',
+    'h1 { font-family: Georgia, serif; font-size: 26pt; font-weight: bold; color: #0F1B2D; margin: 0 0 4pt 0; border-left: 4pt solid #C9953A; padding-left: 10pt; }',
+    '.rtitle { font-size: 13pt; color: #C9953A; font-weight: bold; margin: 2pt 0 8pt 14pt; }',
+    '.contact { font-size: 10pt; color: #4A5568; border-bottom: 2pt solid #0F1B2D; padding-bottom: 8pt; margin-bottom: 14pt; }',
+    'h2 { font-size: 10pt; font-weight: bold; text-transform: uppercase; letter-spacing: 1pt; color: #0F1B2D; border-bottom: 1pt solid #E2D9CE; padding-bottom: 3pt; margin: 16pt 0 8pt 0; }',
+    '.role { font-size: 12pt; font-weight: bold; color: #1A1A2E; margin: 0; }',
+    '.company { font-size: 11pt; color: #C9953A; font-weight: bold; margin: 1pt 0; }',
+    '.dates { font-size: 9pt; color: #8A9BB0; font-style: italic; margin-bottom: 4pt; }',
+    'ul { margin: 4pt 0 8pt 0; padding-left: 16pt; }',
+    'li { font-size: 10.5pt; color: #4A5568; margin-bottom: 3pt; }',
+    '.edu-deg { font-size: 12pt; font-weight: bold; color: #1A1A2E; }',
+    '.edu-inst { font-size: 11pt; color: #C9953A; }',
+    '.edu-meta { font-size: 9pt; color: #8A9BB0; font-style: italic; }',
+    '.skills { font-size: 10.5pt; color: #4A5568; line-height: 1.7; }',
+    '.item { font-size: 10.5pt; color: #4A5568; margin-bottom: 3pt; }',
+    'p { margin: 4pt 0; font-size: 10.5pt; color: #4A5568; line-height: 1.6; }'
+  ].join(NL);
 
-${d.experience?.length ? `
-<h2 class="section-title">Work Experience</h2>
-${d.experience.map(exp => {
-  const bullets = Array.isArray(exp.bullets)
-    ? exp.bullets
-    : (exp.bullets || '').split('
-').filter(b => b.trim());
-  const dates = [exp.start && exp.end ? exp.start + ' – ' + exp.end : (exp.start || ''), exp.location].filter(Boolean).join('  |  ');
-  return `<div style="margin-bottom:12pt;">
-    <div class="exp-role">${exp.title || ''}</div>
-    ${exp.company ? `<div class="exp-company">${exp.company}</div>` : ''}
-    ${dates ? `<div class="exp-dates">${dates}</div>` : ''}
-    ${bullets.length ? `<ul>${bullets.map(b => `<li>${b.replace(/^[•\-]\s*/, '')}</li>`).join('')}</ul>` : ''}
-  </div>`;
-}).join('')}` : ''}
+  var body = '';
 
-${d.education?.length ? `
-<h2 class="section-title">Education</h2>
-${d.education.map(edu => `<div style="margin-bottom:10pt;">
-  <div class="edu-degree">${edu.degree || ''}</div>
-  ${edu.institution ? `<div class="edu-inst">${edu.institution}</div>` : ''}
-  <div class="edu-meta">${[edu.year, edu.cgpa ? 'CGPA: ' + edu.cgpa : (edu.gpa ? 'GPA: ' + edu.gpa : ''), edu.location].filter(Boolean).join('  |  ')}</div>
-</div>`).join('')}` : ''}
+  // Header
+  body += '<h1>' + (d.name || '') + '</h1>' + NL;
+  if (d.title) body += '<div class="rtitle">' + d.title + '</div>' + NL;
+  body += '<div class="contact">' + [d.email, d.phone, d.location, d.linkedin].filter(Boolean).join(' &nbsp;|&nbsp; ') + '</div>' + NL;
 
-${(() => {
-  const tech = [...(d.skills?.technical || []), ...(d.skills?.tools || []), ...(d.skills?.ai || [])].filter(Boolean);
-  return tech.length ? `<h2 class="section-title">Technical Skills</h2><p class="skills-text">${tech.join('  ·  ')}</p>` : '';
-})()}
+  // Summary
+  if (d.summary) body += '<h2>Professional Summary</h2><p>' + d.summary + '</p>' + NL;
 
-${d.skills?.soft?.length ? `<h2 class="section-title">Core Competencies</h2><p class="skills-text">${d.skills.soft.join('  ·  ')}</p>` : ''}
+  // Experience
+  if (d.experience && d.experience.length) {
+    body += '<h2>Work Experience</h2>' + NL;
+    d.experience.forEach(function(exp) {
+      var bullets = splitBullets(exp.bullets);
+      var dateParts = [];
+      if (exp.start || exp.end) dateParts.push((exp.start||'') + (exp.end ? ' \u2013 ' + exp.end : ''));
+      if (exp.location) dateParts.push(exp.location);
+      body += '<div style="margin-bottom:12pt;">';
+      body += '<div class="role">' + (exp.title||'') + '</div>';
+      if (exp.company) body += '<div class="company">' + exp.company + '</div>';
+      if (dateParts.length) body += '<div class="dates">' + dateParts.join('  |  ') + '</div>';
+      if (bullets.length) {
+        body += '<ul>';
+        bullets.forEach(function(b){ body += '<li>' + b.replace(/^[\u2022\-\*]\s*/, '') + '</li>'; });
+        body += '</ul>';
+      }
+      body += '</div>' + NL;
+    });
+  }
 
-${(() => {
-  const certs = Array.isArray(d.certs) ? d.certs : (d.certs ? d.certs.split('
-').filter(c=>c.trim()) : []);
-  return certs.length ? `<h2 class="section-title">Certifications</h2>${certs.map(c=>`<div class="cert-item">• ${c}</div>`).join('')}` : '';
-})()}
+  // Education
+  if (d.education && d.education.length) {
+    body += '<h2>Education</h2>' + NL;
+    d.education.forEach(function(edu) {
+      var meta = [edu.year, edu.cgpa ? 'CGPA: '+edu.cgpa : (edu.gpa ? 'GPA: '+edu.gpa : ''), edu.location].filter(Boolean).join('  |  ');
+      body += '<div style="margin-bottom:10pt;">';
+      body += '<div class="edu-deg">' + (edu.degree||'') + '</div>';
+      if (edu.institution) body += '<div class="edu-inst">' + edu.institution + '</div>';
+      if (meta) body += '<div class="edu-meta">' + meta + '</div>';
+      body += '</div>' + NL;
+    });
+  }
 
-${d.projects?.length ? `<h2 class="section-title">Projects</h2>${(Array.isArray(d.projects)?d.projects:[]).map(p => typeof p==='string' ? `<div class="cert-item">• ${p}</div>` : `<div style="margin-bottom:8pt;"><div class="exp-role">${p.name||''}</div>${p.description?`<p>${p.description}</p>`:''}</div>`).join('')}` : ''}
+  // Technical Skills
+  var tech = [].concat(
+    (d.skills && d.skills.technical) || [],
+    (d.skills && d.skills.tools) || [],
+    (d.skills && d.skills.ai) || []
+  ).filter(Boolean);
+  if (tech.length) body += '<h2>Technical Skills</h2><p class="skills">' + tech.join('  \u00b7  ') + '</p>' + NL;
+  if (d.skills && d.skills.soft && d.skills.soft.length) body += '<h2>Core Competencies</h2><p class="skills">' + d.skills.soft.join('  \u00b7  ') + '</p>' + NL;
 
-${d.awards?.length ? `<h2 class="section-title">Awards & Recognition</h2>${(Array.isArray(d.awards)?d.awards:[]).map(a => `<div class="cert-item">• ${typeof a==='string'?a:(a.name||'')+(a.description?': '+a.description:'')}</div>`).join('')}` : ''}
+  // Certifications
+  var certs = splitLines(d.certs);
+  if (certs.length) {
+    body += '<h2>Certifications</h2>' + NL;
+    certs.forEach(function(c){ body += '<div class="item">\u2022 ' + c + '</div>'; });
+    body += NL;
+  }
 
-</body></html>`;
+  // Projects
+  if (d.projects && d.projects.length) {
+    body += '<h2>Projects</h2>' + NL;
+    d.projects.forEach(function(p) {
+      if (typeof p === 'string') { body += '<div class="item">\u2022 ' + p + '</div>'; }
+      else {
+        if (p.name) body += '<div class="role">' + p.name + '</div>';
+        if (p.description) body += '<p>' + p.description + '</p>';
+        if (p.impact) body += '<p style="color:#1B6B47;">Impact: ' + p.impact + '</p>';
+      }
+    });
+    body += NL;
+  }
 
-  const blob = new Blob([wordHTML], { type: 'application/msword' });
-  const a = document.createElement('a');
+  // Awards
+  if (d.awards && d.awards.length) {
+    body += '<h2>Awards &amp; Recognition</h2>' + NL;
+    d.awards.forEach(function(a) {
+      var text = typeof a === 'string' ? a : (a.name||'') + (a.description ? ': '+a.description : '');
+      body += '<div class="item">\u2022 ' + text + '</div>';
+    });
+    body += NL;
+  }
+
+  var wordHTML = '<!DOCTYPE html>\n'
+    + '<html xmlns:o="urn:schemas-microsoft-com:office:office" '
+    + 'xmlns:w="urn:schemas-microsoft-com:office:word" '
+    + 'xmlns="http://www.w3.org/1999/xhtml">\n'
+    + '<head>\n<meta charset="UTF-8">\n'
+    + '<title>' + (d.name || 'Resume') + '</title>\n'
+    + '<!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View>'
+    + '<w:Zoom>100</w:Zoom></w:WordDocument></xml><![endif]-->\n'
+    + '<style>\n' + css + '\n</style>\n</head>\n<body>\n'
+    + body + '\n</body></html>';
+
+  var blob = new Blob([wordHTML], { type: 'application/msword' });
+  var a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = (d.name ? d.name.replace(/\s+/g, '_') : 'resume') + '_' + currentMarket + '.doc';
   a.click();
