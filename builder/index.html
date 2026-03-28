@@ -665,7 +665,7 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg-pag
     <div class="rf-modal-title">Create new version</div>
     <div class="rf-modal-sub">Name it by the role you're targeting. You can always rename later.</div>
     <label class="rf-modal-label">Version name</label>
-    <input class="rf-modal-input" id="rf-modal-name" placeholder="e.g. Data Analyst — Naukri" maxlength="50"
+    <input class="rf-modal-input" id="rf-modal-name" placeholder="e.g. Data Analyst — LinkedIn" maxlength="50"
       onkeydown="if(event.key==='Enter')rfCreateVersion()">
     <label class="rf-modal-label">Start from</label>
     <select class="rf-modal-input" id="rf-modal-source">
@@ -688,19 +688,19 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg-pag
 
   <div class="tpl-picker-body">
     <div class="tpl-picker-headline">Choose your AI resume style</div>
-    <div class="tpl-picker-sub">All 7 templates are ATS-optimised, built for Naukri & LinkedIn India. Click any to preview — AI fills it with your data.</div>
+    <div class="tpl-picker-sub">All 7 templates are ATS-optimised for global job markets. Click any to preview — AI fills it with your data.</div>
 
     <div class="tpl-picker-grid" id="tpl-picker-grid">
 
-      <!-- T1: India Standard -->
+      <!-- T1: Classic -->
       <div class="tpl-option selected" data-id="classic" onclick="pickerSelect('classic',this)">
         <div class="tpl-preview-frame">
           <div class="tpl-preview-inner" id="tpl-pre-classic"></div>
         </div>
         <div class="tpl-meta">
-          <div class="tpl-meta-name">India Standard</div>
+          <div class="tpl-meta-name">Classic</div>
           <div class="tpl-meta-desc">Clean single-column · Navy headings · Gold accents</div>
-          <span class="tpl-meta-badge" style="background:rgba(0,200,150,0.12);color:#00C896;border-color:rgba(0,200,150,0.25);">⭐ Most Popular · 70% of India</span>
+          <span class="tpl-meta-badge" style="background:rgba(0,200,150,0.12);color:#00C896;border-color:rgba(0,200,150,0.25);">⭐ Most Popular</span>
         </div>
       </div>
 
@@ -765,15 +765,15 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg-pag
       </div>
 
 
-      <!-- T7: Premier Institute -->
+      <!-- T7: Scholar -->
       <div class="tpl-option" data-id="iit" onclick="pickerSelect('iit',this)">
         <div class="tpl-preview-frame">
           <div class="tpl-preview-inner" id="tpl-pre-iit"></div>
         </div>
         <div class="tpl-meta">
-          <div class="tpl-meta-name">Premier Institute</div>
+          <div class="tpl-meta-name">Scholar</div>
           <div class="tpl-meta-desc">B&W · Classic serif · Academic format</div>
-          <span class="tpl-meta-badge">IIT · NIT · BITS · Top Campuses</span>
+          <span class="tpl-meta-badge">Top Universities · Research · Grad Schools</span>
         </div>
       </div>
 
@@ -794,7 +794,7 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg-pag
   <div class="tpl-picker-footer">
     <div>
       <div class="tpl-selected-label">Selected template</div>
-      <div class="tpl-selected-name" id="tpl-selected-name">India Standard</div>
+      <div class="tpl-selected-name" id="tpl-selected-name">Classic</div>
     </div>
     <button class="btn-use-template" onclick="confirmTemplate()">
       Start Building with AI <span class="arrow">→</span>
@@ -886,19 +886,19 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg-pag
           </div>
 
           <div class="field-grid">
-            <div class="field"><label>Full Name <span class="required">*</span></label><input id="f-name" placeholder="Arjun Sharma" oninput="markFilled('personal')"></div>
+            <div class="field"><label>Full Name <span class="required">*</span></label><input id="f-name" placeholder="Your Full Name" oninput="markFilled('personal')"></div>
             <div class="field"><label>Job Title / Role <span class="required">*</span></label><input id="f-title" placeholder="Senior Software Engineer"></div>
           </div>
           <div class="field-grid">
-            <div class="field"><label>Email <span class="required">*</span></label><input id="f-email" type="email" placeholder="arjun@email.com"></div>
-            <div class="field"><label>Phone <span class="required">*</span></label><input id="f-phone" placeholder="+91 9876543210"></div>
+            <div class="field"><label>Email <span class="required">*</span></label><input id="f-email" type="email" placeholder="you@email.com"></div>
+            <div class="field"><label>Phone <span class="required">*</span></label><input id="f-phone" placeholder="+1 (555) 123-4567"></div>
           </div>
           <div class="field-grid">
-            <div class="field"><label>City / Location</label><input id="f-location" placeholder="Hyderabad, India"></div>
-            <div class="field"><label>LinkedIn URL</label><input id="f-linkedin" placeholder="linkedin.com/in/arjun"></div>
+            <div class="field"><label>City / Location</label><input id="f-location" placeholder="City, Country"></div>
+            <div class="field"><label>LinkedIn URL</label><input id="f-linkedin" placeholder="linkedin.com/in/yourname"></div>
           </div>
           <div class="field-grid">
-            <div class="field"><label>Portfolio / Website</label><input id="f-portfolio" placeholder="github.com/arjun or arjun.dev"></div>
+            <div class="field"><label>Portfolio / Website</label><input id="f-portfolio" placeholder="github.com/yourname or yoursite.com"></div>
             <div class="field"><label>Years of Experience</label><input id="f-years" placeholder="5"></div>
           </div>
 
@@ -906,7 +906,7 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg-pag
 
           <!-- Gulf-specific -->
           <div class="field-grid market-field gulf-field" style="display:none">
-            <div class="field"><label>Nationality <span class="required">*</span></label><input id="f-nationality" placeholder="Indian"><div class="hint">Required on all UAE/Gulf applications</div></div>
+            <div class="field"><label>Nationality <span class="required">*</span></label><input id="f-nationality" placeholder="Your nationality"><div class="hint">Required on all UAE/Gulf applications</div></div>
             <div class="field"><label>Visa Status</label><select id="f-visa"><option value="">Select visa status</option><option>UAE Residence Visa</option><option>Employment Visa</option><option>Visit Visa</option><option>Seeking Employment Visa</option><option>Citizen</option></select></div>
           </div>
           <div class="field-grid market-field gulf-field" style="display:none">
@@ -916,7 +916,7 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg-pag
 
           <!-- Europe-specific -->
           <div class="field-grid market-field europe-field" style="display:none">
-            <div class="field"><label>Nationality</label><input id="f-eu-nationality" placeholder="Indian / British etc."></div>
+            <div class="field"><label>Nationality</label><input id="f-eu-nationality" placeholder="e.g. German, British, French"></div>
             <div class="field"><label>Work Authorization</label><select id="f-work-auth"><option value="">Select</option><option>EU Citizen</option><option>EU Work Permit</option><option>Skilled Worker Visa</option><option>Seeking Sponsorship</option></select></div>
           </div>
 
@@ -931,12 +931,6 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg-pag
             <label>Summary / Objective <span class="required">*</span></label>
             <textarea id="f-summary" rows="5" placeholder="Results-driven software engineer with 5+ years building scalable products. Led teams of 8+ engineers delivering features used by 2M+ users. Passionate about clean architecture and developer experience." oninput="markFilled('summary')"></textarea>
             <div class="hint">Tip: Include your years of experience, key skills, and one standout achievement</div>
-          </div>
-          <!-- India specific -->
-          <div class="field market-field india-field" id="india-naukri" style="margin-top:12px;">
-            <label>Naukri.com Headline <span style="font-weight:400;color:var(--text3)">(optional but recommended)</span></label>
-            <input id="f-naukri-headline" placeholder="5+ Yrs | Python | React | AWS | Open to Relocation">
-            <div class="hint">This appears as your headline on Naukri profile — keyword-optimized</div>
           </div>
           <div style="display:flex;gap:8px;margin-top:1rem;">
             <button class="btn btn-secondary" onclick="showSection('personal',document.querySelector('.section-tab'))">← Back</button>
@@ -953,7 +947,7 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg-pag
               <div class="entry-card-header"><div class="entry-card-title">Experience 1</div><button class="btn btn-danger btn-sm" onclick="removeEntry('exp-0')">Remove</button></div>
               <div class="field-grid">
                 <div class="field"><label>Job Title <span class="required">*</span></label><input class="exp-title" placeholder="Senior Software Engineer" oninput="markFilled('experience')"></div>
-                <div class="field"><label>Company Name <span class="required">*</span></label><input class="exp-company" placeholder="Google India"></div>
+                <div class="field"><label>Company Name <span class="required">*</span></label><input class="exp-company" placeholder="Company Name"></div>
               </div>
               <div class="field-grid three">
                 <div class="field">
@@ -998,7 +992,7 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg-pag
                     </label>
                   </div>
                 </div>
-                <div class="field"><label>Location</label><input class="exp-location" placeholder="Hyderabad / Remote"></div>
+                <div class="field"><label>Location</label><input class="exp-location" placeholder="City / Remote"></div>
               </div>
               <div class="field field-grid one">
                 <label>Key Achievements <span class="required">*</span></label>
@@ -1017,13 +1011,13 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg-pag
         <!-- EDUCATION -->
         <div class="section-panel" id="panel-education">
           <div class="panel-title">Education</div>
-          <div class="panel-sub">Your academic qualifications. For India, CGPA is shown. For US, GPA. Gulf shows both.</div>
+          <div class="panel-sub">Your academic qualifications. For US/UK markets, GPA is shown. For all others, CGPA / Percentage.</div>
           <div id="education-list">
             <div class="entry-card" id="edu-0">
               <div class="entry-card-header"><div class="entry-card-title">Education 1</div><button class="btn btn-danger btn-sm" onclick="removeEntry('edu-0')">Remove</button></div>
               <div class="field-grid">
                 <div class="field"><label>Degree <span class="required">*</span></label><input class="edu-degree" placeholder="B.Tech Computer Science" oninput="markFilled('education')"></div>
-                <div class="field"><label>Institution <span class="required">*</span></label><input class="edu-institution" placeholder="IIT Hyderabad"></div>
+                <div class="field"><label>Institution <span class="required">*</span></label><input class="edu-institution" placeholder="University Name"></div>
               </div>
               <div class="field-grid three">
                 <div class="field"><label>Graduation Year</label><input class="edu-year" placeholder="2019"></div>
@@ -1031,7 +1025,7 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg-pag
                 <div class="field india-field europe-field gulf-field edu-cgpa-field"><label id="cgpa-label">CGPA / Percentage</label><input class="edu-cgpa" placeholder="8.4 / 10 or 84%"></div>
                 <!-- US -->
                 <div class="field us-field edu-gpa-field" style="display:none"><label>GPA</label><input class="edu-gpa" placeholder="3.8 / 4.0"></div>
-                <div class="field"><label>Location</label><input class="edu-location" placeholder="Hyderabad, India"></div>
+                <div class="field"><label>Location</label><input class="edu-location" placeholder="City, Country"></div>
               </div>
             </div>
           </div>
@@ -1049,7 +1043,7 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg-pag
           <div class="field-grid one field"><label>Technical Skills <span class="required">*</span></label><input id="f-tech-skills" placeholder="Python, React, Node.js, AWS, PostgreSQL, Docker, Kubernetes" oninput="markFilled('skills')"></div>
           <div class="field-grid one field" style="margin-top:12px;"><label>Soft Skills</label><input id="f-soft-skills" placeholder="Team Leadership, Agile/Scrum, Cross-functional Collaboration, Problem Solving"></div>
           <div class="field-grid one field" style="margin-top:12px;"><label>Tools & Platforms</label><input id="f-tools" placeholder="Jira, Figma, GitHub, Postman, Datadog, NewRelic"></div>
-          <div class="field-grid one field market-field india-field" style="margin-top:12px;">
+          <div class="field-grid one field" style="margin-top:12px;">
             <label>AI Tools Used <span style="font-weight:400;color:var(--text3)">(2026 must-have)</span></label>
             <input id="f-ai-tools" placeholder="Claude, ChatGPT, GitHub Copilot, Midjourney">
             <div class="hint">Explicitly listing AI tools shows modern fluency — highly valued in 2026</div>
@@ -1071,7 +1065,7 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg-pag
           <div class="panel-sub">Certifications, projects, awards — these differentiate you from other candidates.</div>
           <div class="field-grid one field"><label>Certifications</label><textarea id="f-certs" rows="3" placeholder="AWS Solutions Architect (2023)&#10;Google Professional Data Engineer (2022)&#10;PMP Certified (2021)" oninput="markFilled('extras')"></textarea></div>
           <div class="field-grid one field" style="margin-top:12px;"><label>Key Projects</label><textarea id="f-projects" rows="4" placeholder="Project Name | Tech Stack | Link&#10;E-commerce Platform | React, Node.js, AWS | github.com/project&#10;ML Fraud Detection | Python, TensorFlow | 98% accuracy, saved $2M annually"></textarea></div>
-          <div class="field-grid one field" style="margin-top:12px;"><label>Awards & Achievements</label><textarea id="f-awards" rows="3" placeholder="Employee of the Year 2023 — TCS&#10;Hackathon Winner — Microsoft Build 2022&#10;Speaker — PyCon India 2023"></textarea></div>
+          <div class="field-grid one field" style="margin-top:12px;"><label>Awards & Achievements</label><textarea id="f-awards" rows="3" placeholder="Employee of the Year 2023 — Acme Corp&#10;Hackathon Winner — Microsoft Build 2022&#10;Speaker — Tech Summit 2023"></textarea></div>
           <!-- India specific -->
           <div style="display:flex;gap:8px;margin-top:1.5rem;">
             <button class="btn btn-secondary" onclick="prevSection('skills')">← Back</button>
@@ -1096,10 +1090,10 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg-pag
           <textarea id="ai-paste-input" rows="14" placeholder="Paste your existing resume here, OR just dump your raw experience notes...
 
 Example:
-Name: Priya Sharma
-Job: Software developer at Infosys for 3 years
-Before that: internship at startup
-Education: B.Tech from JNTU 2020, 7.8 CGPA
+Name: Alex Johnson
+Job: Software developer at Acme Corp for 3 years
+Before that: internship at a fintech startup
+Education: B.Sc Computer Science 2020, 3.7 GPA
 Skills: Java, Spring Boot, MySQL, basic React
 Did some microservices work, helped migrate legacy system
 Looking for senior dev roles in product companies"></textarea>
@@ -1250,13 +1244,13 @@ Looking for senior dev roles in product companies"></textarea>
 
 // ── TEMPLATE PICKER ────────────────────────────────────────────────────
 const SAMPLE_DATA = {
-  market: 'india',
+  market: 'us',
   name: 'Jane Doe',
   title: 'Business Analyst',
   email: 'jane_doe@example.com',
-  phone: '+91 99999 00000',
-  location: 'Hyderabad, India',
-  linkedin: 'linkedin.com/in/priyagautam',
+  phone: '+1 (555) 000-0000',
+  location: 'New York, USA',
+  linkedin: 'linkedin.com/in/janedoe',
   portfolio: '',
   ctc: '',
   techSkills: 'Python, C++, SQL, Data Analytics, Machine Learning, Power BI, Excel, JIRA, SQL Server, Claude',
@@ -1264,12 +1258,12 @@ const SAMPLE_DATA = {
   tools: 'Power BI, Excel, JIRA, SQL Server',
   aiTools: 'Claude, RAG',
   languages: '',
-  certs: '', projects: '', awards: '', naukri: '',
+  certs: '', projects: '', awards: '',
   photo: null, nationality: '', visa: '',
   summary: 'HIPAA-certified Business Analyst with 3+ years of experience in healthcare data analytics, KPI design, and stakeholder management. Proficient in Python, SQL and Power BI — delivered ₹2.4Cr cost-saving initiative and reduced reporting time by 65% through automated dashboards.',
   experience: [
     {
-      title: 'Business Analyst', company: 'AcadoreSkills', start: 'Jun 2023', end: 'Present', location: 'Hyderabad',
+      title: 'Business Analyst', company: 'Acme Corp', start: 'Jun 2023', end: 'Present', location: 'New York',
       bullets: [
         'Built real-time Power BI dashboards tracking 10+ healthcare KPIs, reducing reporting time by 65%',
         'Analysed 500K+ patient records using Python and SQL to forecast demand with 92% accuracy',
@@ -1279,7 +1273,7 @@ const SAMPLE_DATA = {
       ]
     },
     {
-      title: 'Data Analyst Intern', company: 'Infosys', start: 'Jun 2021', end: 'Dec 2021', location: 'Bangalore',
+      title: 'Data Analyst Intern', company: 'TechStartup Inc', start: 'Jun 2021', end: 'Dec 2021', location: 'Remote',
       bullets: [
         'Developed predictive churn model improving customer retention by 18%',
         'Automated MIS reports saving 12 hours/week of manual effort'
@@ -1310,7 +1304,7 @@ const SAMPLE_DATA = {
   ]
 };
 
-const TPL_NAMES = { classic:'India Standard', modern:'Tech Pro', corporate:'Corporate', executive:'Executive', fresher:'Campus', creative:'Creative', iit:'Premier Institute' };
+const TPL_NAMES = { classic:'Classic', modern:'Tech Pro', corporate:'Corporate', executive:'Executive', fresher:'Campus', creative:'Creative', iit:'Scholar' };
 
 function renderPickerPreviews() {
   const renderers = { classic:renderClassic, modern:renderModern, corporate:renderCorporate, executive:renderExecutive, fresher:renderFresher, creative:renderCreative, iit:renderIIT };
@@ -1366,7 +1360,7 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 
-let currentMarket = 'india';
+let currentMarket = 'us';
 let currentMode = 'form';
 let currentTemplate = 'classic';
 let photoDataUrl = null;
@@ -1523,7 +1517,7 @@ function collectFormData() {
     softSkills: v('f-soft-skills'), tools: v('f-tools'), certs: v('f-certs'),
     projects: v('f-projects'), awards: v('f-awards'),
     // market-specific
-    ctc: '', ectc: '', naukri: v('f-naukri-headline'),
+    ctc: '', ectc: '',
     notice: v('f-notice'), aiTools: v('f-ai-tools'),
     nationality: v('f-nationality'), visa: v('f-visa'), dob: v('f-dob'),
     driving: v('f-driving'), languages: v('f-languages'),
@@ -1629,7 +1623,6 @@ ${data.languages ? 'Languages: ' + data.languages : ''}
 CERTIFICATIONS: ${data.certs || 'None'}
 PROJECTS: ${data.projects || 'None'}
 AWARDS: ${data.awards || 'None'}
-${data.naukri ? 'Naukri Headline: ' + data.naukri : ''}
 
 INSTRUCTIONS:
 1. Include EVERY experience role and EVERY bullet point from the input — do not drop any role or bullet
@@ -1711,7 +1704,7 @@ async function generateResume() {
     showToast('Resume generated successfully!', 'success');
     // Score the generated resume inline
     setTimeout(scoreGeneratedResume, 500);
-    if(currentMode==='form'&&data){renderChecklist(data);}else if(currentMode==='ai'&&generatedATS){renderChecklist({market:currentMarket,name:'',email:'',phone:'',location:'',summary:'(AI mode)',techSkills:'',tools:'',experience:[],education:[],certs:'',naukri:'',ctc:'',notice:'',nationality:'',visa:'',photo:null,languages:'',aiTools:''});}
+    if(currentMode==='form'&&data){renderChecklist(data);}else if(currentMode==='ai'&&generatedATS){renderChecklist({market:currentMarket,name:'',email:'',phone:'',location:'',summary:'(AI mode)',techSkills:'',tools:'',experience:[],education:[],certs:'',ctc:'',notice:'',nationality:'',visa:'',photo:null,languages:'',aiTools:''});}
     // Run completeness check after generation
     if (currentMode === 'form') runCompletenessCheck(data);
 
@@ -1736,7 +1729,7 @@ function buildAIRewritePrompt(paste) {
   const tone = document.getElementById('ai-tone').value;
   const transition = document.getElementById('ai-transition').value;
   const marketInstructions = {
-    india: 'Format for Indian job market: include CGPA, CTC expectations, notice period, optimize for Naukri.com.',
+    india: 'Format for Indian job market: include CGPA, CTC expectations, notice period. Optimize for ATS systems used by Indian employers.',
     us: 'Format for US job market: strict 1-page, strong metrics, no personal info, Workday/Greenhouse ATS-safe.',
     gulf: 'Format for Gulf/UAE market: include nationality, visa status fields, optimize for Bayt.com.',
     europe: 'Format for European job market: Europass-inspired, include language proficiency, work authorization.'
@@ -1793,7 +1786,6 @@ function buildResumeData(data, aiData) {
     photo:       data.photo,
     nationality: data.nationality || '',
     visa:        data.visa        || '',
-    naukri:      data.naukri      || '',
   };
 }
 
@@ -1843,7 +1835,7 @@ function certsArr(d) {
 function projectsArr(d) { return d.projects || []; }
 function awardsArr(d)   { return d.awards   || []; }
 
-// ── T1: CLASSIC NAUKRI ────────────────────────────────────────────────
+// ── T1: CLASSIC ────────────────────────────────────────────────────────
 function renderClassic(d) {
   const tech  = allTechSkills(d.skills, d);
   const soft  = softSkillsArr(d.skills, d);
@@ -2104,7 +2096,7 @@ function renderCreative(d) {
   return h;
 }
 
-// ── T7: IIT / PREMIER INSTITUTE ──────────────────────────────────────
+// ── T7: SCHOLAR ──────────────────────────────────────
 function renderIIT(d) {
   const tech  = allTechSkills(d.skills, d);
   const soft  = softSkillsArr(d.skills, d);
@@ -2147,7 +2139,7 @@ function renderIIT(d) {
   </div>
   <div style="border-top:1.5px solid #000;margin-bottom:14px;"></div>`;
 
-  // IIT order: Summary → Education → Skills → Experience → Projects → Certs → Awards
+  // Scholar order: Summary → Education → Skills → Experience → Projects → Certs → Awards
   if (d.summary)           h += sec('Professional Summary', `<div style="font-size:12.5px;color:#1a1a1a;line-height:1.65;">${sanitise(d.summary)}</div>`);
   if (d.education.length)  h += sec('Education', d.education.map(eduItem).join(''));
   const skillLines = [];
@@ -2621,8 +2613,11 @@ function showToast(msg, type) {
   setTimeout(() => t.classList.remove('show'), 3500);
 }
 
-// Initialize — show India fields by default
-document.querySelectorAll('.india-field').forEach(el => el.style.display = 'flex');
+// Initialize — show US fields by default
+document.querySelectorAll('.india-field').forEach(el => el.style.display = 'none');
+document.querySelectorAll('.us-field').forEach(el => el.style.display = 'flex');
+document.querySelectorAll('.edu-cgpa-field').forEach(el => el.style.display = 'none');
+document.querySelectorAll('.edu-gpa-field').forEach(el => el.style.display = 'flex');
 
 // ── COMPLETENESS CHECKER ───────────────────────────────────────────────
 function runCompletenessCheck(data) {
@@ -2745,8 +2740,6 @@ function buildCompletenessChecklist(data) {
   } else {
     items.push({section:'Summary', status:'ok', icon:'✅', text:'<strong>Summary looks complete</strong>'});
   }
-  if (data.market==='india' && !data.naukri) items.push({section:'Summary', status:'warn', icon:'⚠️', text:'<strong>Naukri headline missing</strong> — improves search visibility on Naukri.com significantly'});
-
   // Experience
   const exps = data.experience || [];
   const filledExps = exps.filter(e=>e.title&&e.company);
@@ -2937,7 +2930,7 @@ function rfFillForm(data) {
   set('f-email', data.email); set('f-phone', data.phone);
   set('f-location', data.location); set('f-linkedin', data.linkedin);
   set('f-portfolio', data.portfolio); set('f-years', data.years);
-  set('f-summary', data.summary); set('f-naukri-headline', data.naukri);
+  set('f-summary', data.summary);
   set('f-tech-skills', data.techSkills); set('f-soft-skills', data.softSkills);
   set('f-tools', data.tools); set('f-ai-tools', data.aiTools);
   set('f-certs', data.certs); set('f-projects', data.projects);
@@ -2985,7 +2978,7 @@ function rfCollectData() {
   return {
     name: g('f-name'), title: g('f-title'), email: g('f-email'), phone: g('f-phone'),
     location: g('f-location'), linkedin: g('f-linkedin'), portfolio: g('f-portfolio'),
-    years: g('f-years'), summary: g('f-summary'), naukri: g('f-naukri-headline'),
+    years: g('f-years'), summary: g('f-summary'),
     techSkills: g('f-tech-skills'), softSkills: g('f-soft-skills'), tools: g('f-tools'),
     aiTools: g('f-ai-tools'), certs: g('f-certs'), projects: g('f-projects'),
     awards: g('f-awards'), ctc: '', ectc: '',
@@ -3109,8 +3102,8 @@ function rfDeleteVersion(id) {
 }
 
 function rfTplName(key) {
-  var n = {classic:'India Standard',modern:'Tech Pro',corporate:'Corporate',executive:'Executive',fresher:'Campus',creative:'Creative',iit:'Premier Institute'};
-  return n[key] || key || 'India Standard';
+  var n = {classic:'Classic',modern:'Tech Pro',corporate:'Corporate',executive:'Executive',fresher:'Campus',creative:'Creative',iit:'Scholar'};
+  return n[key] || key || 'Classic';
 }
 function rfEsc(s) {
   return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
