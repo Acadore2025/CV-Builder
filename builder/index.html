@@ -711,7 +711,19 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg-pag
         </div>
       </div>
 
-      <!-- T2: Tech Pro -->
+      <!-- T2: Harvard Style -->
+      <div class="tpl-option" data-id="harvard" onclick="pickerSelect('harvard',this)">
+        <div class="tpl-preview-frame">
+          <div class="tpl-preview-inner" id="tpl-pre-harvard"></div>
+        </div>
+        <div class="tpl-meta">
+          <div class="tpl-meta-name">Harvard Style</div>
+          <div class="tpl-meta-desc">Centered header · Rule dividers · B&W serif</div>
+          <span class="tpl-meta-badge" style="background:rgba(185,28,28,0.10);color:#B91C1C;border-color:rgba(185,28,28,0.25);">Law · Finance · Consulting · MBA</span>
+        </div>
+      </div>
+
+      <!-- T3: Tech Pro -->
       <div class="tpl-option" data-id="modern" onclick="pickerSelect('modern',this)">
         <div class="tpl-preview-frame">
           <div class="tpl-preview-inner" id="tpl-pre-modern"></div>
@@ -1311,10 +1323,10 @@ const SAMPLE_DATA = {
   ]
 };
 
-const TPL_NAMES = { classic:'Classic', modern:'Tech Pro', corporate:'Corporate', executive:'Executive', fresher:'Campus', creative:'Creative', iit:'Scholar' };
+const TPL_NAMES = { classic:'Classic', harvard:'Harvard Style', modern:'Tech Pro', corporate:'Corporate', executive:'Executive', fresher:'Campus', creative:'Creative', iit:'Scholar' };
 
 function renderPickerPreviews() {
-  const renderers = { classic:renderClassic, modern:renderModern, corporate:renderCorporate, executive:renderExecutive, fresher:renderFresher, creative:renderCreative, iit:renderIIT };
+  const renderers = { classic:renderClassic, harvard:renderHarvard, modern:renderModern, corporate:renderCorporate, executive:renderExecutive, fresher:renderFresher, creative:renderCreative, iit:renderIIT };
   // Build data — use aiData path to get structured skills/certs/projects/awards
   const aiLike = {
     name: SAMPLE_DATA.name,
@@ -1842,6 +1854,77 @@ function certsArr(d) {
 function projectsArr(d) { return d.projects || []; }
 function awardsArr(d)   { return d.awards   || []; }
 
+// ── T2: HARVARD STYLE ─────────────────────────────────────────────────
+function renderHarvard(d) {
+  const tech  = allTechSkills(d.skills, d);
+  const soft  = softSkillsArr(d.skills, d);
+  const langs = langsArr(d.skills, d);
+  const certs = certsArr(d);
+  const projs = projectsArr(d);
+  const awds  = awardsArr(d);
+
+  const hr = `<div style="border-bottom:1px solid #000;margin-bottom:6px;"></div>`;
+
+  const sec = (title, body) => `<div style="margin-bottom:14px;">
+    <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#000;margin-bottom:3px;">${title}</div>
+    ${hr}
+    ${body}
+  </div>`;
+
+  const expItem = (e) => {
+    const bullets = e.bullets
+      ? (Array.isArray(e.bullets) ? e.bullets : e.bullets.split('\n').filter(b=>b.trim()))
+      : [];
+    const dates = [e.start, e.end].filter(Boolean).join(' \u2013 ');
+    return `<div style="margin-bottom:10px;break-inside:avoid;page-break-inside:avoid;">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;">
+        <div style="font-weight:700;font-size:13px;">${sanitise(e.company||'')}</div>
+        <div style="font-size:12px;color:#000;">${sanitise(e.location||'')}</div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:3px;">
+        <div style="font-style:italic;font-size:12.5px;">${sanitise(e.title||'')}</div>
+        <div style="font-size:12px;font-style:italic;">${sanitise(dates)}</div>
+      </div>
+      ${bullets.length ? '<ul style="margin:3px 0 0 18px;padding:0;">' + bullets.map(b=>`<li style="font-size:12.5px;line-height:1.55;margin-bottom:2px;">${sanitise(b.replace(/^[\u2022\-\*o]\s*/,'').trim())}</li>`).join('') + '</ul>' : ''}
+    </div>`;
+  };
+
+  const eduHTML = d.education.map(e => {
+    const meta = [e.cgpa ? (d.market==='us'?'GPA: ':'CGPA: ')+e.cgpa : '', e.location].filter(Boolean).join(' | ');
+    return `<div style="margin-bottom:8px;break-inside:avoid;page-break-inside:avoid;">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;">
+        <div style="font-weight:700;font-size:13px;">${sanitise(e.institution||'')}</div>
+        <div style="font-size:12px;">${sanitise(e.year||'')}</div>
+      </div>
+      <div style="display:flex;justify-content:space-between;">
+        <div style="font-style:italic;font-size:12.5px;">${sanitise(e.degree||'')}</div>
+        ${meta ? `<div style="font-size:12px;color:#333;">${sanitise(meta)}</div>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+
+  const contactParts = [d.email, d.phone, d.location, d.linkedin ? d.linkedin.replace(/https?:\/\//,'') : ''].filter(Boolean);
+
+  let h = `<div style="padding:36px 52px;font-family:'Georgia',serif;font-size:13px;line-height:1.5;color:#000;background:#fff;">
+  <div style="text-align:center;margin-bottom:14px;">
+    <div style="font-size:26px;font-weight:700;letter-spacing:0.02em;text-transform:uppercase;">${sanitise(d.name)}</div>
+    ${d.title ? `<div style="font-size:13px;font-style:italic;margin-top:2px;">${sanitise(d.title)}</div>` : ''}
+    <div style="font-size:11.5px;color:#222;margin-top:6px;">${contactParts.join(' &nbsp;|&nbsp; ')}</div>
+  </div>`;
+
+  if (d.summary)           h += sec('Summary', `<div style="font-size:12.5px;line-height:1.6;">${sanitise(d.summary)}</div>`);
+  if (d.experience.length) h += sec('Experience', d.experience.map(expItem).join(''));
+  if (d.education.length)  h += sec('Education', eduHTML);
+  if (tech.length)         h += sec('Skills', `<div style="font-size:12.5px;line-height:1.7;">${tech.join(' &nbsp;&middot;&nbsp; ')}</div>`);
+  if (soft.length)         h += sec('Competencies', `<div style="font-size:12.5px;line-height:1.7;">${soft.join(' &nbsp;&middot;&nbsp; ')}</div>`);
+  if (langs.length)        h += sec('Languages', `<div style="font-size:12.5px;line-height:1.7;">${langs.join(' &nbsp;&middot;&nbsp; ')}</div>`);
+  if (certs.length)        h += sec('Certifications', '<ul style="margin:3px 0 0 18px;padding:0;">'+certs.map(c=>`<li style="font-size:12px;margin-bottom:2px;">${c}</li>`).join('')+'</ul>');
+  if (projs.length)        h += sec('Projects', projs.map(p=>`<div style="margin-bottom:8px;"><div style="font-weight:700;">${p.name||p}</div>${p.description?`<div style="font-size:12px;">${p.description}</div>`:''}${p.impact?`<div style="font-size:12px;font-style:italic;">Impact: ${p.impact}</div>`:''}</div>`).join(''));
+  if (awds.length)         h += sec('Awards & Honors', '<ul style="margin:3px 0 0 18px;padding:0;">'+awds.map(a=>`<li style="font-size:12px;margin-bottom:2px;">${a}</li>`).join('')+'</ul>');
+  h += '</div>';
+  return h;
+}
+
 // ── T1: CLASSIC ────────────────────────────────────────────────────────
 function renderClassic(d) {
   const tech  = allTechSkills(d.skills, d);
@@ -2166,6 +2249,7 @@ function renderByTemplate(data, aiData) {
   const d = buildResumeData(data, aiData);
   const renderers = {
     classic:   renderClassic,
+    harvard:   renderHarvard,
     modern:    renderModern,
     corporate: renderCorporate,
     executive: renderExecutive,
@@ -2438,9 +2522,15 @@ function exportPDF() {
     '*{box-sizing:border-box;margin:0;padding:0;}',
     'body{font-family:"Inter",sans-serif;}',
     '.resume-entry{break-inside:avoid;page-break-inside:avoid;}',
+    '.exp-block{break-inside:avoid;page-break-inside:avoid;}',
     'li{break-inside:avoid;page-break-inside:avoid;}',
     'ul{break-inside:avoid;page-break-inside:avoid;}',
-    '@media print{@page{margin:0;}body{margin:0;}}'
+    '@media print{',
+    '@page{size:A4;margin:12mm 15mm;}',
+    'body{margin:0;}',
+    '.modern-layout{display:block!important;}',
+    '.modern-sidebar{width:100%!important;background:#fff!important;color:#000!important;padding:8px 0!important;border-bottom:1pt solid #ccc!important;}',
+    '}'
   ].join('');
   const content = '<!DOCTYPE html><html><head>'
     + '<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">'
@@ -2458,7 +2548,7 @@ function exportPDF() {
     setTimeout(function() {
       iframe.contentWindow.focus();
       iframe.contentWindow.print();
-    }, 400);
+    }, 1400);
   };
   iframe.srcdoc = content;
   showToast('Preparing PDF — print dialog will open shortly', 'success');
@@ -2483,18 +2573,23 @@ function exportDOCX() {
   var css = [
     '@page { margin: 2cm; size: A4; }',
     'body { font-family: Calibri, Arial, sans-serif; font-size: 11pt; color: #1A1A2E; line-height: 1.5; }',
-    'h1 { font-family: Georgia, serif; font-size: 26pt; font-weight: bold; color: #0F1B2D; margin: 0 0 4pt 0; border-left: 4pt solid #C9953A; padding-left: 10pt; }',
-    '.rtitle { font-size: 13pt; color: #C9953A; font-weight: bold; margin: 2pt 0 8pt 14pt; }',
-    '.contact { font-size: 10pt; color: #4A5568; border-bottom: 2pt solid #0F1B2D; padding-bottom: 8pt; margin-bottom: 14pt; }',
-    'h2 { font-size: 10pt; font-weight: bold; text-transform: uppercase; letter-spacing: 1pt; color: #0F1B2D; border-bottom: 1pt solid #E2D9CE; padding-bottom: 3pt; margin: 16pt 0 8pt 0; }',
+    /* Clean name header — no border-left (Word renders it poorly) */
+    'h1 { font-family: Georgia, serif; font-size: 24pt; font-weight: bold; color: #0F1B2D; margin: 0 0 4pt 0; }',
+    '.rtitle { font-size: 12pt; color: #C9953A; font-weight: bold; margin: 2pt 0 8pt 0; }',
+    '.contact { font-size: 10pt; color: #4A5568; border-bottom: 1.5pt solid #0F1B2D; padding-bottom: 7pt; margin-bottom: 14pt; }',
+    /* Section headings — never orphaned at page bottom */
+    'h2 { font-size: 10pt; font-weight: bold; text-transform: uppercase; letter-spacing: 1pt; color: #0F1B2D; border-bottom: 1pt solid #C0BAB0; padding-bottom: 3pt; margin: 14pt 0 7pt 0; page-break-after: avoid; }',
+    /* Job entry wrapper — keep title/company/bullets together */
+    '.job { margin-bottom: 12pt; page-break-inside: avoid; }',
     '.role { font-size: 12pt; font-weight: bold; color: #1A1A2E; margin: 0; }',
     '.company { font-size: 11pt; color: #C9953A; font-weight: bold; margin: 1pt 0; }',
-    '.dates { font-size: 9pt; color: #8A9BB0; font-style: italic; margin-bottom: 4pt; }',
-    'ul { margin: 4pt 0 8pt 0; padding-left: 16pt; }',
-    'li { font-size: 10.5pt; color: #4A5568; margin-bottom: 3pt; }',
+    '.dates { font-size: 9pt; color: #6A7B8A; font-style: italic; margin-bottom: 4pt; }',
+    'ul { margin: 4pt 0 0 0; padding-left: 16pt; page-break-inside: avoid; }',
+    'li { font-size: 10.5pt; color: #4A5568; margin-bottom: 3pt; page-break-inside: avoid; }',
+    '.edu-block { margin-bottom: 10pt; page-break-inside: avoid; }',
     '.edu-deg { font-size: 12pt; font-weight: bold; color: #1A1A2E; }',
     '.edu-inst { font-size: 11pt; color: #C9953A; }',
-    '.edu-meta { font-size: 9pt; color: #8A9BB0; font-style: italic; }',
+    '.edu-meta { font-size: 9pt; color: #6A7B8A; font-style: italic; }',
     '.skills { font-size: 10.5pt; color: #4A5568; line-height: 1.7; }',
     '.item { font-size: 10.5pt; color: #4A5568; margin-bottom: 3pt; }',
     'p { margin: 4pt 0; font-size: 10.5pt; color: #4A5568; line-height: 1.6; }'
@@ -2505,7 +2600,8 @@ function exportDOCX() {
   // Header
   body += '<h1>' + (d.name || '') + '</h1>' + NL;
   if (d.title) body += '<div class="rtitle">' + d.title + '</div>' + NL;
-  body += '<div class="contact">' + [d.email, d.phone, d.location, d.linkedin].filter(Boolean).join(' &nbsp;|&nbsp; ') + '</div>' + NL;
+  var contactItems = [d.email, d.phone, d.location, d.linkedin, d.portfolio].filter(Boolean);
+  body += '<div class="contact">' + contactItems.join(' &nbsp;|&nbsp; ') + '</div>' + NL;
 
   // Summary
   if (d.summary) body += '<h2>Professional Summary</h2><p>' + d.summary + '</p>' + NL;
@@ -2518,7 +2614,7 @@ function exportDOCX() {
       var dateParts = [];
       if (exp.start || exp.end) dateParts.push((exp.start||'') + (exp.end ? ' \u2013 ' + exp.end : ''));
       if (exp.location) dateParts.push(exp.location);
-      body += '<div style="margin-bottom:12pt;">';
+      body += '<div class="job">';
       body += '<div class="role">' + (exp.title||'') + '</div>';
       if (exp.company) body += '<div class="company">' + exp.company + '</div>';
       if (dateParts.length) body += '<div class="dates">' + dateParts.join('  |  ') + '</div>';
@@ -2536,7 +2632,7 @@ function exportDOCX() {
     body += '<h2>Education</h2>' + NL;
     d.education.forEach(function(edu) {
       var meta = [edu.year, edu.cgpa ? 'CGPA: '+edu.cgpa : (edu.gpa ? 'GPA: '+edu.gpa : ''), edu.location].filter(Boolean).join('  |  ');
-      body += '<div style="margin-bottom:10pt;">';
+      body += '<div class="edu-block">';
       body += '<div class="edu-deg">' + (edu.degree||'') + '</div>';
       if (edu.institution) body += '<div class="edu-inst">' + edu.institution + '</div>';
       if (meta) body += '<div class="edu-meta">' + meta + '</div>';
@@ -2552,6 +2648,9 @@ function exportDOCX() {
   ).filter(Boolean);
   if (tech.length) body += '<h2>Technical Skills</h2><p class="skills">' + tech.join('  \u00b7  ') + '</p>' + NL;
   if (d.skills && d.skills.soft && d.skills.soft.length) body += '<h2>Core Competencies</h2><p class="skills">' + d.skills.soft.join('  \u00b7  ') + '</p>' + NL;
+  var langs = (d.skills && d.skills.languages) || [];
+  if (!langs.length && d.languages) langs = d.languages.split(',').map(function(l){return l.trim();}).filter(Boolean);
+  if (langs.length) body += '<h2>Languages</h2><p class="skills">' + langs.join('  \u00b7  ') + '</p>' + NL;
 
   // Certifications
   var certs = splitLines(d.certs);
@@ -2575,10 +2674,14 @@ function exportDOCX() {
     body += NL;
   }
 
-  // Awards
-  if (d.awards && d.awards.length) {
+  // Awards — handle string (from form) or array (from AI)
+  var awardsRaw = d.awards;
+  var awardsArr2 = [];
+  if (Array.isArray(awardsRaw)) awardsArr2 = awardsRaw;
+  else if (typeof awardsRaw === 'string' && awardsRaw.trim()) awardsArr2 = awardsRaw.split('\n').filter(function(a){return a.trim();});
+  if (awardsArr2.length) {
     body += '<h2>Awards &amp; Recognition</h2>' + NL;
-    d.awards.forEach(function(a) {
+    awardsArr2.forEach(function(a) {
       var text = typeof a === 'string' ? a : (a.name||'') + (a.description ? ': '+a.description : '');
       body += '<div class="item">\u2022 ' + text + '</div>';
     });
@@ -3112,7 +3215,7 @@ function rfDeleteVersion(id) {
 }
 
 function rfTplName(key) {
-  var n = {classic:'Classic',modern:'Tech Pro',corporate:'Corporate',executive:'Executive',fresher:'Campus',creative:'Creative',iit:'Scholar'};
+  var n = {classic:'Classic',harvard:'Harvard Style',modern:'Tech Pro',corporate:'Corporate',executive:'Executive',fresher:'Campus',creative:'Creative',iit:'Scholar'};
   return n[key] || key || 'Classic';
 }
 function rfEsc(s) {
