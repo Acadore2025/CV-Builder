@@ -345,6 +345,13 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg-pag
   background: rgba(108,92,231,0.12); color: var(--purple2);
   border: 1px solid rgba(108,92,231,0.2);
 }
+.tpl-ats-warn {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 10px; font-weight: 600;
+  padding: 2px 8px; border-radius: 999px; margin-top: 6px;
+  background: rgba(251,191,36,0.12); color: #B45309;
+  border: 1px solid rgba(251,191,36,0.35);
+}
 .tpl-picker-footer {
   height: 80px; flex-shrink: 0;
   background: var(--bg-surface);
@@ -713,6 +720,7 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg-pag
           <div class="tpl-meta-name">Tech Pro</div>
           <div class="tpl-meta-desc">Dark sidebar · Skills left · Experience right</div>
           <span class="tpl-meta-badge" style="background:rgba(96,165,250,0.12);color:#60A5FA;border-color:rgba(96,165,250,0.25);">🔥 FAANG · Startups · Product</span>
+          <span class="tpl-ats-warn">⚠ Two-column — check ATS before applying</span>
         </div>
       </div>
 
@@ -761,6 +769,7 @@ body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg-pag
           <div class="tpl-meta-name">Creative</div>
           <div class="tpl-meta-desc">Gradient header · Pill skills · Bold feel</div>
           <span class="tpl-meta-badge">Marketing · Design · Brand</span>
+          <span class="tpl-ats-warn">⚠ Use for portfolio roles — verify ATS support</span>
         </div>
       </div>
 
@@ -2035,7 +2044,7 @@ function renderFresher(d) {
     <div style="font-size:28px;font-weight:700;color:#1a1a2e;letter-spacing:-0.3px;">${sanitise(d.name)}</div>
     ${d.title?`<div style="font-size:13px;color:#4CAF82;font-weight:500;margin-top:2px;">${sanitise(d.title)}</div>`:''}
     <div style="display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:#4A5568;margin-top:8px;">
-      ${d.email?`<span>✉ ${d.email}</span>`:''}${d.phone?`<span>📱 ${d.phone}</span>`:''}${d.location?`<span>📍 ${d.location}</span>`:''}${d.linkedin?`<span>🔗 ${d.linkedin.replace(/https?:\/\//,'')}</span>`:''}
+      ${d.email?`<span>&#9993; ${d.email}</span>`:''}${d.phone?`<span>&#128241; ${d.phone}</span>`:''}${d.location?`<span>&#128205; ${d.location}</span>`:''}${d.linkedin?`<span>&#128279; ${d.linkedin.replace(/https?:\/\//,'')}</span>`:''}
     </div>
   </div>`;
 
@@ -2209,14 +2218,14 @@ function renderResume(data, aiData, rawText) {
 
   // Contact
   html += `<div class="resume-contact">`;
-  if (email) html += `<span>✉ ${email}</span>`;
-  if (phone) html += `<span>📱 ${phone}</span>`;
-  if (location) html += `<span>📍 ${location}</span>`;
-  if (linkedin) html += `<span>🔗 ${linkedin.replace('https://','').replace('http://','')}</span>`;
-  if (portfolio) html += `<span>🌐 ${portfolio.replace('https://','').replace('http://','')}</span>`;
+  if (email) html += `<span>&#9993; ${email}</span>`;
+  if (phone) html += `<span>&#128241; ${phone}</span>`;
+  if (location) html += `<span>&#128205; ${location}</span>`;
+  if (linkedin) html += `<span>&#128279; ${linkedin.replace('https://','').replace('http://','')}</span>`;
+  if (portfolio) html += `<span>&#127760; ${portfolio.replace('https://','').replace('http://','')}</span>`;
   // Gulf specific
-  if (data.market === 'gulf' && data.nationality) html += `<span>🌍 ${data.nationality}</span>`;
-  if (data.market === 'gulf' && data.visa) html += `<span>📋 ${data.visa}</span>`;
+  if (data.market === 'gulf' && data.nationality) html += `<span>&#127758; ${data.nationality}</span>`;
+  if (data.market === 'gulf' && data.visa) html += `<span>&#128203; ${data.visa}</span>`;
 
   html += `</div>`;
 
@@ -2430,6 +2439,9 @@ function exportPDF() {
     '--text:#1A1A2E;--text2:#4A5568;--text3:#8A9BB0;--border-r:#E2D9CE;--green:#1B6B47;}',
     '*{box-sizing:border-box;margin:0;padding:0;}',
     'body{font-family:"Inter",sans-serif;}',
+    '.resume-entry{break-inside:avoid;page-break-inside:avoid;}',
+    'li{break-inside:avoid;page-break-inside:avoid;}',
+    'ul{break-inside:avoid;page-break-inside:avoid;}',
     '@media print{@page{margin:0;}body{margin:0;}}'
   ].join('');
   const content = '<!DOCTYPE html><html><head>'
