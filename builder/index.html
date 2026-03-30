@@ -1224,25 +1224,20 @@ Looking for senior dev roles in product companies"></textarea>
       </div>
     </div>
 
-    <!-- COMPLETENESS CHECKLIST PANEL -->
-    <div class="checklist-panel" id="checklist-panel">
-      <div class="cl-title">Before you go — here is what you may have missed</div>
-      <div class="cl-sub">Here's what to strengthen before your full analysis.</div>
-      <div id="checklist-content"></div>
-      <div class="cl-actions">
-        <a class="cl-analyse-btn" id="analyse-deep-link" href="/analyser/" target="_blank">📊 Get Full Analysis in Analyser →</a>
-        <span class="cl-dismiss" onclick="document.getElementById('checklist-panel').classList.remove('show')">Dismiss</span>
-      </div>
-    </div>
-
-    <!-- COMPLETENESS CHECKLIST -->
+    <!-- COMPLETENESS CHECKLIST — single merged panel (BUG-FIX: was duplicated) -->
     <div class="checklist-panel" id="checklist-panel">
       <div class="checklist-title">Before you analyse — here's what you may have missed</div>
-      <div class="checklist-sub">These are data points that significantly impact your resume score. Fix them before running the analyser.</div>
+      <div class="checklist-sub">Fix these data points before running the analyser — they directly impact your score.</div>
+      <!-- Grid view rendered by runCompletenessCheck() -->
       <div class="checklist-grid" id="checklist-grid"></div>
+      <!-- Detailed section list rendered by renderChecklist() -->
+      <div id="checklist-content"></div>
       <div class="checklist-cta">
-        <div class="cta-text">Your resume is ready. Run a full 6-dimension analysis to get your score, keyword gaps, section feedback, and rewrites.</div>
-        <a href="/analyser/" class="btn-analyse-cta" id="analyse-cta-btn">Analyse My Resume →</a>
+        <div class="cta-text">Run a full 7-dimension analysis — score, keyword gaps, section rewrites, and HR mindset report.</div>
+        <a href="/analyser/" class="btn-analyse-cta" id="analyse-cta-btn" target="_blank">📊 Analyse My Resume →</a>
+        <!-- Hidden anchor kept so renderChecklist() can update its href — synced to analyse-cta-btn -->
+        <a href="/analyser/" id="analyse-deep-link" style="display:none" target="_blank"></a>
+        <button onclick="document.getElementById('checklist-panel').classList.remove('show')" style="font-size:12px;color:var(--text-muted);background:transparent;border:none;cursor:pointer;padding:8px 0;margin-left:12px;">Dismiss</button>
       </div>
     </div>
 
@@ -1262,6 +1257,9 @@ Looking for senior dev roles in product companies"></textarea>
 
 <script>
 // ── STATE ──────────────────────────────────────────────────────────────
+// Forward declaration — fully initialised in the EMAIL CAPTURE section below.
+// Defined here so showSection() can write to it without a ReferenceError.
+let _dropoff = { lastSection: 'personal', hasGenerated: false, startedAt: Date.now() };
 
 // ── TEMPLATE PICKER ────────────────────────────────────────────────────
 const SAMPLE_DATA = {
@@ -1439,6 +1437,7 @@ function setMode(mode, btn) {
 
 // ── SECTION NAV ────────────────────────────────────────────────────────
 function showSection(id, btn) {
+  _dropoff.lastSection = id; // track which section user reached
   document.querySelectorAll('.section-panel').forEach(p => p.classList.remove('active'));
   document.getElementById('panel-'+id).classList.add('active');
   document.querySelectorAll('.section-tab').forEach(b => b.classList.remove('active'));
@@ -1723,6 +1722,7 @@ async function generateResume() {
     renderResume(displayData, aiData, '');
     hideAILoading();
     showToast('Resume generated successfully!', 'success');
+    _dropoff.hasGenerated = true; // track for email capture context
     // Score the generated resume inline
     setTimeout(scoreGeneratedResume, 500);
     if(currentMode==='form'&&data){renderChecklist(data);}else if(currentMode==='ai'&&generatedATS){renderChecklist({market:currentMarket,name:'',email:'',phone:'',location:'',summary:'(AI mode)',techSkills:'',tools:'',experience:[],education:[],certs:'',ctc:'',notice:'',nationality:'',visa:'',photo:null,languages:'',aiTools:''});}
@@ -3272,6 +3272,11 @@ function pickerSelectUpload(card) {
   document.getElementById('tpl-upload-input').click();
 }
 
+// BUG-FIX: wire the file input's onchange to processFile
+function handleTemplateUpload(e) {
+  if (e.target.files && e.target.files[0]) processFile(e.target.files[0]);
+}
+
 async function processFile(file) {
   const ext = file.name.split('.').pop().toLowerCase();
   if (!['pdf','docx'].includes(ext)) { showToast('Please upload a PDF or DOCX file.', 'error'); return; }
@@ -3518,6 +3523,21 @@ async function scoreGeneratedResume() {
     // Scroll panel into view
     panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
+    // Fire-and-forget session save — no PII, template + scores only
+    saveSession({
+      template:               currentTemplate,
+      market:                 currentMarket,
+      mode:                   currentMode,
+      score_overall:          overall_score,
+      score_ats:              scores.ats_compatibility  || 0,
+      score_content:          scores.content_quality    || 0,
+      score_skills:           scores.skills_relevance   || 0,
+      score_structure:        scores.structure_readability || 0,
+      score_narrative:        scores.career_narrative   || 0,
+      score_professional:     scores.professional_standards || 0,
+      knockout_count:         (data.knockout_flags || []).length,
+    });
+
   } catch (err) {
     console.error('Score failed:', err);
     if (loading) loading.style.display = 'none';
@@ -3526,8 +3546,22 @@ async function scoreGeneratedResume() {
   }
 }
 
+// ── SESSION SAVER ──────────────────────────────────────────────────────
+// Stores template + score metadata only — zero personal content.
+// Fires after every successful score. Silent fail — never blocks UX.
+async function saveSession(payload) {
+  try {
+    await fetch('/api/save_session', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+  } catch (e) { /* silent */ }
+}
+
 
 // ── EMAIL CAPTURE ──────────────────────────────────────────────────────
+// _dropoff is declared at top of STATE block — do not redeclare here.
 let _emailShown = false;
 
 function maybeShowEmailModal() {
@@ -3546,7 +3580,7 @@ function closeEmailModal() {
   localStorage.setItem('rf_email_dismissed', '1');
 }
 
-function submitEmail() {
+async function submitEmail() {
   var input = document.getElementById('email-modal-input');
   var email = input ? input.value.trim() : '';
   if (!email || !email.includes('@') || !email.includes('.')) {
@@ -3554,14 +3588,31 @@ function submitEmail() {
     setTimeout(function() { input.style.borderColor = ''; }, 2000);
     return;
   }
-  // Store locally (replace with Mailchimp/Brevo API call when ready)
+
+  // Disable button to prevent double-submit
+  var btn = document.querySelector('.email-modal-btn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Saving…'; }
+
   try {
-    var emails = JSON.parse(localStorage.getItem('rf_emails') || '[]');
-    if (!emails.includes(email)) { emails.push(email); localStorage.setItem('rf_emails', JSON.stringify(emails)); }
-  } catch(e) {}
+    // POST to Vercel serverless function — keeps API key server-side
+    await fetch('/api/subscribe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email:           email,
+        dropoff_section: _dropoff.lastSection,
+        has_generated:   _dropoff.hasGenerated,
+        template:        currentTemplate || 'classic',
+        market:          currentMarket   || 'us',
+        source:          'email_modal',
+      }),
+    });
+  } catch(e) { /* silent — never block UX on tracking failures */ }
+
   closeEmailModal();
-  showToast('Thanks! We’ll keep you posted.', 'success');
+  showToast("Thanks! We'll keep you posted.", 'success');
 }
+
 
 </script>
 
