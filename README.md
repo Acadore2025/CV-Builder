@@ -1,4 +1,4 @@
-# ResumeForge 🧱
+# Vixo Resume 🧱
 
 > AI-powered resume platform for India 🇮🇳 · US 🇺🇸 · Gulf/UAE 🇦🇪 · Europe 🇪🇺
 
