@@ -38,30 +38,6 @@ body {
   overflow-x: hidden;
 }
 
-/* ── BETA STYLES ── */
-.beta-badge-nav {
-  font-size: 9px;
-  font-family: 'Inter', sans-serif;
-  font-weight: 700;
-  background: rgba(108, 92, 231, 0.1);
-  color: var(--purple);
-  padding: 2px 6px;
-  border-radius: 4px;
-  vertical-align: middle;
-  margin-left: 6px;
-  border: 1px solid rgba(108, 92, 231, 0.2);
-  letter-spacing: 0.05em;
-}
-
-.beta-text-hero {
-  font-size: 11px;
-  color: rgba(232, 228, 255, 0.35);
-  margin-top: -12px;
-  margin-bottom: 32px;
-  font-style: italic;
-  letter-spacing: 0.02em;
-}
-
 /* ── BG ── */
 .bg-gradient {
   position: fixed;
@@ -131,7 +107,9 @@ nav {
 }
 .nav-cta:hover { background: var(--purple2); transform: translateY(-1px); }
 
-/* HERO */
+/* ════════════════════════════════
+   HERO — full-height, side by side
+════════════════════════════════ */
 .hero {
   position: relative;
   z-index: 1;
@@ -146,6 +124,7 @@ nav {
   animation: fadeUp 0.55s ease-out both;
 }
 
+/* Left copy */
 .hero-left {
   padding: 72px 0;
   max-width: 520px;
@@ -224,6 +203,106 @@ nav {
   transform: translateY(-1px);
 }
 
+.hero-trust {
+  display: flex; align-items: center;
+  gap: 20px; flex-wrap: wrap;
+}
+.trust-item {
+  display: flex; align-items: center;
+  gap: 7px; font-size: 12.5px;
+  color: rgba(232,228,255,0.65);
+}
+.trust-check {
+  width: 18px; height: 18px; border-radius: 50%;
+  background: rgba(0,200,150,0.15);
+  border: 1px solid rgba(0,200,150,0.4);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px; color: var(--green); flex-shrink: 0;
+}
+
+/* ── Inline steps inside hero ── */
+.hero-steps {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-bottom: 28px;
+  flex-wrap: nowrap;
+}
+.hstep {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  white-space: nowrap;
+}
+.hstep-num {
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: rgba(108,92,231,0.2);
+  border: 1px solid rgba(108,92,231,0.45);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 700; color: var(--purple2);
+  flex-shrink: 0;
+}
+.hstep-txt {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: rgba(232,228,255,0.7);
+}
+.hstep-dash {
+  flex: 1;
+  height: 1px;
+  min-width: 18px;
+  max-width: 32px;
+  background: repeating-linear-gradient(
+    90deg,
+    rgba(108,92,231,0.45) 0px,
+    rgba(108,92,231,0.45) 4px,
+    transparent 4px,
+    transparent 8px
+  );
+  margin: 0 6px;
+}
+
+/* ── Hero bottom: rating + mini logos ── */
+.hero-bottom {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+  padding-top: 4px;
+}
+.hb-rating {
+  display: flex; align-items: center; gap: 8px;
+}
+.hb-stars { display: flex; gap: 2px; }
+.hb-star  { color: #FFB800; font-size: 13px; }
+.hb-rating-text {
+  font-size: 12px; color: rgba(232,228,255,0.6);
+}
+.hb-rating-text strong { color: rgba(232,228,255,0.9); }
+.hb-divider {
+  width: 1px; height: 28px;
+  background: rgba(255,255,255,0.1);
+}
+.hb-hired {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+}
+.hb-hired-label {
+  font-size: 11px; color: rgba(232,228,255,0.35);
+  white-space: nowrap;
+}
+.hb-companies {
+  display: flex; align-items: center; gap: 12px;
+}
+.hb-co {
+  font-size: 12px; font-weight: 800;
+  color: rgba(255,255,255,0.45);
+  letter-spacing: -0.3px; font-family: 'Inter', sans-serif;
+  transition: color 0.2s; cursor: default;
+}
+.hb-co:hover { color: rgba(255,255,255,0.75); }
+
+/* ── Right: resume visual ── */
 .hero-right {
   position: relative;
   height: 100%;
@@ -241,6 +320,7 @@ nav {
   animation: fadeUp 0.65s ease-out 0.15s both;
 }
 
+/* Gradient border glow */
 .resume-panel-wrap::before {
   content: '';
   position: absolute;
@@ -263,11 +343,13 @@ nav {
   box-shadow: 0 40px 100px rgba(0,0,0,0.65);
 }
 
+/* Two-column resume layout */
 .rp-body {
   display: grid;
   grid-template-columns: 1fr 160px;
 }
 
+/* ── Left column ── */
 .rp-left {
   padding: 26px 22px 24px 26px;
   border-right: 1px solid #e8e8f0;
@@ -293,17 +375,49 @@ nav {
   display: flex; align-items: center; gap: 5px;
   font-size: 9.5px; color: #6b6b8a;
 }
+.rp-contact-item svg { color: #9090b0; }
+
 .rp-sec {
   font-size: 8.5px; font-weight: 700;
   letter-spacing: 0.12em; text-transform: uppercase;
   color: #9090b0;
   margin-bottom: 8px; margin-top: 14px;
 }
+.rp-sec:first-of-type { margin-top: 0; }
+
 .rp-summary {
   font-size: 10.5px; line-height: 1.7;
   color: #444460;
 }
 
+.rp-exp { margin-bottom: 13px; }
+.rp-exp-head {
+  display: flex; justify-content: space-between;
+  align-items: baseline; margin-bottom: 2px;
+}
+.rp-exp-title {
+  font-size: 11px; font-weight: 700; color: #0f0d2a;
+}
+.rp-exp-date {
+  font-size: 9px; color: #aaaac0; white-space: nowrap;
+}
+.rp-exp-co {
+  font-size: 9.5px; color: #8080a0; margin-bottom: 6px;
+}
+.rp-bullet {
+  display: flex; align-items: flex-start;
+  gap: 6px; font-size: 9.5px;
+  color: #555575; line-height: 1.55; margin-bottom: 4px;
+}
+.rp-bullet::before {
+  content: '•'; color: var(--purple);
+  font-size: 11px; line-height: 1.2; flex-shrink: 0;
+}
+
+.rp-edu-name { font-size: 10.5px; font-weight: 700; color: #0f0d2a; margin-bottom: 2px; }
+.rp-edu-info { font-size: 9.5px; color: #8080a0; }
+
+/* ── Right column ── */
 .rp-right {
   padding: 26px 18px 24px 16px;
   background: #f6f5ff;
@@ -318,6 +432,14 @@ nav {
   text-align: center; margin-bottom: 5px;
 }
 
+.rp-ach {
+  display: flex; align-items: flex-start;
+  gap: 6px; font-size: 9.5px;
+  color: #555575; line-height: 1.5; margin-bottom: 8px;
+}
+.rp-ach-ico { font-size: 12px; flex-shrink: 0; }
+
+/* ── ATS floating card ── */
 .ats-float {
   position: absolute;
   right: -28px;
@@ -332,100 +454,1246 @@ nav {
   animation: floatSlow 5s ease-in-out infinite;
 }
 
+.ats-lbl {
+  font-size: 8.5px; font-weight: 700; letter-spacing: 0.1em;
+  text-transform: uppercase; color: rgba(232,228,255,0.4);
+  text-align: center; margin-bottom: 12px;
+}
+
+.ats-ring-wrap {
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 14px; position: relative;
+}
+.ats-ring-svg { transform: rotate(-90deg); }
+.ats-ring-bg   { fill: none; stroke: rgba(255,255,255,0.06); stroke-width: 6; }
+.ats-ring-fill {
+  fill: none; stroke: url(#atsGrad);
+  stroke-width: 6; stroke-linecap: round;
+  stroke-dasharray: 220;
+  stroke-dashoffset: 22; /* 90% */
+}
+.ats-center {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%,-50%); text-align: center;
+}
 .ats-num {
   font-family: 'Cormorant Garamond', serif;
   font-size: 28px; font-weight: 700;
   color: #fff; line-height: 1;
 }
-
 .ats-excellent {
   font-size: 8.5px; color: var(--green);
   font-weight: 600; letter-spacing: 0.04em;
 }
 
+.ats-desc {
+  font-size: 10px; color: rgba(232,228,255,0.5);
+  text-align: center; margin-bottom: 12px; line-height: 1.5;
+}
+
+.ats-checks { display: flex; flex-direction: column; gap: 7px; }
+.ats-check-row {
+  display: flex; align-items: center;
+  gap: 8px; font-size: 10.5px;
+  color: rgba(232,228,255,0.75);
+}
+.ats-check-ico {
+  width: 15px; height: 15px; border-radius: 50%;
+  background: rgba(0,200,150,0.15);
+  border: 1px solid rgba(0,200,150,0.4);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 7.5px; color: var(--green); flex-shrink: 0;
+}
+
+/* ════ TRUST BAR ════ */
+.trust-bar {
+  position: relative; z-index: 1;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  padding: 36px 60px;
+  max-width: 1400px; margin: 0 auto;
+  animation: fadeUp 0.55s ease-out 0.2s both;
+}
+.trust-bar-label {
+  text-align: center;
+  font-size: 10px; font-weight: 600;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: rgba(232,228,255,0.28); margin-bottom: 22px;
+}
+.trust-logos {
+  display: flex; align-items: center;
+  justify-content: center; flex-wrap: wrap;
+}
+.trust-logo {
+  flex: 1; text-align: center;
+  padding: 0 24px;
+  border-right: 1px solid rgba(255,255,255,0.06);
+}
+.trust-logo:last-child { border-right: none; }
+.trust-logo-name {
+  font-size: 15px; font-weight: 800;
+  color: rgba(255,255,255,0.55);
+  letter-spacing: -0.4px; transition: color 0.2s;
+  cursor: default; font-family: 'Inter', sans-serif;
+}
+.trust-logo:hover .trust-logo-name { color: rgba(255,255,255,0.85); }
+
+/* ════ HOW IT WORKS — dual workflow ════ */
+.how-section {
+  position: relative; z-index: 1;
+  padding: 80px 60px 100px;
+  max-width: 1400px; margin: 0 auto;
+  animation: fadeUp 0.55s ease-out 0.22s both;
+}
+.how-section-header {
+  text-align: center; margin-bottom: 64px;
+}
+.how-eyebrow {
+  font-size: 11px; font-weight: 600; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--purple2); margin-bottom: 12px;
+}
+.how-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(32px,3.5vw,48px); font-weight: 700;
+  color: var(--white); letter-spacing: -1px; line-height: 1.1;
+}
+.how-title em {
+  font-style: italic;
+  background: linear-gradient(135deg,#a29bfe,var(--green));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Workflow block */
+.workflow-block { margin-bottom: 56px; }
+.workflow-block:last-child { margin-bottom: 0; }
+
+.workflow-label-row {
+  display: flex; align-items: center; gap: 16px; margin-bottom: 20px;
+}
+.workflow-pill {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 7px 16px; border-radius: 999px;
+  font-size: 12px; font-weight: 700;
+  letter-spacing: 0.02em; flex-shrink: 0;
+}
+.workflow-pill.purple {
+  background: rgba(108,92,231,0.14);
+  border: 1px solid rgba(108,92,231,0.35);
+  color: var(--purple2);
+}
+.workflow-pill.green {
+  background: rgba(0,200,150,0.12);
+  border: 1px solid rgba(0,200,150,0.3);
+  color: var(--green);
+}
+.workflow-pill-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+}
+.workflow-pill.purple .workflow-pill-dot { background: var(--purple2); }
+.workflow-pill.green  .workflow-pill-dot { background: var(--green); }
+.workflow-rule {
+  flex: 1; height: 1px;
+  background: rgba(255,255,255,0.07);
+}
+.workflow-step-count {
+  font-size: 11px; color: rgba(232,228,255,0.3);
+  flex-shrink: 0;
+}
+
+/* Step grid */
+.how-steps-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; }
+.how-steps-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; }
+
+.how-step {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 20px;
+  overflow: hidden;
+  transition: border-color 0.25s, transform 0.25s, background 0.25s;
+  display: flex; flex-direction: column;
+}
+.how-step:hover {
+  border-color: rgba(108,92,231,0.4);
+  background: rgba(108,92,231,0.05);
+  transform: translateY(-4px);
+}
+
+/* ── LIGHT mockup area ── */
+.how-mockup {
+  position: relative;
+  height: 200px;
+  background: #f4f3ff;
+  border-bottom: 1px solid rgba(108,92,231,0.1);
+  overflow: hidden;
+  padding: 18px 16px 0;
+  flex-shrink: 0;
+}
+
+/* ─ Template fan (step 1 builder) ─ */
+.tmpl-fan { position: relative; height: 175px; }
+.tmpl-card {
+  position: absolute;
+  width: 86px; height: 112px;
+  border-radius: 6px; background: #fff;
+  box-shadow: 0 4px 14px rgba(108,92,231,0.18);
+  overflow: hidden;
+}
+.tmpl-card-header { height: 20px; }
+.tmpl-card-lines { padding: 6px 8px; display: flex; flex-direction: column; gap: 4px; }
+.tmpl-card-line { height: 4px; border-radius: 2px; background: #e8e6f8; }
+.tmpl-c1 { left: 10px; top: 12px; transform: rotate(-8deg); z-index: 1; }
+.tmpl-c1 .tmpl-card-header { background: #6C5CE7; }
+.tmpl-c2 { left: 58px; top: 4px; z-index: 3; }
+.tmpl-c2 .tmpl-card-header { background: #00C896; }
+.tmpl-c3 { left: 106px; top: 12px; transform: rotate(8deg); z-index: 1; }
+.tmpl-c3 .tmpl-card-header { background: #fd79a8; }
+.tmpl-sparkle {
+  position: absolute; font-size: 16px; color: var(--purple);
+  animation: floatSlow 3s ease-in-out infinite;
+}
+.tmpl-sparkle.s1 { right: 16px; top: 10px; animation-delay:0s; }
+.tmpl-sparkle.s2 { left: 6px; bottom: 30px; font-size:11px; animation-delay:1s; }
+
+/* ─ Fill details form (step 2 builder) ─ */
+.form-ui { display: flex; flex-direction: column; gap: 8px; }
+.form-field {
+  background: #fff;
+  border: 1px solid #e0dcf8;
+  border-radius: 7px; padding: 7px 10px;
+}
+.form-field-label {
+  font-size: 8px; font-weight: 600; letter-spacing: 0.06em;
+  text-transform: uppercase; color: #9090c0; margin-bottom: 4px;
+}
+.form-field-value {
+  height: 6px; border-radius: 3px;
+  background: linear-gradient(90deg, #6C5CE7 0%, #a29bfe 100%);
+}
+.form-field-value.w85 { width: 85%; }
+.form-field-value.w65 { width: 65%; }
+.form-field-value.w50 { width: 50%; }
+.form-ai-pill {
+  display: flex; align-items: center; gap: 6px;
+  background: rgba(108,92,231,0.1);
+  border: 1px solid rgba(108,92,231,0.2);
+  border-radius: 7px; padding: 6px 10px;
+  font-size: 9px; font-weight: 600; color: var(--purple);
+}
+
+/* ─ Upload drop zone (step 1 analyser) ─ */
+.upload-ui {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 10px; padding-top: 8px;
+}
+.upload-zone {
+  width: 100%; border: 2px dashed rgba(108,92,231,0.35);
+  border-radius: 12px; padding: 20px 12px;
+  text-align: center; background: rgba(108,92,231,0.05);
+}
+.upload-icon { font-size: 24px; margin-bottom: 6px; }
+.upload-text {
+  font-size: 9.5px; font-weight: 600; color: #6C5CE7; margin-bottom: 3px;
+}
+.upload-sub { font-size: 8.5px; color: #9090c0; }
+.upload-types {
+  display: flex; gap: 6px;
+}
+.upload-type-chip {
+  font-size: 8.5px; font-weight: 700; padding: 3px 8px;
+  border-radius: 5px; background: #fff;
+  border: 1px solid #e0dcf8; color: #6C5CE7;
+}
+
+/* ─ ATS bars (step 2 analyser) ─ */
+.ats-ui { display: flex; flex-direction: column; gap: 7px; }
+.ats-ui-score-bubble {
+  display: flex; align-items: center; gap: 10px;
+  background: rgba(0,200,150,0.08);
+  border: 1px solid rgba(0,200,150,0.25);
+  border-radius: 10px; padding: 8px 12px; margin-bottom: 2px;
+}
+.ats-ui-big { font-family:'Cormorant Garamond',serif; font-size:28px; font-weight:700; color:#00A87E; line-height:1; }
+.ats-ui-sub { font-size:10px; color:#00A87E; font-weight:600; }
+.ats-ui-bar-row { display:flex; align-items:center; gap:8px; }
+.ats-ui-label { font-size:9px; color:#7070a0; width:58px; flex-shrink:0; }
+.ats-ui-track { flex:1; height:6px; background:#e8e6f8; border-radius:3px; overflow:hidden; }
+.ats-ui-fill  { height:100%; border-radius:3px; }
+.ats-ui-fill.c-green  { background: var(--green); }
+.ats-ui-fill.c-purple { background: var(--purple2); }
+.ats-ui-fill.c-amber  { background: #f0a500; }
+.ats-ui-pct { font-size:9px; color:#9090c0; width:26px; text-align:right; flex-shrink:0; }
+
+/* ─ AI editor (step 3 analyser) ─ */
+.editor-ui { display:flex; flex-direction:column; gap:7px; }
+.editor-caption {
+  font-size:8.5px; color:#9090c0; font-weight:600;
+  letter-spacing:0.06em; text-transform:uppercase;
+}
+.editor-old {
+  background: #fff5f5; border: 1px solid #ffc5c5;
+  border-radius: 7px; padding: 8px 10px;
+}
+.editor-new {
+  background: #f0fdf8; border: 1px solid #a0e6cc;
+  border-radius: 7px; padding: 8px 10px;
+}
+.editor-tag { font-size:8px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; margin-bottom:4px; }
+.editor-tag.red   { color: #e74c3c; }
+.editor-tag.green { color: #00A87E; }
+.editor-line { height:5px; border-radius:2px; margin-bottom:3px; }
+.editor-line.red-l   { background: rgba(231,76,60,0.2); }
+.editor-line.green-l { background: rgba(0,200,150,0.3); }
+.editor-line.w100 { width:100%; }
+.editor-line.w80  { width:80%; }
+.editor-line.w60  { width:60%; }
+.editor-apply-btn {
+  display:flex; align-items:center; justify-content:center;
+  gap:6px; background: var(--green); color:#042E22;
+  border-radius:7px; padding:7px; font-size:10px; font-weight:700; margin-top:2px;
+}
+
+/* ─ Download dialog (shared) ─ */
+.dl-dialog {
+  background: #fff; border: 1px solid #e0dcf8;
+  border-radius: 12px; padding: 14px;
+  box-shadow: 0 4px 16px rgba(108,92,231,0.1);
+}
+.dl-dialog-title {
+  font-size: 10px; font-weight: 700; color: #3a3a6a;
+  margin-bottom: 11px; text-align: center;
+}
+.dl-formats { display:flex; flex-direction:column; gap:6px; margin-bottom:10px; }
+.dl-format-row {
+  display:flex; align-items:center; gap:8px;
+  padding:6px 10px; border-radius:7px;
+  border: 1px solid #e8e6f8;
+  background: #faf9ff;
+}
+.dl-format-row.selected {
+  background: rgba(108,92,231,0.07);
+  border-color: rgba(108,92,231,0.35);
+}
+.dl-format-dot {
+  width:10px; height:10px; border-radius:50%;
+  border:2px solid #c0bce8; flex-shrink:0;
+}
+.dl-format-row.selected .dl-format-dot { background:var(--purple); border-color:var(--purple); }
+.dl-format-badge { font-size:9px; font-weight:800; padding:2px 6px; border-radius:4px; flex-shrink:0; }
+.dl-format-badge.pdf  { background:#e74c3c; color:#fff; }
+.dl-format-badge.word { background:#2980b9; color:#fff; }
+.dl-format-badge.txt  { background:#27ae60; color:#fff; }
+.dl-format-name { font-size:10px; color:#4a4a7a; flex:1; }
+.dl-format-size { font-size:9px; color:#b0b0d0; }
+.dl-btn {
+  width:100%; background:var(--green); color:#042E22;
+  border-radius:7px; padding:7px; font-size:10.5px;
+  font-weight:700; text-align:center;
+}
+
+/* ── Text body below mockup ── */
+.how-step-body {
+  padding: 18px 20px 22px;
+  flex:1; display:flex; flex-direction:column;
+}
+.how-step-badge {
+  font-size:10px; font-weight:800; letter-spacing:0.06em;
+  color:var(--purple2); margin-bottom:7px; font-family:'Inter',sans-serif;
+}
+.how-step-badge.green { color: var(--green); }
+.how-step-title {
+  font-size:15px; font-weight:700;
+  color:var(--white); margin-bottom:7px; letter-spacing:-0.2px;
+}
+.how-step-desc {
+  font-size:13px; color:rgba(232,228,255,0.52); line-height:1.6; flex:1;
+}
+.how-step-tag {
+  display:inline-block; margin-top:13px;
+  font-size:10px; font-weight:600;
+  padding:3px 10px; border-radius:99px; width:fit-content;
+}
+.how-step-tag.purple {
+  background:rgba(108,92,231,0.12); color:var(--purple2);
+  border:1px solid rgba(108,92,231,0.25);
+}
+.how-step-tag.green {
+  background:rgba(0,200,150,0.1); color:var(--green);
+  border:1px solid rgba(0,200,150,0.2);
+}
+
+/* ════ STATS ════ */
+.stats-row {
+  position: relative; z-index: 1;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  padding: 48px 60px;
+  display: flex; max-width: 1400px; margin: 0 auto;
+  animation: fadeUp 0.55s ease-out 0.25s both;
+}
+.stat-item {
+  flex: 1; text-align: center; padding: 0 32px;
+  border-right: 1px solid rgba(255,255,255,0.08);
+}
+.stat-item:last-child { border-right: none; }
+.stat-item-num {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 44px; font-weight: 700; color: var(--white);
+  letter-spacing: -1.5px; line-height: 1.2; margin-bottom: 6px;
+  display: flex; align-items: baseline; justify-content: center; gap: 2px;
+}
+.stat-item-lbl { font-size: 12px; color: var(--muted); font-weight: 400; }
+.stat-item-note { font-size: 10px; color: rgba(232,228,255,0.3); margin-top: 3px; font-style: italic; }
+
+/* ════ TOOLS ════ */
+.tools-section {
+  position: relative; z-index: 1;
+  padding: 100px 60px; max-width: 1400px; margin: 0 auto;
+  animation: fadeUp 0.55s ease-out 0.3s both;
+}
+.section-eyebrow {
+  font-size: 11px; font-weight: 600; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--purple2); margin-bottom: 16px;
+}
+.section-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(36px,4vw,54px); font-weight: 700;
+  line-height: 1.1; letter-spacing: -1px; color: var(--white); margin-bottom: 16px;
+}
+.section-sub {
+  font-size: 16px; color: var(--muted);
+  max-width: 500px; line-height: 1.7; margin-bottom: 56px;
+}
+.tools-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.tool-card {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 24px; padding: 36px;
+  text-decoration: none; color: inherit;
+  display: flex; flex-direction: column;
+  transition: all 0.3s cubic-bezier(0.2,0.9,0.4,1.1);
+  position: relative; overflow: hidden; cursor: pointer;
+}
+.tool-card::before {
+  content: ''; position: absolute;
+  top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--purple), var(--green), transparent);
+  opacity: 0; transition: opacity 0.3s;
+}
+.tool-card:hover { background: rgba(255,255,255,0.08); border-color: rgba(108,92,231,0.5); transform: translateY(-4px); }
+.tool-card:hover::before { opacity: 1; }
+.tool-card:active { transform: scale(0.98); }
+.tool-ico {
+  width: 56px; height: 56px; border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 26px; margin-bottom: 24px;
+}
+.ico-purple { background: rgba(108,92,231,0.18); border: 1px solid rgba(108,92,231,0.3); }
+.ico-green  { background: rgba(0,200,150,0.15);  border: 1px solid rgba(0,200,150,0.3); }
+.tool-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 28px; font-weight: 700; color: var(--white);
+  letter-spacing: -0.5px; margin-bottom: 12px;
+}
+.tool-desc { font-size: 14px; color: var(--muted); line-height: 1.65; margin-bottom: 24px; }
+.tool-features { display: flex; flex-direction: column; gap: 8px; margin-bottom: 28px; flex: 1; }
+.tool-feat { display: flex; align-items: center; gap: 10px; font-size: 12.5px; color: rgba(255,255,255,0.7); }
+.feat-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--purple2); flex-shrink: 0; }
+.tool-link {
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: 8px; font-size: 14px; font-weight: 600;
+  padding: 12px 24px; border-radius: 10px; transition: all 0.2s;
+  width: 100%; text-align: center; margin-top: auto;
+}
+.tool-card:hover .tool-link { transform: translateX(4px); }
+.link-purple { background: var(--purple); color: #fff; }
+.link-purple:hover { background: var(--purple2); }
+.link-green  { background: rgba(0,200,150,0.12); color: var(--green); border: 1px solid rgba(0,200,150,0.25); }
+.link-green:hover { background: rgba(0,200,150,0.2); }
+
+/* ════ TESTIMONIALS ════ */
+.testimonials-section {
+  position: relative; z-index: 1;
+  padding: 60px 60px 100px;
+  max-width: 1400px; margin: 0 auto;
+  animation: fadeUp 0.55s ease-out 0.35s both;
+}
+.testimonials-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; }
+.testimonial-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.09);
+  border-radius: 20px; padding: 28px;
+  display: flex; flex-direction: column; gap: 16px;
+  transition: border-color 0.25s, background 0.25s;
+}
+.testimonial-card:hover { background: rgba(255,255,255,0.07); border-color: rgba(108,92,231,0.3); }
+.tc-stars { display: flex; gap: 3px; }
+.tc-star  { color: #FFB800; font-size: 13px; }
+.tc-quote { font-size: 13.5px; line-height: 1.7; color: rgba(232,228,255,0.8); font-style: italic; flex: 1; }
+.tc-author { display: flex; align-items: center; gap: 12px; }
+.tc-avatar {
+  width: 36px; height: 36px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 700; color: #fff;
+  font-family: 'Cormorant Garamond', serif; flex-shrink: 0;
+}
+.av1 { background: linear-gradient(135deg,#6C5CE7,#a29bfe); }
+.av2 { background: linear-gradient(135deg,#00C896,#00A87E); }
+.av3 { background: linear-gradient(135deg,#fd79a8,#e84393); }
+.av4 { background: linear-gradient(135deg,#fdcb6e,#e17055); }
+.av5 { background: linear-gradient(135deg,#74b9ff,#0984e3); }
+.av6 { background: linear-gradient(135deg,#55efc4,#00b894); }
+.tc-name  { font-size: 13px; font-weight: 600; color: var(--white); margin-bottom: 2px; }
+.tc-role  { font-size: 11px; color: rgba(232,228,255,0.4); }
+.tc-market {
+  font-size: 10px; background: rgba(108,92,231,0.15);
+  color: var(--purple2); padding: 2px 8px;
+  border-radius: 99px; font-weight: 500; margin-left: auto;
+}
+
+/* ════ PREMIUM BADGE ════ */
+.premium-badge {
+  position: fixed; bottom: 24px; right: 24px;
+  background: rgba(10,7,32,0.85); backdrop-filter: blur(12px);
+  padding: 8px 16px; border-radius: 40px;
+  font-size: 11px; font-weight: 500; color: var(--purple2);
+  border: 1px solid rgba(108,92,231,0.35);
+  z-index: 1000; pointer-events: none;
+  font-family: 'Inter', sans-serif;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+/* ════ FOOTER ════ */
+footer {
+  position: relative; z-index: 1;
+  padding: 36px 60px;
+  border-top: 1px solid rgba(255,255,255,0.07);
+  display: flex; align-items: center; justify-content: space-between;
+  max-width: 1400px; margin: 0 auto;
+}
+.footer-logo { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 700; color: var(--white); }
+.footer-logo span { color: var(--purple2); }
+.footer-copy { font-size: 12px; color: var(--muted); }
+
+/* ════ RESPONSIVE ════ */
+@media (max-width: 1050px) {
+  .hero { padding: 0 36px; gap: 24px; }
+  .ats-float { right: -12px; }
+  .resume-panel-wrap { max-width: 400px; }
+}
+
+@media (max-width: 880px) {
+  nav { padding: 0 24px; }
+  .hero {
+    grid-template-columns: 1fr;
+    padding: 48px 24px 0;
+    min-height: auto; gap: 0;
+  }
+  .hero-left { padding: 0 0 40px; max-width: 100%; text-align: center; }
+  .hero-sub  { margin: 0 auto 36px; }
+  .hero-btns { justify-content: center; }
+  .hero-trust { justify-content: center; }
+  .hero-right { min-height: auto; padding: 0 0 70px; justify-content: center; }
+  .resume-panel-wrap { max-width: 400px; }
+  .ats-float { right: -10px; bottom: 80px; }
+  .how-section { padding: 48px 24px 64px; }
+  .how-steps-3, .how-steps-4 { grid-template-columns: 1fr 1fr; gap: 12px; }
+  .how-mockup { height: 185px; }
+  .workflow-block { margin-bottom: 40px; }
+  .hero-steps { flex-wrap: wrap; gap: 8px; }
+  .hstep-dash { min-width: 10px; }
+  .trust-bar   { padding: 28px 24px; }
+  .trust-logos { flex-wrap: wrap; gap: 4px; }
+  .trust-logo  { padding: 8px 12px; border-right: none; border-bottom: none; flex: 1 1 30%; }
+  .stats-row   { flex-wrap: wrap; padding: 40px 24px; }
+  .stat-item   { border-right:none; border-bottom:1px solid rgba(255,255,255,0.08); padding:24px 16px; flex:1 1 50%; }
+  .stat-item:last-child { border-bottom:none; }
+  .tools-section { padding: 60px 24px; }
+  .tools-grid    { grid-template-columns: 1fr; gap: 20px; }
+  .testimonials-section { padding: 40px 24px 60px; }
+  .testimonials-grid    { grid-template-columns: 1fr; gap: 16px; }
+  footer { padding: 28px 24px; flex-direction: column; gap: 12px; text-align: center; }
+}
+
+@media (max-width: 600px) {
+  .hero-btns { flex-direction:column; width:100%; }
+  .btn-green,.btn-secondary { justify-content:center; width:100%; }
+  .hero h1 { font-size: clamp(38px,8vw,58px); }
+  .stat-item { flex: 1 1 100%; }
+  .stat-item-num { font-size: 38px; }
+  .tool-card { padding: 28px; }
+  .tool-name  { font-size: 24px; }
+  .ats-float  { right: 0; bottom: 90px; width: 150px; padding: 14px 14px 12px; }
+  .ats-num    { font-size: 24px; }
+  .premium-badge { bottom:16px; right:16px; font-size:10px; padding:6px 12px; }
+}
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); }
+::-webkit-scrollbar-thumb { background: rgba(108,92,231,0.5); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--purple); }
 </style>
 </head>
 <body>
+<div class="bg-gradient"></div>
 
-  <div class="bg-gradient"></div>
+<!-- SVG gradient for ATS ring -->
+<svg width="0" height="0" style="position:absolute;pointer-events:none">
+  <defs>
+    <linearGradient id="atsGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%"   stop-color="#6C5CE7"/>
+      <stop offset="100%" stop-color="#00C896"/>
+    </linearGradient>
+  </defs>
+</svg>
 
-  <nav>
-    <div class="nav-logo">Vixo <span>Resume</span> <span class="beta-badge-nav">BETA</span></div>
-    <div class="nav-links">
-      <a href="#how" class="nav-link">How it works</a>
-      <a href="#tools" class="nav-link">Products</a>
-      <a href="#pricing" class="nav-link">Pricing</a>
-      <a href="/login" class="nav-link">Log in</a>
-      <a href="/signup" class="nav-cta">Get Started</a>
-    </div>
-  </nav>
+<!-- ── NAV ── -->
+<nav>
+  <div class="nav-logo">Vixo<span>Resume</span></div>
+  <div class="nav-links">
+    <a href="/builder/"  class="nav-link">Resume Builder</a>
+    <a href="/analyser/" class="nav-link">Resume Analyser</a>
+    <a href="#tools"     class="nav-cta">Get Started →</a>
+  </div>
+</nav>
 
-  <section class="hero">
-    <div class="hero-left">
-      <div class="hero-badge">
-        <div class="hero-badge-dot"></div>
-        Live AI Analysis Available
-      </div>
-      
-      <h1>Build a resume that <em>demands</em> an interview.</h1>
-      
-      <p class="hero-sub">
-        The world's first AI platform that doesn't just write your resume—it <strong>analyses</strong> it against global industry standards to ensure you rank #1.
-      </p>
+<!-- ── HERO ── -->
+<section class="hero">
 
-      <div class="hero-btns">
-        <a href="/builder" class="btn-green">Build My Resume</a>
-        <a href="/analyse" class="btn-secondary">Analyse My Existing Resume</a>
-      </div>
-      
-      <p class="beta-text-hero">* Vixo is currently in Public Beta. We're refining our AI daily for peak accuracy.</p>
-
-      <div class="hero-trust">
-        <div class="trust-item">
-          <div class="trust-check">✓</div>
-          ATS-Optimised
-        </div>
-        <div class="trust-item">
-          <div class="trust-check">✓</div>
-          AI Content Quality
-        </div>
-        <div class="trust-item">
-          <div class="trust-check">✓</div>
-          Market Relevance
-        </div>
-      </div>
+  <!-- Left: Copy -->
+  <div class="hero-left">
+    <div class="hero-badge">
+      <span class="hero-badge-dot"></span>
+      Premium AI Resume Platform
     </div>
 
-    <div class="hero-right">
-      <div class="resume-panel-wrap">
-        <div class="resume-panel">
-          <div class="rp-body">
-            <div class="rp-left">
-              <div class="rp-name">James Henderson</div>
-              <div class="rp-role">Senior Product Manager</div>
-              <div class="rp-contacts">
-                <div class="rp-contact-item">London, UK</div>
-                <div class="rp-contact-item">james.h@vixo.ai</div>
-              </div>
-              <div class="rp-sec">Professional Summary</div>
-              <p class="rp-summary">Results-driven Product Leader with 8+ years of experience in scaling SaaS products from 0 to 1M users. Expert in data-led strategy and cross-functional leadership.</p>
+    <h1>Get Interview-Ready<br>Resumes in Minutes<br><em>with AI</em></h1>
+
+    <p class="hero-sub">
+      Upload your resume, get an instant ATS score, and fix what's
+      holding you back — all in <strong style="color:var(--white);font-weight:600">under 5 minutes.</strong>
+    </p>
+
+    <div class="hero-btns">
+      <a href="/builder/"  class="btn-green">Build My Resume →</a>
+      <a href="/analyser/" class="btn-secondary">Analyze My Resume →</a>
+    </div>
+
+    <!-- Inline numbered steps -->
+    <div class="hero-steps">
+      <div class="hstep">
+        <div class="hstep-num">1</div>
+        <span class="hstep-txt">Upload</span>
+      </div>
+      <div class="hstep-dash"></div>
+      <div class="hstep">
+        <div class="hstep-num">2</div>
+        <span class="hstep-txt">Analyze</span>
+      </div>
+      <div class="hstep-dash"></div>
+      <div class="hstep">
+        <div class="hstep-num">3</div>
+        <span class="hstep-txt">Improve</span>
+      </div>
+      <div class="hstep-dash"></div>
+      <div class="hstep">
+        <div class="hstep-num">4</div>
+        <span class="hstep-txt">Download</span>
+      </div>
+    </div>
+
+    <!-- Rating + mini trust logos -->
+    <div class="hero-bottom">
+      <div class="hb-rating">
+        <div class="hb-stars">
+          <span class="hb-star">★</span><span class="hb-star">★</span>
+          <span class="hb-star">★</span><span class="hb-star">★</span>
+          <span class="hb-star">★</span>
+        </div>
+        <div class="hb-rating-text"><strong>4.8/5</strong> from 1,000+ users</div>
+      </div>
+      <div class="hb-divider"></div>
+      <div class="hb-hired">
+        <span class="hb-hired-label">Trusted by candidates hired at</span>
+        <div class="hb-companies">
+          <span class="hb-co">Google</span>
+          <span class="hb-co">Amazon</span>
+          <span class="hb-co">Microsoft</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right: Resume mockup -->
+  <div class="hero-right">
+    <div class="resume-panel-wrap">
+
+      <div class="resume-panel">
+        <div class="rp-body">
+
+          <!-- Left column of resume -->
+          <div class="rp-left">
+            <div class="rp-name">RACHEL JOHNSON</div>
+            <div class="rp-role">Senior Product Manager</div>
+
+            <div class="rp-contacts">
+              <span class="rp-contact-item">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="99ebf8faf1fcf5b7f3f6f1f7eaf6f7d9fcf4f8f0f5b7faf6f4">[email&#160;protected]</a>
+              </span>
+              <span class="rp-contact-item">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13.6a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 3h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 10.9a16 16 0 0 0 5.93 5.93l1.12-1.12a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 17z"/></svg>
+                (555) 123-4567
+              </span>
+              <span class="rp-contact-item">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                New York, NY
+              </span>
+              <span class="rp-contact-item">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+                linkedin.com/in/racheljohnson
+              </span>
             </div>
-            <div class="rp-right">
-              <div class="rp-sec">Top Skills</div>
-              <span class="rp-skill-chip">Product Strategy</span>
-              <span class="rp-skill-chip">Agile Mastery</span>
-              <span class="rp-skill-chip">Market Analysis</span>
+
+            <div class="rp-sec">Professional Summary</div>
+            <p class="rp-summary">Product Manager with 5+ years driving product strategy, user growth, and cross-functional collaboration at high-growth tech companies. Passionate about building user-centric products that solve real problems.</p>
+
+            <div class="rp-sec">Experience</div>
+
+            <div class="rp-exp">
+              <div class="rp-exp-head">
+                <span class="rp-exp-title">Senior Product Manager</span>
+                <span class="rp-exp-date">2021 – Present</span>
+              </div>
+              <div class="rp-exp-co">TechCorp · New York, NY</div>
+              <div class="rp-bullet">Led a team of 6 to deliver a SaaS platform used by 50,000+ users</div>
+              <div class="rp-bullet">Increased user retention by 32% through data-driven improvements</div>
+              <div class="rp-bullet">Collaborated with engineering, design, and marketing to ship on time</div>
+            </div>
+
+            <div class="rp-exp">
+              <div class="rp-exp-head">
+                <span class="rp-exp-title">Product Manager</span>
+                <span class="rp-exp-date">2019 – 2021</span>
+              </div>
+              <div class="rp-exp-co">InnovateLab · San Francisco, CA</div>
+              <div class="rp-bullet">Managed product roadmap and feature prioritization for 3 product lines</div>
+              <div class="rp-bullet">Conducted user research and A/B tests to optimize conversion rates</div>
+              <div class="rp-bullet">Improved onboarding flow, increasing activation by 25%</div>
+            </div>
+
+            <div class="rp-sec">Education</div>
+            <div class="rp-edu-name">B.S. Computer Science — UC Berkeley</div>
+            <div class="rp-edu-info">University of California, Berkeley · 2019</div>
+          </div>
+
+          <!-- Right column of resume -->
+          <div class="rp-right">
+            <div class="rp-sec">Skills</div>
+            <span class="rp-skill-chip">Product Strategy</span>
+            <span class="rp-skill-chip">Roadmapping</span>
+            <span class="rp-skill-chip">User Research</span>
+            <span class="rp-skill-chip">SQL</span>
+            <span class="rp-skill-chip">Data Analysis</span>
+            <span class="rp-skill-chip">Figma</span>
+            <span class="rp-skill-chip">A/B Testing</span>
+            <span class="rp-skill-chip">Agile / Scrum</span>
+
+            <div class="rp-sec" style="margin-top:18px">Achievements</div>
+            <div class="rp-ach">
+              <span class="rp-ach-ico">🏆</span>
+              <span>Grew user base by 45% in 12 months</span>
+            </div>
+            <div class="rp-ach">
+              <span class="rp-ach-ico">🚀</span>
+              <span>Launched 3 features that raised NPS by 20+</span>
+            </div>
+            <div class="rp-ach">
+              <span class="rp-ach-ico">⭐</span>
+              <span>Top Performer Q2 2023</span>
             </div>
           </div>
         </div>
+      </div>
 
-        <div class="ats-float">
-          <div class="ats-num">92</div>
-          <div class="ats-excellent">Excellent Score</div>
+      <!-- Floating ATS score card -->
+      <div class="ats-float">
+        <div class="ats-lbl">ATS Score</div>
+
+        <div class="ats-ring-wrap">
+          <svg class="ats-ring-svg" width="86" height="86" viewBox="0 0 86 86">
+            <circle class="ats-ring-bg"   cx="43" cy="43" r="34"/>
+            <circle class="ats-ring-fill" cx="43" cy="43" r="34"/>
+          </svg>
+          <div class="ats-center">
+            <div class="ats-num">92</div>
+            <div class="ats-excellent">Excellent</div>
+          </div>
+        </div>
+
+        <div class="ats-desc">Your resume is highly optimized for ATS systems.</div>
+
+        <div class="ats-checks">
+          <div class="ats-check-row"><div class="ats-check-ico">✓</div> Keyword Match</div>
+          <div class="ats-check-row"><div class="ats-check-ico">✓</div> Format</div>
+          <div class="ats-check-row"><div class="ats-check-ico">✓</div> Skills</div>
+          <div class="ats-check-row"><div class="ats-check-ico">✓</div> Experience</div>
         </div>
       </div>
-    </div>
-  </section>
 
-</body>
-</html>
+    </div>
+  </div>
+
+</section>
+
+<!-- ── TRUST BAR ── -->
+<div class="trust-bar">
+  <div class="trust-bar-label">Trusted by job seekers hired at</div>
+  <div class="trust-logos">
+    <div class="trust-logo"><div class="trust-logo-name">Google</div></div>
+    <div class="trust-logo"><div class="trust-logo-name">Boeing</div></div>
+    <div class="trust-logo"><div class="trust-logo-name">Microsoft</div></div>
+    <div class="trust-logo"><div class="trust-logo-name">Amazon</div></div>
+    <div class="trust-logo"><div class="trust-logo-name">Meta</div></div>
+    <div class="trust-logo"><div class="trust-logo-name">Verizon</div></div>
+  </div>
+</div>
+
+<!-- ── HOW IT WORKS ── -->
+<div class="how-section">
+
+  <div class="how-section-header">
+    <div class="how-eyebrow">How it works</div>
+    <div class="how-title">Two tools. One goal: <em>get you hired.</em></div>
+  </div>
+
+  <!-- ── WORKFLOW 1: Build My Resume (3 steps) ── -->
+  <div class="workflow-block">
+    <div class="workflow-label-row">
+      <div class="workflow-pill purple">
+        <span class="workflow-pill-dot"></span>
+        📝 &nbsp;Build My Resume
+      </div>
+      <div class="workflow-rule"></div>
+      <span class="workflow-step-count">3 steps</span>
+    </div>
+
+    <div class="how-steps-3">
+
+      <!-- B1: Choose a Template -->
+      <div class="how-step">
+        <div class="how-mockup">
+          <div class="tmpl-fan">
+            <div class="tmpl-card tmpl-c1">
+              <div class="tmpl-card-header" style="background:#6C5CE7"></div>
+              <div class="tmpl-card-lines">
+                <div class="tmpl-card-line" style="background:#a29bfe;width:72%;height:5px"></div>
+                <div class="tmpl-card-line" style="width:50%"></div>
+                <div class="tmpl-card-line" style="width:90%;margin-top:5px"></div>
+                <div class="tmpl-card-line" style="width:80%"></div>
+                <div class="tmpl-card-line" style="width:65%"></div>
+                <div class="tmpl-card-line" style="background:#a29bfe;width:55%;margin-top:5px"></div>
+                <div class="tmpl-card-line" style="width:85%"></div>
+              </div>
+            </div>
+            <div class="tmpl-card tmpl-c2">
+              <div class="tmpl-card-header" style="background:#00C896"></div>
+              <div class="tmpl-card-lines">
+                <div class="tmpl-card-line" style="background:#00C896;width:75%;height:5px"></div>
+                <div class="tmpl-card-line" style="width:52%"></div>
+                <div class="tmpl-card-line" style="width:88%;margin-top:5px"></div>
+                <div class="tmpl-card-line" style="width:78%"></div>
+                <div class="tmpl-card-line" style="width:60%"></div>
+                <div class="tmpl-card-line" style="background:#a0e6cc;width:55%;margin-top:5px"></div>
+                <div class="tmpl-card-line" style="width:82%"></div>
+              </div>
+            </div>
+            <div class="tmpl-card tmpl-c3">
+              <div class="tmpl-card-header" style="background:#fd79a8"></div>
+              <div class="tmpl-card-lines">
+                <div class="tmpl-card-line" style="background:#fd79a8;width:70%;height:5px"></div>
+                <div class="tmpl-card-line" style="width:50%"></div>
+                <div class="tmpl-card-line" style="width:86%;margin-top:5px"></div>
+                <div class="tmpl-card-line" style="width:72%"></div>
+              </div>
+            </div>
+            <span class="tmpl-sparkle s1">✦</span>
+            <span class="tmpl-sparkle s2">✦</span>
+          </div>
+        </div>
+        <div class="how-step-body">
+          <div class="how-step-badge">STEP 01</div>
+          <div class="how-step-title">Choose a Template</div>
+          <div class="how-step-desc">Pick from 7 ATS-optimised designs built for US, UK, Gulf, and European job markets.</div>
+          <span class="how-step-tag purple">7 professional templates</span>
+        </div>
+      </div>
+
+      <!-- B2: Fill Your Details -->
+      <div class="how-step">
+        <div class="how-mockup">
+          <div class="form-ui">
+            <div class="form-field">
+              <div class="form-field-label">Full Name</div>
+              <div class="form-field-value w85"></div>
+            </div>
+            <div class="form-field">
+              <div class="form-field-label">Job Title</div>
+              <div class="form-field-value w65" style="background:linear-gradient(90deg,#00C896,#00a87e)"></div>
+            </div>
+            <div class="form-field">
+              <div class="form-field-label">Work Experience</div>
+              <div class="form-field-value w50"></div>
+            </div>
+            <div class="form-ai-pill">
+              ✨ &nbsp;AI wrote this for you
+            </div>
+          </div>
+        </div>
+        <div class="how-step-body">
+          <div class="how-step-badge">STEP 02</div>
+          <div class="how-step-title">Fill Your Details</div>
+          <div class="how-step-desc">Step-by-step form — or paste your old resume and let AI rewrite every section for you.</div>
+          <span class="how-step-tag purple">AI rewrite mode</span>
+        </div>
+      </div>
+
+      <!-- B3: Download & Apply -->
+      <div class="how-step">
+        <div class="how-mockup">
+          <div class="dl-dialog">
+            <div class="dl-dialog-title">Download Your Resume</div>
+            <div class="dl-formats">
+              <div class="dl-format-row selected">
+                <div class="dl-format-dot"></div>
+                <div class="dl-format-badge pdf">PDF</div>
+                <div class="dl-format-name">PDF Document</div>
+                <div class="dl-format-size">~84 KB</div>
+              </div>
+              <div class="dl-format-row">
+                <div class="dl-format-dot"></div>
+                <div class="dl-format-badge word">DOCX</div>
+                <div class="dl-format-name">Word Document</div>
+                <div class="dl-format-size">~61 KB</div>
+              </div>
+              <div class="dl-format-row">
+                <div class="dl-format-dot"></div>
+                <div class="dl-format-badge txt">TXT</div>
+                <div class="dl-format-name">ATS Plain Text</div>
+                <div class="dl-format-size">~4 KB</div>
+              </div>
+            </div>
+            <div class="dl-btn">⬇ &nbsp;Download Now</div>
+          </div>
+        </div>
+        <div class="how-step-body">
+          <div class="how-step-badge">STEP 03</div>
+          <div class="how-step-title">Download &amp; Apply</div>
+          <div class="how-step-desc">Export as PDF, DOCX, or ATS plain text. Works on desktop and mobile — ready to send instantly.</div>
+          <span class="how-step-tag purple">3 export formats</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── WORKFLOW 2: Analyse My Resume (4 steps) ── -->
+  <div class="workflow-block">
+    <div class="workflow-label-row">
+      <div class="workflow-pill green">
+        <span class="workflow-pill-dot"></span>
+        📊 &nbsp;Analyse My Resume
+      </div>
+      <div class="workflow-rule"></div>
+      <span class="workflow-step-count">4 steps</span>
+    </div>
+
+    <div class="how-steps-4">
+
+      <!-- A1: Upload Resume -->
+      <div class="how-step">
+        <div class="how-mockup">
+          <div class="upload-ui">
+            <div class="upload-zone">
+              <div class="upload-icon">📄</div>
+              <div class="upload-text">Drop your resume here</div>
+              <div class="upload-sub">or click to browse</div>
+            </div>
+            <div class="upload-types">
+              <span class="upload-type-chip">PDF</span>
+              <span class="upload-type-chip">DOCX</span>
+              <span class="upload-type-chip">TXT</span>
+            </div>
+          </div>
+        </div>
+        <div class="how-step-body">
+          <div class="how-step-badge green">STEP 01</div>
+          <div class="how-step-title">Upload Your Resume</div>
+          <div class="how-step-desc">Drop a PDF, DOCX, or paste plain text. Our AI parses it in seconds.</div>
+          <span class="how-step-tag green">Instant parsing</span>
+        </div>
+      </div>
+
+      <!-- A2: Get ATS Score -->
+      <div class="how-step">
+        <div class="how-mockup">
+          <div class="ats-ui">
+            <div class="ats-ui-score-bubble">
+              <div class="ats-ui-big">92</div>
+              <div>
+                <div style="font-size:11px;font-weight:700;color:#00A87E;margin-bottom:1px">Excellent</div>
+                <div class="ats-ui-sub">Your ATS Score</div>
+              </div>
+            </div>
+            <div class="ats-ui-bar-row">
+              <div class="ats-ui-label">Keywords</div>
+              <div class="ats-ui-track"><div class="ats-ui-fill c-green" style="width:94%"></div></div>
+              <div class="ats-ui-pct">94%</div>
+            </div>
+            <div class="ats-ui-bar-row">
+              <div class="ats-ui-label">Format</div>
+              <div class="ats-ui-track"><div class="ats-ui-fill c-purple" style="width:88%"></div></div>
+              <div class="ats-ui-pct">88%</div>
+            </div>
+            <div class="ats-ui-bar-row">
+              <div class="ats-ui-label">Skills Gap</div>
+              <div class="ats-ui-track"><div class="ats-ui-fill c-amber" style="width:61%"></div></div>
+              <div class="ats-ui-pct">61%</div>
+            </div>
+            <div class="ats-ui-bar-row">
+              <div class="ats-ui-label">Experience</div>
+              <div class="ats-ui-track"><div class="ats-ui-fill c-green" style="width:90%"></div></div>
+              <div class="ats-ui-pct">90%</div>
+            </div>
+          </div>
+        </div>
+        <div class="how-step-body">
+          <div class="how-step-badge green">STEP 02</div>
+          <div class="how-step-title">Get Your ATS Score</div>
+          <div class="how-step-desc">AI scans 7 dimensions — keywords, structure, skills gaps, formatting, and impact.</div>
+          <span class="how-step-tag green">7-dimension analysis</span>
+        </div>
+      </div>
+
+      <!-- A3: Improve with AI -->
+      <div class="how-step">
+        <div class="how-mockup">
+          <div class="editor-ui">
+            <div class="editor-caption">AI Suggestion · Bullet Point</div>
+            <div class="editor-old">
+              <div class="editor-tag red">✕ &nbsp;Weak</div>
+              <div class="editor-line red-l w100"></div>
+              <div class="editor-line red-l w80"></div>
+              <div class="editor-line red-l w60"></div>
+            </div>
+            <div style="text-align:center;font-size:16px;color:#00A87E;line-height:1.2">↓</div>
+            <div class="editor-new">
+              <div class="editor-tag green">✓ &nbsp;AI Rewrite</div>
+              <div class="editor-line green-l w100"></div>
+              <div class="editor-line green-l w80"></div>
+              <div class="editor-line green-l w60"></div>
+            </div>
+            <div class="editor-apply-btn">✓ &nbsp;Apply Rewrite</div>
+          </div>
+        </div>
+        <div class="how-step-body">
+          <div class="how-step-badge green">STEP 03</div>
+          <div class="how-step-title">Improve with AI</div>
+          <div class="how-step-desc">Get bullet-by-bullet rewrites, close skills gaps, and fix weak phrasing in one click.</div>
+          <span class="how-step-tag green">AI-powered edits</span>
+        </div>
+      </div>
+
+      <!-- A4: Download -->
+      <div class="how-step">
+        <div class="how-mockup">
+          <div class="dl-dialog">
+            <div class="dl-dialog-title">Download Improved Resume</div>
+            <div class="dl-formats">
+              <div class="dl-format-row selected">
+                <div class="dl-format-dot"></div>
+                <div class="dl-format-badge pdf">PDF</div>
+                <div class="dl-format-name">PDF Document</div>
+                <div class="dl-format-size">~84 KB</div>
+              </div>
+              <div class="dl-format-row">
+                <div class="dl-format-dot"></div>
+                <div class="dl-format-badge word">DOCX</div>
+                <div class="dl-format-name">Word Document</div>
+                <div class="dl-format-size">~61 KB</div>
+              </div>
+              <div class="dl-format-row">
+                <div class="dl-format-dot"></div>
+                <div class="dl-format-badge txt">TXT</div>
+                <div class="dl-format-name">ATS Plain Text</div>
+                <div class="dl-format-size">~4 KB</div>
+              </div>
+            </div>
+            <div class="dl-btn">⬇ &nbsp;Download Now</div>
+          </div>
+        </div>
+        <div class="how-step-body">
+          <div class="how-step-badge green">STEP 04</div>
+          <div class="how-step-title">Download &amp; Apply</div>
+          <div class="how-step-desc">Export your improved resume as PDF, DOCX, or ATS plain text — ready to send right now.</div>
+          <span class="how-step-tag green">3 export formats</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<!-- ── STATS ── -->
+<div class="stats-row">
+  <div class="stat-item">
+    <div class="stat-item-num">7</div>
+    <div class="stat-item-lbl">Resume Templates</div>
+    <div class="stat-item-note">Expert-crafted designs</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-item-num">7</div>
+    <div class="stat-item-lbl">Analysis Dimensions</div>
+    <div class="stat-item-note">ATS · Skills · Structure · More</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-item-num">4</div>
+    <div class="stat-item-lbl">Global Job Markets</div>
+    <div class="stat-item-note">US · UK · Gulf · Europe</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-item-num"><span>92</span><span>%</span></div>
+    <div class="stat-item-lbl">ATS Pass Rate</div>
+    <div class="stat-item-note">Among active users</div>
+  </div>
+</div>
+
+<!-- ── TOOLS ── -->
+<section class="tools-section" id="tools">
+  <div class="section-eyebrow">Two powerful tools</div>
+  <div class="section-title">Everything you need<br>to land the job.</div>
+  <p class="section-sub">Build from scratch with premium AI assistance or analyse your existing resume with professional-grade insights.</p>
+
+  <div class="tools-grid">
+    <a href="/builder/" class="tool-card">
+      <div class="tool-ico ico-purple">📝</div>
+      <div class="tool-name">Resume Builder</div>
+      <div class="tool-desc">Build a professional, ATS-optimised resume from scratch or let premium AI rewrite your existing one.</div>
+      <div class="tool-features">
+        <div class="tool-feat"><span class="feat-dot"></span>Form builder — fill step by step</div>
+        <div class="tool-feat"><span class="feat-dot"></span>AI rewrite — paste old resume</div>
+        <div class="tool-feat"><span class="feat-dot"></span>Export PDF, DOCX, ATS text</div>
+        <div class="tool-feat"><span class="feat-dot"></span>Career transition support</div>
+        <div class="tool-feat"><span class="feat-dot"></span>Global market formats supported</div>
+      </div>
+      <span class="tool-link link-purple">Build My Resume →</span>
+    </a>
+
+    <a href="/analyser/" class="tool-card">
+      <div class="tool-ico ico-green">📊</div>
+      <div class="tool-name">Resume Analyser</div>
+      <div class="tool-desc">Get a full 7-dimension professional analysis — ATS score, skills gap, competitor benchmark, and why HR ignores you.</div>
+      <div class="tool-features">
+        <div class="tool-feat"><span class="feat-dot"></span>ATS score &amp; keyword matching</div>
+        <div class="tool-feat"><span class="feat-dot"></span>Section-by-section feedback</div>
+        <div class="tool-feat"><span class="feat-dot"></span>Competitor benchmark</div>
+        <div class="tool-feat"><span class="feat-dot"></span>Why HR is not picking up</div>
+        <div class="tool-feat"><span class="feat-dot"></span>Before &amp; after rewrites</div>
+      </div>
+      <span class="tool-link link-green">Analyse My Resume →</span>
+    </a>
+  </div>
+</section>
+
+<!-- ── TESTIMONIALS ── -->
+<section class="testimonials-section">
+  <div class="section-eyebrow">Real users · Real results</div>
+  <div class="section-title" style="margin-bottom:48px">Job seekers who made it.</div>
+
+  <div class="testimonials-grid">
+    <div class="testimonial-card">
+      <div class="tc-stars"><span class="tc-star">★</span><span class="tc-star">★</span><span class="tc-star">★</span><span class="tc-star">★</span><span class="tc-star">★</span></div>
+      <div class="tc-quote">"The AI rewrite completely transformed my resume. I went from zero callbacks to three interviews in one week. The ATS optimization alone is worth it."</div>
+      <div class="tc-author">
+        <div class="tc-avatar av1">J</div>
+        <div>
+          <div class="tc-name">Jessica Martinez</div>
+          <div class="tc-role">Software Engineer → Google NYC</div>
+        </div>
+        <span class="tc-market">🇺🇸 US</span>
+      </div>
+    </div>
+
+    <div class="testimonial-card">
+      <div class="tc-stars"><span class="tc-star">★</span><span class="tc-star">★</span><span class="tc-star">★</span><span class="tc-star">★</span><span class="tc-star">★</span></div>
+      <div class="tc-quote">"The analyser showed me exactly which keywords I was missing. My ATS score jumped from 48% to 91% after one revision. Landed at Amazon in 3 weeks."</div>
+      <div class="tc-author">
+        <div class="tc-avatar av2">M</div>
+        <div>
+          <div class="tc-name">Marcus Thompson</div>
+          <div class="tc-role">Data Scientist → Amazon Seattle</div>
+        </div>
+        <span class="tc-market">🇺🇸 US</span>
+      </div>
+    </div>
+
+    <div class="testimonial-card">
+      <div class="tc-stars"><span class="tc-star">★</span><span class="tc-star">★</span><span class="tc-star">★</span><span class="tc-star">★</span><span class="tc-star">★</span></div>
+      <div class="tc-quote">"I was switching from education to UX design. The career transition AI reframed my experience so well it looked like I'd been doing UX for years. Got hired at Microsoft."</div>
+      <div class="tc-author">
+        <div class="tc-avatar av3">S</div>
+        <div>
+          <div class="tc-name">Sarah Chen</div>
+          <div class="tc-role">Teacher → UX Designer, Microsoft</div>
+        </div>
+        <span class="tc-market">🇺🇸 US</span>
+      </div>
+    </div>
+
+    <div class="testimonial-card">
+      <div class="tc-stars"><span class="tc-star">★</span><span class="tc-star">★</span><span class="tc-star">★</span><span class="tc-star">★</span><span class="tc-star">★</span></div>
+      <div class="tc-quote">"I've tried four resume tools. This is the only one that gave feedback that actually made sense — specific, actionable, not just generic filler tips."</div>
+      <div class="tc-author">
+        <div class="tc-avatar av4">D</div>
+        <div>
+          <div class="tc-name">David Kim</div>
+          <div class="tc-role">Marketing Manager → Meta Austin</div>
+        </div>
+        <span class="tc-market">🇺🇸 US</span>
+      </div>
+    </div>
+
+    <div class="testimonial-card">
+      <div class="tc-stars"><span class="tc-star">★</span><span class="tc-star">★</span><span class="tc-star">★</span><span class="tc-star">★</span><span class="tc-star">★</span></div>
+      <div class="tc-quote">"The competitor benchmark showed me what top finance candidates were including that I wasn't. I added those sections and landed at Goldman Sachs in New York."</div>
+      <div class="tc-author">
+        <div class="tc-avatar av5">A</div>
+        <div>
+          <div class="tc-name">Ashley Williams</div>
+          <div class="tc-role">Financial Analyst → Goldman Sachs</div>
+        </div>
+        <span class="tc-market">🇺🇸 US</span>
+      </div>
+    </div>
+
+    <div class="testimonial-card">
+      <div class="tc-stars"><span class="tc-star">★</span><span class="tc-star">★</span><span class="tc-star">★</span><span class="tc-star">★</span><span class="tc-star">★</span></div>
+      <div class="tc-quote">"As a veteran transitioning to the private sector, I had no idea how to translate my experience. Vixo Resume made it crystal clear. Hired at Boeing within 2 months."</div>
+      <div class="tc-author">
+        <div class="tc-avatar av6">R</div>
+        <div>
+          <div class="tc-name">Ryan O'Brien</div>
+          <div class="tc-role">Army Captain → Program Manager, Boeing</div>
+        </div>
+        <span class="tc-market">🇺🇸 US</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PREMIUM BADGE -->
+<div class="premium-badge">✨ Premium AI Technology</div>
+
+<footer>
+  <div class="footer-logo">Vixo<span>Resume</span></div>
+  <div c
