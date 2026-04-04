@@ -9,11 +9,7 @@
 <link rel="shortcut icon" type="image/svg+xml" href="/favicon.svg">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
   --bg0: #0A0720;
@@ -31,9 +27,7 @@
   --card-border: rgba(255, 255, 255, 0.1);
 }
 
-html {
-  scroll-behavior: smooth;
-}
+html { scroll-behavior: smooth; }
 
 body {
   font-family: 'Inter', sans-serif;
@@ -44,7 +38,31 @@ body {
   overflow-x: hidden;
 }
 
-/* BG GRADIENT */
+/* ── BETA STYLES ── */
+.beta-badge-nav {
+  font-size: 9px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  background: rgba(108, 92, 231, 0.1);
+  color: var(--purple);
+  padding: 2px 6px;
+  border-radius: 4px;
+  vertical-align: middle;
+  margin-left: 6px;
+  border: 1px solid rgba(108, 92, 231, 0.2);
+  letter-spacing: 0.05em;
+}
+
+.beta-text-hero {
+  font-size: 11px;
+  color: rgba(232, 228, 255, 0.35);
+  margin-top: -12px;
+  margin-bottom: 32px;
+  font-style: italic;
+  letter-spacing: 0.02em;
+}
+
+/* ── BG ── */
 .bg-gradient {
   position: fixed;
   inset: 0;
@@ -56,777 +74,358 @@ body {
     linear-gradient(160deg, #0A0720 0%, #1A1250 50%, #0e0929 100%);
   pointer-events: none;
 }
-
 .bg-gradient::after {
   content: '';
   position: absolute;
   inset: 0;
-  background-image: radial-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+  background-image: radial-gradient(rgba(255,255,255,0.03) 1px, transparent 1px);
   background-size: 28px 28px;
 }
 
-/* FOCUS STATES - Accessibility */
-*:focus-visible {
-  outline: 2px solid var(--green);
-  outline-offset: 3px;
-  border-radius: 4px;
-}
+*:focus-visible { outline: 2px solid var(--green); outline-offset: 3px; border-radius: 4px; }
 
-/* ANIMATIONS */
 @keyframes fadeUp {
-  from {
-    opacity: 0;
-    transform: translateY(24px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes pulse-dot {
+  0%,100% { opacity:1; transform:scale(1); }
+  50%      { opacity:.6; transform:scale(.85); }
+}
+@keyframes floatSlow {
+  0%,100% { transform: translateY(0px); }
+  50%      { transform: translateY(-7px); }
 }
 
-/* NAV */
+/* ── NAV ── */
 nav {
   position: sticky;
   top: 0;
   z-index: 100;
-  background: rgba(255, 255, 255, 0.97);
+  background: rgba(255,255,255,0.97);
   backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.07);
+  border-bottom: 1px solid rgba(0,0,0,0.07);
   height: 64px;
   display: flex;
   align-items: center;
   padding: 0 48px;
   gap: 40px;
 }
-
 .nav-logo {
   font-family: 'Cormorant Garamond', serif;
-  font-size: 22px;
-  font-weight: 700;
-  color: #1A1917;
-  letter-spacing: -0.3px;
+  font-size: 22px; font-weight: 700;
+  color: #1A1917; letter-spacing: -0.3px;
 }
-
-.nav-logo span {
-  color: var(--purple);
-}
-
-.nav-links {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  margin-left: auto;
-}
-
+.nav-logo span { color: var(--purple); }
+.nav-links { display: flex; align-items: center; gap: 4px; margin-left: auto; }
 .nav-link {
-  font-size: 13px;
-  font-weight: 500;
-  color: #4A4A6A;
-  padding: 7px 14px;
-  border-radius: 7px;
-  text-decoration: none;
-  transition: all 0.15s;
+  font-size: 13px; font-weight: 500; color: #4A4A6A;
+  padding: 7px 14px; border-radius: 7px;
+  text-decoration: none; transition: all 0.15s;
 }
-
-.nav-link:hover {
-  background: #F0EDFF;
-  color: var(--purple);
-}
-
+.nav-link:hover { background: #F0EDFF; color: var(--purple); }
 .nav-cta {
-  background: var(--purple);
-  color: #fff;
-  font-size: 13px;
-  font-weight: 500;
-  padding: 9px 20px;
-  border-radius: 8px;
-  text-decoration: none;
-  transition: all 0.15s;
-  margin-left: 8px;
+  background: var(--purple); color: #fff; font-size: 13px;
+  font-weight: 500; padding: 9px 20px; border-radius: 8px;
+  text-decoration: none; transition: all 0.15s; margin-left: 8px;
 }
-
-.nav-cta:hover {
-  background: var(--purple2);
-  transform: translateY(-1px);
-}
+.nav-cta:hover { background: var(--purple2); transform: translateY(-1px); }
 
 /* HERO */
 .hero {
   position: relative;
   z-index: 1;
   min-height: calc(100vh - 64px);
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   align-items: center;
-  padding: 80px 80px 60px 80px;
   max-width: 1400px;
   margin: 0 auto;
+  padding: 0 60px;
   gap: 40px;
-  animation: fadeUp 0.6s ease-out forwards;
+  animation: fadeUp 0.55s ease-out both;
 }
 
 .hero-left {
-  flex: 1;
-  max-width: 640px;
+  padding: 72px 0;
+  max-width: 520px;
 }
 
 .hero-badge {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  padding: 6px 14px;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  background: rgba(255, 255, 255, 0.07);
-  color: rgba(255, 255, 255, 0.75);
-  margin-bottom: 32px;
+  font-size: 11px; font-weight: 500;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  padding: 6px 14px; border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(255,255,255,0.07);
+  color: rgba(255,255,255,0.75);
+  margin-bottom: 28px;
 }
-
 .hero-badge-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
+  width: 6px; height: 6px; border-radius: 50%;
   background: var(--green);
+  animation: pulse-dot 2s ease-in-out infinite;
 }
 
 .hero h1 {
   font-family: 'Cormorant Garamond', serif;
-  font-size: clamp(52px, 6vw, 88px);
+  font-size: clamp(42px, 4.5vw, 68px);
   font-weight: 700;
-  line-height: 1.0;
+  line-height: 1.06;
   letter-spacing: -2px;
   color: var(--white);
-  margin-bottom: 24px;
+  margin-bottom: 20px;
 }
-
 .hero h1 em {
   font-style: italic;
-  color: rgba(180, 168, 255, 0.9);
+  background: linear-gradient(135deg, #a29bfe 0%, var(--green) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .hero-sub {
-  font-size: 18px;
-  line-height: 1.6;
+  font-size: 16px; line-height: 1.7;
   color: var(--muted);
-  max-width: 500px;
-  margin-bottom: 32px;
-  font-weight: 400;
+  max-width: 430px; margin-bottom: 36px;
 }
 
 .hero-btns {
-  display: flex;
-  gap: 14px;
-  flex-wrap: wrap;
-  margin-bottom: 20px;
+  display: flex; gap: 14px;
+  flex-wrap: wrap; margin-bottom: 32px;
 }
 
 .btn-green {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: var(--green);
-  color: #042E22;
-  font-size: 15px;
-  font-weight: 600;
-  padding: 14px 28px;
-  border-radius: 10px;
-  text-decoration: none;
-  transition: all 0.2s ease;
-  border: none;
-  cursor: pointer;
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--green); color: #042E22;
+  font-size: 15px; font-weight: 600; padding: 14px 28px;
+  border-radius: 10px; text-decoration: none;
+  transition: all 0.2s; border: none; cursor: pointer;
   font-family: 'Inter', sans-serif;
 }
-
 .btn-green:hover {
-  background: #00DBA8;
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(0, 200, 150, 0.25);
+  background: #00DBA8; transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0,200,150,0.3);
 }
 
 .btn-secondary {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: rgba(255, 255, 255, 0.06);
-  color: var(--off);
-  font-size: 15px;
-  font-weight: 500;
-  padding: 14px 28px;
-  border-radius: 10px;
-  text-decoration: none;
-  transition: all 0.2s ease;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  cursor: pointer;
-  font-family: 'Inter', sans-serif;
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(255,255,255,0.06); color: var(--off);
+  font-size: 15px; font-weight: 500; padding: 14px 28px;
+  border-radius: 10px; text-decoration: none;
+  transition: all 0.2s; border: 1px solid rgba(255,255,255,0.2);
+  cursor: pointer; font-family: 'Inter', sans-serif;
 }
-
 .btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.12);
-  border-color: rgba(255, 255, 255, 0.35);
+  background: rgba(255,255,255,0.12);
+  border-color: rgba(255,255,255,0.35);
   transform: translateY(-1px);
 }
 
-.hero-footnote {
-  font-size: 12px;
-  color: var(--muted);
-  opacity: 0.7;
-  margin-top: 16px;
+.hero-right {
+  position: relative;
+  height: 100%;
+  min-height: calc(100vh - 64px);
   display: flex;
   align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
+  justify-content: flex-start;
+  padding: 40px 0;
 }
 
-.hero-footnote span {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-
-/* STATS ROW */
-.stats-row {
+.resume-panel-wrap {
   position: relative;
-  z-index: 1;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  padding: 48px 80px;
-  display: flex;
-  gap: 0;
-  max-width: 1400px;
-  margin: 0 auto;
-  animation: fadeUp 0.6s ease-out forwards;
-  animation-delay: 0.1s;
-  opacity: 0;
-  animation-fill-mode: forwards;
+  width: 100%;
+  max-width: 480px;
+  animation: fadeUp 0.65s ease-out 0.15s both;
 }
 
-.stat-item {
-  flex: 1;
-  text-align: center;
-  padding: 0 32px;
-  border-right: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.stat-item:last-child {
-  border-right: none;
-}
-
-.stat-item-num {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 44px;
-  font-weight: 700;
-  color: var(--white);
-  letter-spacing: -1.5px;
-  line-height: 1.2;
-  margin-bottom: 6px;
-  display: flex;
-  align-items: baseline;
-  justify-content: center;
-  gap: 2px;
-}
-
-.stat-item-num span {
-  display: inline-block;
-  line-height: 1;
-}
-
-/* For single digits, ensure consistent baseline */
-.stat-item-num:not(:has(span)) {
-  display: block;
-  text-align: center;
-}
-
-.stat-item-lbl {
-  font-size: 12px;
-  color: var(--muted);
-  font-weight: 400;
-}
-
-.stat-item-note {
-  font-size: 10px;
-  color: rgba(232, 228, 255, 0.3);
-  margin-top: 3px;
-  font-style: italic;
-}
-
-/* TOOLS SECTION */
-.tools-section {
-  position: relative;
-  z-index: 1;
-  padding: 100px 80px;
-  max-width: 1400px;
-  margin: 0 auto;
-  animation: fadeUp 0.6s ease-out forwards;
-  animation-delay: 0.2s;
-  opacity: 0;
-  animation-fill-mode: forwards;
-}
-
-.section-eyebrow {
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--purple2);
-  margin-bottom: 16px;
-}
-
-.section-title {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: clamp(36px, 4vw, 54px);
-  font-weight: 700;
-  line-height: 1.1;
-  letter-spacing: -1px;
-  color: var(--white);
-  margin-bottom: 16px;
-}
-
-.section-sub {
-  font-size: 16px;
-  color: var(--muted);
-  max-width: 500px;
-  line-height: 1.7;
-  margin-bottom: 56px;
-}
-
-.tools-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 24px;
-}
-
-.tool-card {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 24px;
-  padding: 36px;
-  text-decoration: none;
-  color: inherit;
-  display: flex;
-  flex-direction: column;
-  transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
-  position: relative;
-  overflow: hidden;
-  cursor: pointer;
-}
-
-.tool-card::before {
+.resume-panel-wrap::before {
   content: '';
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, var(--purple), var(--green), transparent);
-  opacity: 0;
-  transition: opacity 0.3s;
+  inset: -2px;
+  border-radius: 20px;
+  background: linear-gradient(135deg,
+    rgba(108,92,231,0.8) 0%,
+    rgba(139,124,246,0.4) 40%,
+    rgba(0,200,150,0.5) 100%);
+  z-index: 0;
+  filter: blur(1px);
 }
 
-.tool-card:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(108, 92, 231, 0.5);
-  transform: translateY(-4px);
-}
-
-.tool-card:hover::before {
-  opacity: 1;
-}
-
-.tool-card:active {
-  transform: scale(0.98);
-}
-
-.tool-ico {
-  width: 56px;
-  height: 56px;
-  border-radius: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 26px;
-  margin-bottom: 24px;
-}
-
-.ico-purple {
-  background: rgba(108, 92, 231, 0.18);
-  border: 1px solid rgba(108, 92, 231, 0.3);
-}
-
-.ico-green {
-  background: rgba(0, 200, 150, 0.15);
-  border: 1px solid rgba(0, 200, 150, 0.3);
-}
-
-.tool-name {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 28px;
-  font-weight: 700;
-  color: var(--white);
-  letter-spacing: -0.5px;
-  margin-bottom: 12px;
-}
-
-.tool-desc {
-  font-size: 14px;
-  color: var(--muted);
-  line-height: 1.65;
-  margin-bottom: 24px;
-}
-
-.tool-features {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-bottom: 28px;
-  flex: 1;
-}
-
-.tool-feat {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 12.5px;
-  color: rgba(255, 255, 255, 0.7);
-}
-
-.feat-dot {
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: var(--purple2);
-  flex-shrink: 0;
-}
-
-.tool-link {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  font-size: 14px;
-  font-weight: 600;
-  padding: 12px 24px;
-  border-radius: 10px;
-  transition: all 0.2s;
-  width: 100%;
-  text-align: center;
-  margin-top: auto;
-}
-
-.tool-card:hover .tool-link {
-  transform: translateX(4px);
-}
-
-.link-purple {
-  background: var(--purple);
-  color: #fff;
-}
-
-.link-purple:hover {
-  background: var(--purple2);
-}
-
-.link-green {
-  background: rgba(0, 200, 150, 0.12);
-  color: var(--green);
-  border: 1px solid rgba(0, 200, 150, 0.25);
-}
-
-.link-green:hover {
-  background: rgba(0, 200, 150, 0.2);
-}
-
-/* PREMIUM BADGE - Premium Positioning */
-.premium-badge {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  background: rgba(10, 7, 32, 0.85);
-  backdrop-filter: blur(12px);
-  padding: 8px 16px;
-  border-radius: 40px;
-  font-size: 11px;
-  font-weight: 500;
-  color: var(--purple2);
-  border: 1px solid rgba(108, 92, 231, 0.35);
-  z-index: 1000;
-  pointer-events: none;
-  font-family: 'Inter', sans-serif;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
-
-/* FOOTER */
-footer {
+.resume-panel {
   position: relative;
   z-index: 1;
-  padding: 36px 80px;
-  border-top: 1px solid rgba(255, 255, 255, 0.07);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  max-width: 1400px;
-  margin: 0 auto;
+  background: #ffffff;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 40px 100px rgba(0,0,0,0.65);
 }
 
-.footer-logo {
+.rp-body {
+  display: grid;
+  grid-template-columns: 1fr 160px;
+}
+
+.rp-left {
+  padding: 26px 22px 24px 26px;
+  border-right: 1px solid #e8e8f0;
+}
+
+.rp-name {
+  font-size: 19px; font-weight: 800;
+  color: #0f0d2a; letter-spacing: -0.3px;
+  margin-bottom: 4px; font-family: 'Inter', sans-serif;
+}
+.rp-role {
+  font-size: 11.5px; color: var(--purple);
+  font-weight: 600; margin-bottom: 13px;
+}
+
+.rp-contacts {
+  display: flex; flex-wrap: wrap;
+  gap: 5px 12px; margin-bottom: 16px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #e8e8f0;
+}
+.rp-contact-item {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 9.5px; color: #6b6b8a;
+}
+.rp-sec {
+  font-size: 8.5px; font-weight: 700;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: #9090b0;
+  margin-bottom: 8px; margin-top: 14px;
+}
+.rp-summary {
+  font-size: 10.5px; line-height: 1.7;
+  color: #444460;
+}
+
+.rp-right {
+  padding: 26px 18px 24px 16px;
+  background: #f6f5ff;
+}
+
+.rp-skill-chip {
+  display: block; font-size: 9px; font-weight: 600;
+  background: rgba(108,92,231,0.1);
+  color: var(--purple);
+  border: 1px solid rgba(108,92,231,0.2);
+  padding: 5px 8px; border-radius: 6px;
+  text-align: center; margin-bottom: 5px;
+}
+
+.ats-float {
+  position: absolute;
+  right: -28px;
+  bottom: 48px;
+  z-index: 20;
+  background: #0d0b2e;
+  border: 1px solid rgba(108,92,231,0.55);
+  border-radius: 18px;
+  padding: 18px 20px 16px;
+  width: 172px;
+  box-shadow: 0 20px 56px rgba(0,0,0,0.6), 0 0 0 1px rgba(108,92,231,0.15);
+  animation: floatSlow 5s ease-in-out infinite;
+}
+
+.ats-num {
   font-family: 'Cormorant Garamond', serif;
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--white);
+  font-size: 28px; font-weight: 700;
+  color: #fff; line-height: 1;
 }
 
-.footer-logo span {
-  color: var(--purple2);
+.ats-excellent {
+  font-size: 8.5px; color: var(--green);
+  font-weight: 600; letter-spacing: 0.04em;
 }
 
-.footer-copy {
-  font-size: 12px;
-  color: var(--muted);
-}
-
-/* MOBILE RESPONSIVENESS */
-@media (max-width: 900px) {
-  nav {
-    padding: 0 24px;
-  }
-  
-  .hero {
-    flex-direction: column;
-    padding: 48px 24px 40px 24px;
-    min-height: auto;
-  }
-  
-  .hero-left {
-    text-align: center;
-  }
-  
-  .hero-sub {
-    margin-left: auto;
-    margin-right: auto;
-  }
-  
-  .hero-btns {
-    justify-content: center;
-  }
-  
-  .hero-footnote {
-    justify-content: center;
-  }
-  
-  .stats-row {
-    flex-wrap: wrap;
-    padding: 40px 24px;
-    gap: 0;
-  }
-  
-  .stat-item {
-    border-right: none;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    padding: 24px 16px;
-    flex: 1 1 50%;
-  }
-  
-  .stat-item:nth-last-child(2) {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  }
-  
-  .stat-item:last-child {
-    border-bottom: none;
-  }
-  
-  .tools-section {
-    padding: 60px 24px;
-  }
-  
-  .tools-grid {
-    grid-template-columns: 1fr;
-    gap: 20px;
-  }
-  
-  footer {
-    padding: 28px 24px;
-    flex-direction: column;
-    gap: 12px;
-    text-align: center;
-  }
-}
-
-@media (max-width: 600px) {
-  .hero h1 {
-    font-size: clamp(44px, 8vw, 64px);
-  }
-  
-  .hero-sub {
-    font-size: 16px;
-  }
-  
-  .hero-btns {
-    flex-direction: column;
-    width: 100%;
-  }
-  
-  .btn-green, .btn-secondary {
-    justify-content: center;
-    width: 100%;
-  }
-  
-  .stat-item {
-    flex: 1 1 100%;
-  }
-  
-  .stat-item-num {
-    font-size: 38px;
-  }
-  
-  .tool-card {
-    padding: 28px;
-  }
-  
-  .tool-name {
-    font-size: 24px;
-  }
-  
-  .tool-link {
-    padding: 10px 20px;
-    font-size: 13px;
-  }
-  
-  .premium-badge {
-    bottom: 16px;
-    right: 16px;
-    font-size: 10px;
-    padding: 6px 12px;
-  }
-}
-
-/* Dark mode friendly scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.05);
-}
-
-::-webkit-scrollbar-thumb {
-  background: rgba(108, 92, 231, 0.5);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--purple);
-}
 </style>
 </head>
 <body>
-<div class="bg-gradient"></div>
 
-<!-- NAV -->
-<nav>
-  <div class="nav-logo">Vixo<span>Resume</span></div>
-  <div class="nav-links">
-    <a href="/builder/" class="nav-link">Resume Builder</a>
-    <a href="/analyser/" class="nav-link">Resume Analyser</a>
-    <a href="#tools" class="nav-cta">Get Started →</a>
-  </div>
-</nav>
+  <div class="bg-gradient"></div>
 
-<!-- HERO -->
-<section class="hero">
-  <div class="hero-left">
-    <div class="hero-badge">
-      <span class="hero-badge-dot"></span>
-      Premium AI Technology · Global Markets · Professional Grade
+  <nav>
+    <div class="nav-logo">Vixo <span>Resume</span> <span class="beta-badge-nav">BETA</span></div>
+    <div class="nav-links">
+      <a href="#how" class="nav-link">How it works</a>
+      <a href="#tools" class="nav-link">Products</a>
+      <a href="#pricing" class="nav-link">Pricing</a>
+      <a href="/login" class="nav-link">Log in</a>
+      <a href="/signup" class="nav-cta">Get Started</a>
     </div>
-    <h1>Build Resumes<br>That <em>Get You</em><br>Hired.</h1>
-    <p class="hero-sub">The premium AI resume platform built for global job markets — with professional-grade ATS scoring, real career transition support, and expert-crafted templates.</p>
-    <div class="hero-btns">
-      <a href="/builder/" class="btn-green">Build My Resume →</a>
-      <a href="/analyser/" class="btn-secondary">Analyse My Resume →</a>
-    </div>
-    <div class="hero-footnote">
-      <span>✓ Professional-grade analysis</span>
-      <span>✓ Trusted by hiring experts</span>
-      <span>✓ Premium AI technology</span>
-    </div>
-  </div>
-</section>
+  </nav>
 
-<!-- STATS ROW - Fixed Alignment -->
-<div class="stats-row">
-  <div class="stat-item">
-    <div class="stat-item-num">7</div>
-    <div class="stat-item-lbl">Resume Templates</div>
-    <div class="stat-item-note">Expert-crafted designs</div>
-  </div>
-  <div class="stat-item">
-    <div class="stat-item-num">7</div>
-    <div class="stat-item-lbl">Analysis Dimensions</div>
-    <div class="stat-item-note">ATS · Skills · Structure · More</div>
-  </div>
-  <div class="stat-item">
-    <div class="stat-item-num">4</div>
-    <div class="stat-item-lbl">Global Job Markets</div>
-    <div class="stat-item-note">US · UK · Gulf · Europe</div>
-  </div>
-  <div class="stat-item">
-    <div class="stat-item-num">
-      <span>98</span><span>%</span>
-    </div>
-    <div class="stat-item-lbl">ATS Success Rate</div>
-    <div class="stat-item-note">Among active users</div>
-  </div>
-</div>
-
-<!-- TOOLS SECTION -->
-<section class="tools-section" id="tools">
-  <div class="section-eyebrow">Two powerful tools</div>
-  <div class="section-title">Everything you need<br>to land the job.</div>
-  <p class="section-sub">Build from scratch with premium AI assistance or analyse your existing resume with professional-grade insights.</p>
-
-  <div class="tools-grid">
-    <a href="/builder/" class="tool-card">
-      <div class="tool-ico ico-purple">📝</div>
-      <div class="tool-name">Resume Builder</div>
-      <div class="tool-desc">Build a professional, ATS-optimised resume from scratch or let premium AI rewrite your existing one.</div>
-      <div class="tool-features">
-        <div class="tool-feat"><span class="feat-dot"></span>Form builder — fill step by step</div>
-        <div class="tool-feat"><span class="feat-dot"></span>AI rewrite — paste old resume</div>
-        <div class="tool-feat"><span class="feat-dot"></span>Export PDF, DOCX, ATS text</div>
-        <div class="tool-feat"><span class="feat-dot"></span>Career transition support</div>
-        <div class="tool-feat"><span class="feat-dot"></span>Global market formats supported</div>
+  <section class="hero">
+    <div class="hero-left">
+      <div class="hero-badge">
+        <div class="hero-badge-dot"></div>
+        Live AI Analysis Available
       </div>
-      <span class="tool-link link-purple">Build My Resume →</span>
-    </a>
+      
+      <h1>Build a resume that <em>demands</em> an interview.</h1>
+      
+      <p class="hero-sub">
+        The world's first AI platform that doesn't just write your resume—it <strong>analyses</strong> it against global industry standards to ensure you rank #1.
+      </p>
 
-    <a href="/analyser/" class="tool-card">
-      <div class="tool-ico ico-green">📊</div>
-      <div class="tool-name">Resume Analyser</div>
-      <div class="tool-desc">Get a full 7-dimension professional analysis — ATS score, skills gap, competitor benchmark, and why HR ignores you.</div>
-      <div class="tool-features">
-        <div class="tool-feat"><span class="feat-dot"></span>ATS score & keyword matching</div>
-        <div class="tool-feat"><span class="feat-dot"></span>Section-by-section feedback</div>
-        <div class="tool-feat"><span class="feat-dot"></span>Competitor benchmark</div>
-        <div class="tool-feat"><span class="feat-dot"></span>Why HR is not picking up</div>
-        <div class="tool-feat"><span class="feat-dot"></span>Before & after rewrites</div>
+      <div class="hero-btns">
+        <a href="/builder" class="btn-green">Build My Resume</a>
+        <a href="/analyse" class="btn-secondary">Analyse My Existing Resume</a>
       </div>
-      <span class="tool-link link-green">Analyse My Resume →</span>
-    </a>
-  </div>
-</section>
+      
+      <p class="beta-text-hero">* Vixo is currently in Public Beta. We're refining our AI daily for peak accuracy.</p>
 
-<!-- PREMIUM BADGE -->
-<div class="premium-badge">
-  ✨ Premium AI Technology
-</div>
+      <div class="hero-trust">
+        <div class="trust-item">
+          <div class="trust-check">✓</div>
+          ATS-Optimised
+        </div>
+        <div class="trust-item">
+          <div class="trust-check">✓</div>
+          AI Content Quality
+        </div>
+        <div class="trust-item">
+          <div class="trust-check">✓</div>
+          Market Relevance
+        </div>
+      </div>
+    </div>
 
-<footer>
-  <div class="footer-logo">Resume Builder<span>.AI</span></div>
-  <div class="footer-copy">Built for job seekers across global markets &nbsp;·&nbsp; Resume Builder.AI 2026</div>
-</footer>
+    <div class="hero-right">
+      <div class="resume-panel-wrap">
+        <div class="resume-panel">
+          <div class="rp-body">
+            <div class="rp-left">
+              <div class="rp-name">James Henderson</div>
+              <div class="rp-role">Senior Product Manager</div>
+              <div class="rp-contacts">
+                <div class="rp-contact-item">London, UK</div>
+                <div class="rp-contact-item">james.h@vixo.ai</div>
+              </div>
+              <div class="rp-sec">Professional Summary</div>
+              <p class="rp-summary">Results-driven Product Leader with 8+ years of experience in scaling SaaS products from 0 to 1M users. Expert in data-led strategy and cross-functional leadership.</p>
+            </div>
+            <div class="rp-right">
+              <div class="rp-sec">Top Skills</div>
+              <span class="rp-skill-chip">Product Strategy</span>
+              <span class="rp-skill-chip">Agile Mastery</span>
+              <span class="rp-skill-chip">Market Analysis</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="ats-float">
+          <div class="ats-num">92</div>
+          <div class="ats-excellent">Excellent Score</div>
+        </div>
+      </div>
+    </div>
+  </section>
 
 </body>
 </html>
