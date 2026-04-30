@@ -507,22 +507,64 @@ async function runAnalysis(){
   document.getElementById('loading-sub').textContent='Section-by-section detailed review';
   const t67=setTimeout(()=>{setDone(6);setRunning(7);document.getElementById('loading-title').textContent='Building HR insights...';document.getElementById('loading-sub').textContent='What recruiters actually see';},15000);
 
-  // ── Call 2: Deep (Sonnet ~35s) — skills, section feedback, HR ────────
-  const ctrl2=new AbortController();
-  const timer2=setTimeout(()=>ctrl2.abort(),55000);
-
+  // ── Call 2: Deep (Sonnet, SSE streaming — no timeout) ────────────────
+  // Streams via SSE so Vercel's 300s limit applies, not the 60s limit.
+  // Frontend reads the stream and renders the result when it arrives.
   try{
-    const res2=await fetch('/api/score',{method:'POST',signal:ctrl2.signal,headers:{'Content-Type':'application/json'},body:JSON.stringify({resume_text:resume,experience_level:level,target_role:jd,mode:'deep'})});
-    clearTimeout(timer2);clearTimeout(t67);
-    const raw2=await res2.text();
-    let d2;
-    try{d2=JSON.parse(raw2);}catch{throw new Error('Deep analysis returned an unexpected response.');}
-    if(d2.error){setDone(6);setDone(7);showDeepError(d2.error);}
-    else{setDone(6);setDone(7);try{renderDeepResults(d2);}catch(e){console.error('renderDeepResults error:',e);showDeepError('Render error: '+e.message);}}
+    const res2=await fetch('/api/score',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({resume_text:resume,experience_level:level,target_role:jd,mode:'deep'})});
+
+    if(!res2.body){
+      const errData=await res2.json().catch(()=>({}));
+      throw new Error(errData.error||'Deep analysis failed — no response body.');
+    }
+
+    const reader=res2.body.getReader();
+    const decoder=new TextDecoder();
+    let lineBuf='';
+    let evtType='';
+    let evtData='';
+    let resolved=false;
+
+    while(true){
+      const{done,value}=await reader.read();
+      if(done)break;
+
+      lineBuf+=decoder.decode(value,{stream:true});
+      const lines=lineBuf.split('\n');
+      lineBuf=lines.pop(); // keep incomplete line in buffer
+
+      for(const line of lines){
+        if(line===''){
+          // blank line = end of one SSE message
+          if(evtType==='ping'){evtType='';evtData='';continue;}
+          if(evtType==='result'&&evtData){
+            try{
+              const d2=JSON.parse(evtData);
+              clearTimeout(t67);setDone(6);setDone(7);
+              resolved=true;
+              try{renderDeepResults(d2);}catch(e){console.error('renderDeepResults:',e);showDeepError('Render error: '+e.message);}
+            }catch{showDeepError('Could not parse deep analysis result.');}
+          }else if(evtType==='error'&&evtData){
+            try{
+              const obj=JSON.parse(evtData);
+              clearTimeout(t67);setDone(6);setDone(7);
+              showDeepError(obj.error||'Deep analysis failed.');
+            }catch{showDeepError('Deep analysis failed.');}
+          }
+          evtType='';evtData='';
+        }else if(line.startsWith('event: ')){
+          evtType=line.slice(7).trim();
+        }else if(line.startsWith('data: ')){
+          evtData=line.slice(6);
+        }
+      }
+    }
+
+    if(!resolved){clearTimeout(t67);setDone(6);setDone(7);}
+
   }catch(err){
-    clearTimeout(timer2);clearTimeout(t67);
-    setDone(6);setDone(7);
-    showDeepError(err.name==='AbortError'?'Deep analysis timed out — scores above are valid. Retry when ready.':'Deep analysis failed: '+err.message);
+    clearTimeout(t67);setDone(6);setDone(7);
+    showDeepError('Deep analysis failed: '+err.message);
   }finally{
     document.getElementById('analyse-btn').disabled=false;
   }
