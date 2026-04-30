@@ -347,6 +347,10 @@ select option{background:var(--bg-surface);color:var(--text-primary);}
           </div>
         </div>
 
+        <div id="deep-loading-bar" style="display:none;align-items:center;gap:10px;background:var(--purple-light);border:1px solid rgba(108,92,231,0.2);border-radius:12px;padding:10px 16px;margin-bottom:16px;">
+          <div style="width:14px;height:14px;border:2px solid rgba(108,92,231,0.3);border-top-color:var(--purple);border-radius:50%;animation:spin 0.8s linear infinite;flex-shrink:0;"></div>
+          <span style="font-size:12px;color:var(--purple);font-weight:500;">Loading Skills, Section Feedback &amp; HR Insights…</span>
+        </div>
         <div class="tabs">
           <button class="tab-btn active" data-tab="overview" onclick="showTab('overview')">Overview</button>
           <button class="tab-btn" data-tab="skills" onclick="showTab('skills')">Skills Gap</button>
@@ -442,36 +446,86 @@ async function runAnalysis(){
     return;
   }
   const resume=rv.text;
-  const jd=document.getElementById('jd-input')?document.getElementById('jd-input').value.trim():'',level=document.getElementById('exp-select').value;
-  document.getElementById('empty-state').style.display='none';document.getElementById('dashboard').classList.remove('show');document.getElementById('loading-state').classList.add('show');document.getElementById('analyse-btn').disabled=true;resetProg();
-  const steps=[[1,'Scoring content quality...','Bullets, metrics, filler, verbs'],[2,'Checking ATS compatibility...','Structure, keywords, parsing risks'],[3,'Analysing skills gap...','Role-specific skills, market expectations'],[4,'Reviewing structure...','Length, bullets, section order'],[5,'Evaluating career narrative...','Progression, alignment, consistency'],[6,'Generating section feedback...','Section-by-section detailed review'],[7,'Building HR insights...','What recruiters actually see']];
-  let si=0;const iv=setInterval(()=>{if(si<steps.length){if(si>0)setDone(si);setRunning(steps[si][0]);document.getElementById('loading-title').textContent=steps[si][1];document.getElementById('loading-sub').textContent=steps[si][2];si++;}else clearInterval(iv);},900);
+  const jd=(document.getElementById('jd-input')?document.getElementById('jd-input').value.trim():'');
+  const level=document.getElementById('exp-select').value;
 
-  // BUG-002 FIX: AbortController — 55s timeout
-  const ctrl=new AbortController();
-  const timer=setTimeout(()=>ctrl.abort(),55000);
+  // Reset UI for new analysis
+  document.getElementById('empty-state').style.display='none';
+  document.getElementById('dashboard').classList.remove('show');
+  document.getElementById('right-error-state').style.display='none';
+  document.getElementById('deep-loading-bar').style.display='none';
+  document.getElementById('loading-state').classList.add('show');
+  document.getElementById('analyse-btn').disabled=true;
+  resetProg();
+
+  // ── Phase 1 animation: steps 1-5 while fast call runs (~15s) ─────────
+  const fastSteps=[
+    [1,'Scoring content quality...','Bullets, metrics, filler, verbs'],
+    [2,'Checking ATS compatibility...','Structure, keywords, parsing risks'],
+    [3,'Reviewing structure & readability...','Length, bullets, section order'],
+    [4,'Evaluating career narrative...','Progression, alignment, consistency'],
+    [5,'Computing final scores...','Applying dimension weights'],
+  ];
+  let si=0;
+  setRunning(fastSteps[0][0]);
+  document.getElementById('loading-title').textContent=fastSteps[0][1];
+  document.getElementById('loading-sub').textContent=fastSteps[0][2];
+  si=1;
+  const iv=setInterval(()=>{
+    if(si<fastSteps.length){
+      setDone(fastSteps[si-1][0]);
+      setRunning(fastSteps[si][0]);
+      document.getElementById('loading-title').textContent=fastSteps[si][1];
+      document.getElementById('loading-sub').textContent=fastSteps[si][2];
+      si++;
+    }else{clearInterval(iv);}
+  },2800);
+
+  // ── Call 1: Fast (Haiku ~15s) — scores, overview, top fixes ──────────
+  const ctrl1=new AbortController();
+  const timer1=setTimeout(()=>ctrl1.abort(),30000);
 
   try{
-    const res=await fetch('/api/analyse',{method:'POST',signal:ctrl.signal,headers:{'Content-Type':'application/json'},body:JSON.stringify({resume_text:resume,experience_level:level,target_role:jd,mode:'full'})});
-    clearTimeout(timer);
-    const raw=await res.text();
-    let d;
-    try{d=JSON.parse(raw);}catch{throw new Error('Server returned an unexpected response (HTTP '+res.status+'). Please try again.');}
-    if(d.error)throw new Error(d.error);
-    clearInterval(iv);for(let i=1;i<=7;i++)setDone(i);
-    try{
-      renderDashboard(d);
-    }catch(renderErr){
-      console.error('renderDashboard error:',renderErr);
-      showRightPanelError('Dashboard render error: '+renderErr.message+'. Please try again or contact support.');
-    }
+    const res1=await fetch('/api/score',{method:'POST',signal:ctrl1.signal,headers:{'Content-Type':'application/json'},body:JSON.stringify({resume_text:resume,experience_level:level,target_role:jd,mode:'fast'})});
+    clearTimeout(timer1);clearInterval(iv);
+    const raw1=await res1.text();
+    let d1;
+    try{d1=JSON.parse(raw1);}catch{throw new Error('Server returned an unexpected response. Please try again.');}
+    if(d1.error)throw new Error(d1.error);
+    for(let i=1;i<=5;i++)setDone(i);
+    try{renderFastResults(d1);}catch(e){console.error('renderFastResults error:',e);showRightPanelError('Render error: '+e.message);document.getElementById('analyse-btn').disabled=false;return;}
   }catch(err){
-    clearTimeout(timer);
-    clearInterval(iv);
-    const msg=err.name==='AbortError'?'Analysis timed out (55s). The server may be busy — please try again.':'Analysis failed: '+err.message;
-    showRightPanelError(msg);
+    clearTimeout(timer1);clearInterval(iv);
+    document.getElementById('analyse-btn').disabled=false;
+    showRightPanelError(err.name==='AbortError'?'Analysis timed out. Please try again.':'Analysis failed: '+err.message);
+    return;
   }
-  finally{document.getElementById('analyse-btn').disabled=false;}
+
+  // ── Phase 2 animation: steps 6-7 while deep call runs (~35s) ─────────
+  setRunning(6);
+  document.getElementById('loading-title').textContent='Generating section feedback...';
+  document.getElementById('loading-sub').textContent='Section-by-section detailed review';
+  const t67=setTimeout(()=>{setDone(6);setRunning(7);document.getElementById('loading-title').textContent='Building HR insights...';document.getElementById('loading-sub').textContent='What recruiters actually see';},15000);
+
+  // ── Call 2: Deep (Sonnet ~35s) — skills, section feedback, HR ────────
+  const ctrl2=new AbortController();
+  const timer2=setTimeout(()=>ctrl2.abort(),55000);
+
+  try{
+    const res2=await fetch('/api/score',{method:'POST',signal:ctrl2.signal,headers:{'Content-Type':'application/json'},body:JSON.stringify({resume_text:resume,experience_level:level,target_role:jd,mode:'deep'})});
+    clearTimeout(timer2);clearTimeout(t67);
+    const raw2=await res2.text();
+    let d2;
+    try{d2=JSON.parse(raw2);}catch{throw new Error('Deep analysis returned an unexpected response.');}
+    if(d2.error){setDone(6);setDone(7);showDeepError(d2.error);}
+    else{setDone(6);setDone(7);try{renderDeepResults(d2);}catch(e){console.error('renderDeepResults error:',e);showDeepError('Render error: '+e.message);}}
+  }catch(err){
+    clearTimeout(timer2);clearTimeout(t67);
+    setDone(6);setDone(7);
+    showDeepError(err.name==='AbortError'?'Deep analysis timed out — scores above are valid. Retry when ready.':'Deep analysis failed: '+err.message);
+  }finally{
+    document.getElementById('analyse-btn').disabled=false;
+  }
 }
 
 function showRightPanelError(msg){
@@ -484,7 +538,7 @@ function showRightPanelError(msg){
 
 
 
-function renderDashboard(d){
+function renderFastResults(d){
   document.getElementById('loading-state').classList.remove('show');
   const s=d.scores||{};baseScores={overall:s.overall||0};
   document.getElementById('d-overall').textContent=(s.overall||0)+'/100';
@@ -506,26 +560,53 @@ function renderDashboard(d){
   document.getElementById('ov-strengths').innerHTML=(d.overview?.strengths||[]).map(x=>`<div class="row"><div class="rb rb-g"></div><div><div class="row-title">${x.point}</div><div class="row-sub">${x.detail}</div></div></div>`).join('');
   document.getElementById('ov-issues').innerHTML=(d.overview?.critical_issues||[]).map(x=>`<div class="row"><div class="rb rb-r"></div><div><div class="row-title">${x.issue}</div><div class="row-sub-r">${x.impact}</div></div></div>`).join('');
 
-  // Top fixes — plain prioritised list
+  // Top fixes
   document.getElementById('top-fixes').innerHTML=(d.top_fixes||[]).map((q,i)=>`<div class="fix-row"><div class="fix-num">${i+1}</div><div><div class="fix-label">${q.fix}</div><div class="fix-meta"><span class="fix-dim">${q.dimension}</span>${q.why?`<span class="fix-why">${q.why}</span>`:''}<span class="fix-pts">+${q.points_available||0} pts</span></div></div></div>`).join('');
+
+  // Deep-loading placeholders for tabs 3, 6, 7
+  const loadingPlaceholder=`<div style="display:flex;align-items:center;gap:10px;padding:16px 4px;color:var(--text-secondary);font-size:13px;"><div style="width:14px;height:14px;border:2px solid rgba(108,92,231,0.3);border-top-color:var(--purple);border-radius:50%;animation:spin 0.8s linear infinite;flex-shrink:0;"></div>Analysing — results loading…</div>`;
+  document.getElementById('skills-strong').innerHTML=loadingPlaceholder;
+  document.getElementById('skills-missing').innerHTML='';
+  document.getElementById('skills-recs').innerHTML='';
+  document.getElementById('section-feedback-list').innerHTML=loadingPlaceholder;
+  document.getElementById('hr-reasons').innerHTML=loadingPlaceholder;
+  document.getElementById('hr-mindset').innerHTML='';
+
+  // Show deep loading banner
+  document.getElementById('deep-loading-bar').style.display='flex';
+
+  generatedDashboard=true;
+  document.getElementById('dashboard').classList.add('show');
+  document.getElementById('dashboard').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function renderDeepResults(d){
+  document.getElementById('deep-loading-bar').style.display='none';
 
   // Skills
   const sk=d.skills||{};
-  document.getElementById('skills-strong').innerHTML=(sk.strong_skills||[]).map(s=>`<span class="tag tg">${s}</span>`).join('') || '<span style="font-size:12px;color:var(--text-muted)">No skills detected — ensure your resume has a skills section</span>';
-  document.getElementById('skills-missing').innerHTML=(sk.missing_skills||[]).map(s=>`<span class="tag tr">${s}</span>`).join('') || '<span style="font-size:12px;color:var(--text-muted)">—</span>';
+  document.getElementById('skills-strong').innerHTML=(sk.strong_skills||[]).map(s=>`<span class="tag tg">${s}</span>`).join('')||'<span style="font-size:12px;color:var(--text-muted)">No skills detected — ensure your resume has a skills section</span>';
+  document.getElementById('skills-missing').innerHTML=(sk.missing_skills||[]).map(s=>`<span class="tag tr">${s}</span>`).join('')||'<span style="font-size:12px;color:var(--text-muted)">—</span>';
   document.getElementById('skills-recs').innerHTML=(sk.recommendations||[]).map(r=>`<div class="row"><div class="rb rb-a"></div><div><div class="row-title">${r.skill}</div><div class="row-sub">${r.why}</div><div class="row-sub-a">How: ${r.how}</div></div></div>`).join('');
 
-  // Section feedback
+  // Section feedback — with full before/after quality preserved
   const vc={'Strong':'sb-g','Good':'sb-g','Needs Work':'sb-a','Missing':'sb-r'};
   document.getElementById('section-feedback-list').innerHTML=(d.section_feedback||[]).map(sf=>`<div class="card"><div class="card-head"><div class="card-head-left">${sf.section}</div><span class="sec-badge ${vc[sf.verdict]||'sb-a'}">${sf.verdict} · ${sf.score}/100</span></div><div class="alert al-a" style="margin-bottom:10px;font-size:12px;">${sf.feedback}</div>${sf.before?`<div style="margin-top:12px;"><div class="diff"><div class="diff-lbl diff-before">Before</div><div class="diff-body">${sf.before}</div></div><div class="diff"><div class="diff-lbl diff-after">After</div><div class="diff-body after">${sf.after}</div></div></div>`:''}</div>`).join('');
 
   // HR
   document.getElementById('hr-reasons').innerHTML=(d.hr_reasons||[]).map(r=>`<div class="hr-card"><div class="hr-n">${r.rank}</div><div><div class="hr-title">${r.reason}</div><div class="hr-body">${r.detail}</div><div class="hr-fix">Fix: ${r.fix}</div></div></div>`).join('');
   document.getElementById('hr-mindset').innerHTML=`<div style="font-size:13px;color:var(--text-secondary);line-height:1.8;">${d.hr_mindset||''}</div>`;
+}
 
-  generatedDashboard=true;
-  document.getElementById('dashboard').classList.add('show');
-  document.getElementById('dashboard').scrollIntoView({behavior:'smooth',block:'start'});
+function showDeepError(msg){
+  document.getElementById('deep-loading-bar').style.display='none';
+  const errHtml=`<div class="alert al-r"><div class="alert-head">Deep analysis unavailable</div>${msg}</div>`;
+  document.getElementById('skills-strong').innerHTML=errHtml;
+  document.getElementById('skills-missing').innerHTML='';
+  document.getElementById('skills-recs').innerHTML='';
+  document.getElementById('section-feedback-list').innerHTML=errHtml;
+  document.getElementById('hr-reasons').innerHTML=errHtml;
+  document.getElementById('hr-mindset').innerHTML='';
 }
 
 // File upload
