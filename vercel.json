@@ -6,11 +6,11 @@
     { "source": "/analyser/", "destination": "/analyser/index.html" }
   ],
   "functions": {
-    "api/subscribe.js":    { "memory": 128, "maxDuration": 10 },
-    "api/save_session.js": { "memory": 128, "maxDuration": 10 },
-    "api/generate.js":     { "memory": 256, "maxDuration": 60 },
-    "api/score.js":        { "memory": 256, "maxDuration": 60 },
-    "api/analyse.js":      { "memory": 256, "maxDuration": 60 },
-    "api/extract.js":      { "memory": 256, "maxDuration": 60 }
+    "api/subscribe.js":    { "memory": 128, "maxDuration": 10  },
+    "api/save_session.js": { "memory": 128, "maxDuration": 10  },
+    "api/generate.js":     { "memory": 256, "maxDuration": 60  },
+    "api/score.js":        { "memory": 256, "maxDuration": 300 },
+    "api/analyse.js":      { "memory": 256, "maxDuration": 300 },
+    "api/extract.js":      { "memory": 256, "maxDuration": 60  }
   }
 }
