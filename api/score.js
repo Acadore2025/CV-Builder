@@ -1,15 +1,18 @@
 /**
  * score.js — Resume Scoring Engine
  *
- * Two-call architecture — full quality, no timeouts:
+ * Two-call architecture:
  *
- *   mode: 'fast'  → Haiku  → ~15s → scores, knockout_flags, top_fixes, overview
- *   mode: 'deep'  → Sonnet → ~35s → section_feedback (with before/after), skills, hr_reasons, hr_mindset
+ *   mode: 'fast'  → Haiku  → regular JSON response  → ~15s
+ *   mode: 'deep'  → Sonnet → SSE streaming response  → no timeout
  *
- * Frontend fires 'fast' first → user sees scores immediately.
- * Frontend fires 'deep' right after → deep analysis loads in background.
+ * The deep call streams via SSE so Vercel's 300s limit applies
+ * instead of the 60s non-streaming limit. Full Sonnet quality preserved.
  *
- * Legacy modes: 'quick' aliased to 'fast'. 'full' aliased to 'fast'.
+ * SSE events sent to frontend:
+ *   event: ping   — heartbeat every 8s (keeps connection alive)
+ *   event: result — complete parsed tool result (JSON)
+ *   event: error  — { error: string }
  */
 
 const CORS = {
@@ -29,6 +32,7 @@ module.exports = async function handler(req, res) {
   const { resume_text, experience_level, target_role, mode } = req.body;
   if (!resume_text?.trim()) return res.status(400).json({ error: 'resume_text is required' });
 
+  // Normalise legacy mode values
   const resolvedMode = (mode === 'quick' || mode === 'full' || !mode) ? 'fast' : mode;
 
   if (resolvedMode === 'deep') {
@@ -37,7 +41,7 @@ module.exports = async function handler(req, res) {
   return runFast(res, apiKey, resume_text.trim(), experience_level, target_role);
 };
 
-// ── FAST call — Haiku, 30s timeout ─────────────────────────────────────────
+// ── FAST call — Haiku, regular JSON, 30s timeout ───────────────────────────
 
 async function runFast(res, apiKey, resume, level, role) {
   const controller = new AbortController();
@@ -64,7 +68,7 @@ async function runFast(res, apiKey, resume, level, role) {
     });
 
     clearTimeout(timeout);
-    return handleResponse(res, response, FAST_TOOL.name);
+    return handleJsonResponse(res, response, FAST_TOOL.name);
 
   } catch (err) {
     clearTimeout(timeout);
@@ -75,11 +79,27 @@ async function runFast(res, apiKey, resume, level, role) {
   }
 }
 
-// ── DEEP call — Sonnet, 55s timeout ────────────────────────────────────────
+// ── DEEP call — Sonnet, SSE streaming, no hard timeout ────────────────────
 
 async function runDeep(res, apiKey, resume, level, role) {
+  // Switch to SSE streaming headers
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache, no-transform');
+  res.setHeader('Connection', 'keep-alive');
+  res.setHeader('X-Accel-Buffering', 'no'); // prevents nginx/Vercel edge buffering
+
+  function send(event, data) {
+    res.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
+  }
+
+  // Keep connection alive while Sonnet generates
+  const heartbeat = setInterval(() => {
+    res.write('event: ping\ndata: {}\n\n');
+  }, 8000);
+
+  // 270s abort — just under vercel.json maxDuration: 300
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 55000);
+  const timeout = setTimeout(() => controller.abort(), 270000);
 
   try {
     const response = await fetch('https://api.anthropic.com/v1/messages', {
@@ -94,7 +114,8 @@ async function runDeep(res, apiKey, resume, level, role) {
         model: 'claude-sonnet-4-6',
         max_tokens: 4000,
         temperature: 0,
-        system: 'Be detailed and actionable. Write clear before/after rewrites. Never copy resume text verbatim — paraphrase and improve.',
+        stream: true,
+        system: 'Be detailed and actionable. Write clear before/after rewrites. Never copy resume text verbatim — always paraphrase and improve.',
         tools: [DEEP_TOOL],
         tool_choice: { type: 'tool', name: DEEP_TOOL.name },
         messages: [{ role: 'user', content: buildDeepPrompt(resume, level, role) }],
@@ -102,20 +123,75 @@ async function runDeep(res, apiKey, resume, level, role) {
     });
 
     clearTimeout(timeout);
-    return handleResponse(res, response, DEEP_TOOL.name);
+
+    // Handle non-streaming error responses from Anthropic
+    if (!response.ok) {
+      const errText = await response.text();
+      let errMsg = 'Anthropic API error';
+      try { errMsg = JSON.parse(errText)?.error?.message || errMsg; } catch {}
+      clearInterval(heartbeat);
+      send('error', { error: errMsg });
+      res.end();
+      return;
+    }
+
+    // Read the stream and accumulate input_json_delta events
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let jsonAcc  = '';
+    let lineBuf  = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      lineBuf += decoder.decode(value, { stream: true });
+      const lines = lineBuf.split('\n');
+      lineBuf = lines.pop(); // keep last incomplete line in buffer
+
+      for (const line of lines) {
+        if (!line.startsWith('data: ')) continue;
+        const raw = line.slice(6).trim();
+        if (!raw || raw === '[DONE]') continue;
+
+        try {
+          const evt = JSON.parse(raw);
+          if (
+            evt.type === 'content_block_delta' &&
+            evt.delta?.type === 'input_json_delta'
+          ) {
+            jsonAcc += evt.delta.partial_json || '';
+          }
+        } catch { /* ignore malformed SSE lines */ }
+      }
+    }
+
+    clearInterval(heartbeat);
+
+    // Parse the fully assembled tool input and send to frontend
+    try {
+      const result = JSON.parse(jsonAcc);
+      send('result', result);
+    } catch {
+      send('error', { error: 'Failed to parse analysis result. Please try again.' });
+    }
+
+    res.end();
 
   } catch (err) {
     clearTimeout(timeout);
-    if (err.name === 'AbortError') {
-      return res.status(504).json({ error: 'Deep analysis timed out. Your scores above are still valid — try again.' });
-    }
-    return res.status(500).json({ error: err.message });
+    clearInterval(heartbeat);
+    const msg = err.name === 'AbortError'
+      ? 'Deep analysis timed out. Your scores above are still valid.'
+      : err.message;
+    send('error', { error: msg });
+    res.end();
   }
 }
 
-// ── Shared response handler ─────────────────────────────────────────────────
+// ── Shared JSON response handler (fast only) ────────────────────────────────
 
-async function handleResponse(res, response, toolName) {
+async function handleJsonResponse(res, response, toolName) {
   let envelope;
   const raw = await response.text();
 
@@ -168,7 +244,7 @@ const FIX_ITEM = {
   required: ['priority', 'fix', 'dimension', 'points_available', 'why'],
 };
 
-// Call 1 — Haiku: scores + overview
+// Call 1 — Haiku: scores + overview (fast, cheap)
 const FAST_TOOL = {
   name: 'score_resume_fast',
   description: 'Score resume across 7 dimensions. Return scores, knockout flags, top fixes, and overview.',
@@ -224,7 +300,7 @@ const FAST_TOOL = {
   },
 };
 
-// Call 2 — Sonnet: full quality deep analysis, before/after preserved
+// Call 2 — Sonnet streaming: full quality deep analysis, before/after fully preserved
 const DEEP_TOOL = {
   name: 'score_resume_deep',
   description: 'Deep resume analysis with section rewrites, skills gap, HR rejection reasons, and recruiter mindset.',
@@ -362,10 +438,13 @@ Your analysis must cover four areas:
    - AFTER: write a concrete, meaningfully improved rewrite of that section
 
 3. HR REJECTION REASONS
-   The top 5 reasons a recruiter would reject this resume in the first screening pass, ranked by likelihood. For each: the reason, why it matters to a recruiter, and the specific fix.
+   The top 5 reasons a recruiter would reject this resume in the first screening pass, ranked by likelihood.
+   For each: the reason, why it matters to a recruiter, and the specific fix.
 
 4. RECRUITER MINDSET
-   Write 3-4 sentences capturing exactly what goes through a recruiter's mind in the first 6 seconds of reading this resume — the gut reaction, what stands out, what raises red flags.
+   Write 3-4 sentences capturing exactly what goes through a recruiter's mind in the first 6 seconds
+   of reading this resume — the gut reaction, what stands out, what raises red flags.
 
-Be direct and specific. Generic observations like "improve your summary" are not acceptable — every point must reference something specific in this resume.`;
+Be direct and specific. Generic observations like "improve your summary" are not acceptable —
+every point must reference something specific in this resume.`;
 }
