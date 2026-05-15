@@ -85,7 +85,7 @@ module.exports = async function handler(req, res) {
 
   // BUG-002 FIX: AbortController with 55s timeout
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 55000);
+  const timeout = setTimeout(() => controller.abort(), 110000);
 
   try {
     const response = await fetch('https://api.anthropic.com/v1/messages', {
