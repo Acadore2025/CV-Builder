@@ -1686,9 +1686,9 @@ async function generateResume() {
 
     updateAILoading('Crafting your content...', 'Enhancing bullet points with AI');
 
-    // BUG-002 FIX: 55s timeout — Vercel kills at 60s, user sees proper error not infinite spinner
+    // Increased to 110s for mobile — slow upload + API time can exceed 55s on 4G
     const genCtrl = new AbortController();
-    const genTimeout = setTimeout(() => genCtrl.abort(), 55000);
+    const genTimeout = setTimeout(() => genCtrl.abort(), 110000);
 
     const response = await fetch('/api/generate', {
       method: 'POST',
@@ -1732,7 +1732,7 @@ async function generateResume() {
   } catch(err) {
     hideAILoading();
     const errMsg = err.name === 'AbortError'
-      ? 'Generation timed out (55s). The server may be busy — please try again.'
+      ? 'Generation timed out — your connection may be slow. Please check your network and try again.'
       : 'Generation failed: ' + err.message;
     showToast(errMsg, 'error');
     // Also show persistent error banner below the generate button
@@ -3437,9 +3437,9 @@ async function scoreGeneratedResume() {
   }
 
   try {
-    // BUG-002 FIX: 55s timeout on score call
+    // Increased to 90s for mobile
     const scoreCtrl = new AbortController();
-    const scoreTimeout = setTimeout(() => scoreCtrl.abort(), 55000);
+    const scoreTimeout = setTimeout(() => scoreCtrl.abort(), 90000);
     var res = await fetch('/api/score', {
       method: 'POST',
       signal: scoreCtrl.signal,
