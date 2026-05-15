@@ -155,6 +155,16 @@ select option{background:var(--bg-surface);color:var(--text-primary);}
 .al-r{background:var(--red-light);border:1px solid rgba(255,107,107,0.2);color:var(--red);}
 .al-a{background:var(--amber-bg);border:1px solid var(--amber-border);color:var(--amber);}
 .al-i{background:var(--purple-light);border:1px solid rgba(108,92,231,0.2);color:var(--purple);}
+.analysis-status{display:none;align-items:center;gap:14px;background:var(--purple-light);border:1px solid rgba(108,92,231,0.22);border-radius:14px;padding:14px 16px;margin-bottom:16px;}
+.analysis-status.show{display:flex;}
+.analysis-status.done{background:var(--green-light);border-color:rgba(0,200,150,0.25);}
+.analysis-status.warn{background:var(--amber-bg);border-color:var(--amber-border);}
+.status-spinner{width:20px;height:20px;border:2px solid rgba(108,92,231,0.25);border-top-color:var(--purple);border-radius:50%;animation:spin 0.8s linear infinite;flex-shrink:0;}
+.analysis-status.done .status-spinner{animation:none;border-color:var(--green);background:var(--green);}
+.analysis-status.warn .status-spinner{animation:none;border-color:var(--amber);}
+.status-copy{flex:1;}
+.status-title{font-size:13px;font-weight:600;color:var(--text-primary);margin-bottom:3px;}
+.status-body{font-size:12px;color:var(--text-secondary);line-height:1.55;}
 .diff{border-radius:12px;overflow:hidden;margin-bottom:12px;}
 .diff-lbl{font-size:10px;font-weight:600;letter-spacing:0.07em;text-transform:uppercase;padding:6px 12px;}
 .diff-before{background:var(--red-light);color:var(--red);}
@@ -328,6 +338,13 @@ select option{background:var(--bg-surface);color:var(--text-primary);}
         <button onclick="document.getElementById('right-error-state').style.display='none';document.getElementById('empty-state').style.display='flex';" style="padding:10px 24px;border:1px solid var(--border-medium);border-radius:10px;background:white;color:var(--text-secondary);font-size:13px;font-weight:500;font-family:'Inter',sans-serif;cursor:pointer;">← Try Again</button>
       </div>
       <div class="dashboard" id="dashboard">
+        <div class="analysis-status" id="analysis-status">
+          <div class="status-spinner" id="status-spinner"></div>
+          <div class="status-copy">
+            <div class="status-title" id="status-title"></div>
+            <div class="status-body" id="status-body"></div>
+          </div>
+        </div>
         <div id="knockout-container"></div>
         <div class="score-banner">
           <div class="ring-wrap">
@@ -441,6 +458,13 @@ async function requestAnalysis(payload, mode, timeoutMs){
   }
 }
 
+function showAnalysisStatus(kind,title,body){
+  const el=document.getElementById('analysis-status');
+  el.className='analysis-status show '+(kind||'');
+  document.getElementById('status-title').textContent=title;
+  document.getElementById('status-body').textContent=body;
+}
+
 async function runAnalysis(){
   const resumeRaw=document.getElementById('resume-input').value.trim();
   if(!resumeRaw){
@@ -462,30 +486,49 @@ async function runAnalysis(){
   const steps=[[1,'Scoring content quality...','Bullets, metrics, filler, verbs'],[2,'Checking ATS compatibility...','Structure, keywords, parsing risks'],[3,'Analysing skills gap...','Role-specific skills, market expectations'],[4,'Reviewing structure...','Length, bullets, section order'],[5,'Evaluating career narrative...','Progression, alignment, consistency'],[6,'Generating section feedback...','Section-by-section detailed review'],[7,'Building HR insights...','What recruiters actually see']];
   let si=0;const iv=setInterval(()=>{if(si<steps.length){if(si>0)setDone(si);setRunning(steps[si][0]);document.getElementById('loading-title').textContent=steps[si][1];document.getElementById('loading-sub').textContent=steps[si][2];si++;}else clearInterval(iv);},900);
 
-  // Full analysis gets a longer Vercel-safe window, then falls back to quick mode.
   try{
     const payload={resume_text:resume,experience_level:level,target_role:jd};
-    let d;
+    document.getElementById('loading-title').textContent='Preparing quick score...';
+    document.getElementById('loading-sub').textContent='You will see initial results first';
+
+    const quick=await requestAnalysis(payload,'quick',90000);
+    quick.quick_preview=true;
+    clearInterval(iv);for(let i=1;i<=3;i++)setDone(i);
     try{
-      d=await requestAnalysis(payload,'full',285000);
-    }catch(fullErr){
-      const timedOut=fullErr.name==='AbortError'||/timed out/i.test(fullErr.message);
-      if(!timedOut) throw fullErr;
-      document.getElementById('loading-title').textContent='Full analysis is taking too long...';
-      document.getElementById('loading-sub').textContent='Switching to quick scoring so you still get results';
-      d=await requestAnalysis(payload,'quick',90000);
-      d.quick_fallback=true;
-    }
-    clearInterval(iv);for(let i=1;i<=7;i++)setDone(i);
-    try{
-      renderDashboard(d);
+      renderDashboard(quick);
+      showAnalysisStatus('','Quick score ready','Full analysis can take 1-3 minutes. Still working in the background to generate section feedback, skills gap, and HR insights.');
     }catch(renderErr){
       console.error('renderDashboard error:',renderErr);
       showRightPanelError('Dashboard render error: '+renderErr.message+'. Please try again or contact support.');
+      return;
+    }
+
+    const fullMessages=[
+      'Still working. The full report is being generated.',
+      'Checking the deeper resume sections now. This can take 1-3 minutes.',
+      'Building section feedback, skills gap, and HR insights.',
+      'Almost there. The detailed analysis is still running.'
+    ];
+    let mi=0;
+    const msgTimer=setInterval(()=>{
+      showAnalysisStatus('', 'Quick score ready', fullMessages[mi%fullMessages.length]);
+      mi++;
+    },18000);
+
+    try{
+      const full=await requestAnalysis(payload,'full',285000);
+      clearInterval(msgTimer);
+      renderDashboard(full,{scroll:false});
+      showAnalysisStatus('done','Full report ready','The quick score has been upgraded with the complete section feedback, skills gap, and HR insights.');
+      for(let i=1;i<=7;i++)setDone(i);
+    }catch(fullErr){
+      clearInterval(msgTimer);
+      console.error('Full analysis error:',fullErr);
+      showAnalysisStatus('warn','Quick score is available','The full report took too long or failed, so the quick score remains visible. Try again later for the complete report.');
     }
   }catch(err){
     clearInterval(iv);
-    const msg=err.name==='AbortError'?'Analysis timed out. Please try again with a shorter resume or try again in a minute.':'Analysis failed: '+err.message;
+    const msg=err.name==='AbortError'?'Quick analysis timed out. Please try again with a shorter resume or try again in a minute.':'Analysis failed: '+err.message;
     showRightPanelError(msg);
   }
   finally{document.getElementById('analyse-btn').disabled=false;}
@@ -501,7 +544,7 @@ function showRightPanelError(msg){
 
 
 
-function renderDashboard(d){
+function renderDashboard(d,opts={}){
   document.getElementById('loading-state').classList.remove('show');
   const s=d.scores||{};baseScores={overall:s.overall||0};
   document.getElementById('d-overall').textContent=(s.overall||0)+'/100';
@@ -520,8 +563,9 @@ function renderDashboard(d){
   document.getElementById('knockout-container').innerHTML=kos.length?`<div class="knockout-banner"><div class="knockout-title">⚠️ Knockout Flags — Capping your score</div>${kos.map(k=>`<div class="knockout-item">• <strong>${k.dimension.toUpperCase()}</strong>: ${k.reason}</div>`).join('')}</div>`:'';
 
   // Overview
-  document.getElementById('ov-strengths').innerHTML=(d.overview?.strengths||[]).map(x=>`<div class="row"><div class="rb rb-g"></div><div><div class="row-title">${x.point}</div><div class="row-sub">${x.detail}</div></div></div>`).join('');
-  document.getElementById('ov-issues').innerHTML=(d.overview?.critical_issues||[]).map(x=>`<div class="row"><div class="rb rb-r"></div><div><div class="row-title">${x.issue}</div><div class="row-sub-r">${x.impact}</div></div></div>`).join('');
+  const previewNote='<div class="row-sub">Full analysis is still running. This section will fill in automatically when the complete report is ready.</div>';
+  document.getElementById('ov-strengths').innerHTML=(d.overview?.strengths||[]).map(x=>`<div class="row"><div class="rb rb-g"></div><div><div class="row-title">${x.point}</div><div class="row-sub">${x.detail}</div></div></div>`).join('') || (d.quick_preview?previewNote:'');
+  document.getElementById('ov-issues').innerHTML=(d.overview?.critical_issues||[]).map(x=>`<div class="row"><div class="rb rb-r"></div><div><div class="row-title">${x.issue}</div><div class="row-sub-r">${x.impact}</div></div></div>`).join('') || (d.quick_preview?previewNote:'');
 
   // Top fixes — plain prioritised list
   document.getElementById('top-fixes').innerHTML=(d.top_fixes||[]).map((q,i)=>`<div class="fix-row"><div class="fix-num">${i+1}</div><div><div class="fix-label">${q.fix}</div><div class="fix-meta"><span class="fix-dim">${q.dimension}</span>${q.why?`<span class="fix-why">${q.why}</span>`:''}<span class="fix-pts">+${q.points_available||0} pts</span></div></div></div>`).join('');
@@ -542,7 +586,7 @@ function renderDashboard(d){
 
   generatedDashboard=true;
   document.getElementById('dashboard').classList.add('show');
-  document.getElementById('dashboard').scrollIntoView({behavior:'smooth',block:'start'});
+  if(opts.scroll!==false)document.getElementById('dashboard').scrollIntoView({behavior:'smooth',block:'start'});
 }
 
 // File upload
