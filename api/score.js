@@ -112,7 +112,7 @@ async function runDeep(res, apiKey, resume, level, role) {
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
-        max_tokens: 4000,
+        max_tokens: 8000,
         temperature: 0,
         stream: true,
         system: 'Be detailed and actionable. Write clear before/after rewrites. Never copy resume text verbatim — always paraphrase and improve.',
