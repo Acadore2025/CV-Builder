@@ -58,7 +58,7 @@ select option{background:var(--bg-surface);color:var(--text-primary);}
 .btn-ghost:hover{background:var(--purple-light);color:var(--purple);border-color:var(--purple);}
 .upload-zone{border:1px dashed var(--border-medium);border-radius:12px;padding:20px 16px;text-align:center;cursor:pointer;transition:all 0.2s ease;background:var(--bg-surface);margin-bottom:12px;position:relative;}
 .upload-zone:hover,.upload-zone.drag-over{border-color:var(--purple);background:var(--purple-light);}
-.upload-zone input[type="file"]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;z-index:2;pointer-events:none;}
+.upload-zone input[type="file"]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
 .upload-ico-wrap{width:40px;height:40px;border-radius:12px;background:var(--bg-sidebar);border:1px solid var(--border-light);display:flex;align-items:center;justify-content:center;margin:0 auto 10px;font-size:18px;}
 .upload-title{font-size:13px;font-weight:500;color:var(--text-primary);margin-bottom:4px;}.upload-hint{font-size:11px;color:var(--text-muted);}
 .upload-fname{display:none;align-items:center;justify-content:center;gap:10px;font-size:12px;color:var(--green);font-weight:500;margin-top:8px;}.upload-fname.show{display:flex;}
@@ -241,7 +241,7 @@ select option{background:var(--bg-surface);color:var(--text-primary);}
       </div>
       <div class="field">
         <div class="flabel"><span>Resume</span><span class="char-ct" id="char-count">0 chars</span></div>
-        <div class="upload-zone" id="upload-zone" ondragover="handleDragOver(event)" ondragleave="handleDragLeave()" ondrop="handleDrop(event)" onclick="if(event.target.id!=='file-input'&&event.target.className!=='upload-rm')document.getElementById('file-input').click()">
+        <div class="upload-zone" id="upload-zone" ondragover="handleDragOver(event)" ondragleave="handleDragLeave()" ondrop="handleDrop(event)">
           <input type="file" id="file-input" accept=".pdf,.docx" onchange="handleFileSelect(event)">
           <div id="upload-prompt"><div class="upload-ico-wrap">📎</div><div class="upload-title">Upload PDF or DOCX</div><div class="upload-hint">Drag & drop or click to browse</div></div>
           <div class="upload-fname" id="upload-fname"><span id="upload-fname-label"></span><button class="upload-rm" onclick="removeFile(event)">✕</button></div>
@@ -325,11 +325,7 @@ select option{background:var(--bg-surface);color:var(--text-primary);}
         <div style="width:72px;height:72px;border-radius:20px;background:var(--red-light);border:1px solid rgba(255,107,107,0.25);display:flex;align-items:center;justify-content:center;font-size:32px;">⚠️</div>
         <div style="font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:700;color:var(--text-primary);">Analysis Failed</div>
         <div id="right-error-msg" style="font-size:13px;color:var(--red);max-width:420px;line-height:1.7;background:var(--red-light);border:1px solid rgba(255,107,107,0.25);border-radius:12px;padding:14px 18px;"></div>
-        <div style="font-size:12px;color:var(--text-secondary);max-width:360px;line-height:1.6;">💡 On mobile? Try switching to <strong>WiFi</strong> for a faster connection, or paste your resume text directly.</div>
-        <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;">
-          <button onclick="document.getElementById('analyse-btn').click();" style="padding:10px 24px;border:none;border-radius:10px;background:var(--purple);color:#fff;font-size:13px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;">↺ Retry Analysis</button>
-          <button onclick="document.getElementById('right-error-state').style.display='none';document.getElementById('empty-state').style.display='flex';" style="padding:10px 24px;border:1px solid var(--border-medium);border-radius:10px;background:white;color:var(--text-secondary);font-size:13px;font-weight:500;font-family:'Inter',sans-serif;cursor:pointer;">← Start Over</button>
-        </div>
+        <button onclick="document.getElementById('right-error-state').style.display='none';document.getElementById('empty-state').style.display='flex';" style="padding:10px 24px;border:1px solid var(--border-medium);border-radius:10px;background:white;color:var(--text-secondary);font-size:13px;font-weight:500;font-family:'Inter',sans-serif;cursor:pointer;">← Try Again</button>
       </div>
       <div class="dashboard" id="dashboard">
         <div id="knockout-container"></div>
@@ -399,7 +395,6 @@ select option{background:var(--bg-surface);color:var(--text-primary);}
 
 <script>
 let currentMode='resume',baseScores={},generatedDashboard=false;
-let lastResumeText='',lastExpLevel='mid',lastTargetRole='';
 window.addEventListener('DOMContentLoaded',()=>{const p=new URLSearchParams(window.location.search).get('prefill');if(p){document.getElementById('resume-input').value=decodeURIComponent(p);document.getElementById('char-count').textContent=decodeURIComponent(p).length.toLocaleString()+' chars';}});
 function setMode(m,b){currentMode=m;document.querySelectorAll('.mode-tab').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.getElementById('jd-section').style.display=m==='both'?'block':'none';document.getElementById('nav-mode-label').textContent=m==='both'?'Resume + JD':'Resume Only';}
 function updateCount(){document.getElementById('char-count').textContent=document.getElementById('resume-input').value.length.toLocaleString()+' chars';}
@@ -453,8 +448,6 @@ async function runAnalysis(){
   const resume=rv.text;
   const jd=(document.getElementById('jd-input')?document.getElementById('jd-input').value.trim():'');
   const level=document.getElementById('exp-select').value;
-  // Store for retryDeepAnalysis()
-  lastResumeText=resume; lastExpLevel=level; lastTargetRole=jd;
 
   // Reset UI for new analysis
   document.getElementById('empty-state').style.display='none';
@@ -489,9 +482,8 @@ async function runAnalysis(){
   },2800);
 
   // ── Call 1: Fast (Haiku ~15s) — scores, overview, top fixes ──────────
-  // Timeout increased to 60s for mobile networks (slow upload adds latency)
   const ctrl1=new AbortController();
-  const timer1=setTimeout(()=>ctrl1.abort(),60000);
+  const timer1=setTimeout(()=>ctrl1.abort(),30000);
 
   try{
     const res1=await fetch('/api/score',{method:'POST',signal:ctrl1.signal,headers:{'Content-Type':'application/json'},body:JSON.stringify({resume_text:resume,experience_level:level,target_role:jd,mode:'fast'})});
@@ -505,7 +497,7 @@ async function runAnalysis(){
   }catch(err){
     clearTimeout(timer1);clearInterval(iv);
     document.getElementById('analyse-btn').disabled=false;
-    showRightPanelError(err.name==='AbortError'?'Analysis timed out — your connection may be slow. Please check your network and try again.':'Analysis failed: '+err.message);
+    showRightPanelError(err.name==='AbortError'?'Analysis timed out. Please try again.':'Analysis failed: '+err.message);
     return;
   }
 
@@ -568,11 +560,11 @@ async function runAnalysis(){
       }
     }
 
-    if(!resolved){clearTimeout(t67);setDone(6);setDone(7);showDeepError('Connection dropped before deep analysis completed — tap Retry Deep Analysis below.');}
+    if(!resolved){clearTimeout(t67);setDone(6);setDone(7);}
 
   }catch(err){
     clearTimeout(t67);setDone(6);setDone(7);
-    showDeepError(err.name==='AbortError'?'Connection timed out — tap Retry Deep Analysis below.':'Deep analysis failed: '+err.message);
+    showDeepError('Deep analysis failed: '+err.message);
   }finally{
     document.getElementById('analyse-btn').disabled=false;
   }
@@ -650,46 +642,13 @@ function renderDeepResults(d){
 
 function showDeepError(msg){
   document.getElementById('deep-loading-bar').style.display='none';
-  const retryBtn=`<button onclick="retryDeepAnalysis()" style="margin-top:10px;padding:8px 20px;border:none;border-radius:8px;background:var(--purple);color:#fff;font-size:12px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;">↺ Retry Deep Analysis</button>`;
-  const tip=navigator.connection&&navigator.connection.effectiveType&&navigator.connection.effectiveType.includes('2g')?'<div style="font-size:11px;color:var(--text-secondary);margin-top:6px;">Tip: Switch to WiFi for a faster connection.</div>':'';
-  const errHtml=`<div class="alert al-r"><div class="alert-head">Deep analysis unavailable</div>${msg}${tip}${retryBtn}</div>`;
+  const errHtml=`<div class="alert al-r"><div class="alert-head">Deep analysis unavailable</div>${msg}</div>`;
   document.getElementById('skills-strong').innerHTML=errHtml;
   document.getElementById('skills-missing').innerHTML='';
   document.getElementById('skills-recs').innerHTML='';
   document.getElementById('section-feedback-list').innerHTML=errHtml;
   document.getElementById('hr-reasons').innerHTML=errHtml;
   document.getElementById('hr-mindset').innerHTML='';
-}
-
-// Retry just the deep section without re-running the full analysis
-async function retryDeepAnalysis(){
-  if(!lastResumeText)return;
-  const t67=setTimeout(()=>{setDone(6);setRunning(7);},10000);
-  setRunning(6);
-  document.getElementById('skills-strong').innerHTML='<div style="color:var(--text-secondary);font-size:13px;Retrying…"></div>';
-  document.getElementById('section-feedback-list').innerHTML='';
-  document.getElementById('hr-reasons').innerHTML='';
-  try{
-    const res2=await fetch('/api/score',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({resume_text:lastResumeText,experience_level:lastExpLevel,target_role:lastTargetRole,mode:'deep'})});
-    if(!res2.body)throw new Error('No response body');
-    const reader=res2.body.getReader();const decoder=new TextDecoder();
-    let lineBuf='',evtType='',evtData='',resolved=false;
-    while(true){
-      const{done,value}=await reader.read();if(done)break;
-      lineBuf+=decoder.decode(value,{stream:true});
-      const lines=lineBuf.split('\n');lineBuf=lines.pop();
-      for(const line of lines){
-        if(line===''){
-          if(evtType==='ping'){evtType='';evtData='';continue;}
-          if(evtType==='result'&&evtData){try{const d2=JSON.parse(evtData);clearTimeout(t67);setDone(6);setDone(7);resolved=true;renderDeepResults(d2);}catch{showDeepError('Could not parse result.');}}
-          else if(evtType==='error'&&evtData){try{const obj=JSON.parse(evtData);clearTimeout(t67);setDone(6);setDone(7);showDeepError(obj.error||'Deep analysis failed.');}catch{showDeepError('Deep analysis failed.');}}
-          evtType='';evtData='';
-        }else if(line.startsWith('event: ')){evtType=line.slice(7).trim();}
-        else if(line.startsWith('data: ')){evtData=line.slice(6);}
-      }
-    }
-    if(!resolved){clearTimeout(t67);setDone(6);setDone(7);showDeepError('Connection dropped — please try again.');}
-  }catch(err){clearTimeout(t67);setDone(6);setDone(7);showDeepError('Retry failed: '+err.message);}
 }
 
 // File upload
@@ -744,9 +703,8 @@ async function processFile(file) {
     _subEl.textContent = _steps[_si];
   }, 4000);
 
-  // Increased to 110s for mobile: slow upload + API time can exceed 55s on 4G
   const ctrl = new AbortController();
-  const timer = setTimeout(() => ctrl.abort(), 110000);
+  const timer = setTimeout(() => ctrl.abort(), 55000);
 
   try {
     const base64 = await fileToBase64(file);
@@ -777,7 +735,7 @@ async function processFile(file) {
     clearTimeout(timer);
     clearInterval(_stepTimer);
     document.getElementById('extract-banner').classList.remove('show');
-    const msg = err.name === 'AbortError' ? 'Extraction timed out — your connection may be slow. Please try again.' : err.message;
+    const msg = err.name === 'AbortError' ? 'Extraction timed out. Try a smaller file.' : err.message;
     document.getElementById('extract-err-text').textContent = msg;
     document.getElementById('extract-err').classList.add('show');
     setTimeout(() => document.getElementById('extract-err').classList.remove('show'), 6000);
