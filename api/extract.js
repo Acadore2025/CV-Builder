@@ -59,7 +59,7 @@ module.exports = async function handler(req, res) {
 
   // ── PDF: extract with Claude Vision ────────────────────────────────────
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 55000);
+  const timeout = setTimeout(() => controller.abort(), 110000);
 
   try {
     const response = await fetch('https://api.anthropic.com/v1/messages', {
