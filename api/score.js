@@ -1,12 +1,6 @@
 /**
  * score.js — Resume Scoring Engine
  * Uses Anthropic Tool Use API for guaranteed structured output.
- *
- * TIMEOUT FIX (Vercel free plan):
- *   - max_tokens full mode: 6000 → 3000  (tool output rarely exceeds 2,400 tokens)
- *   - Prompt trimmed: removed redundant labels, kept all scoring logic intact
- *   - AbortController stays at 55s (Vercel free hard-caps at 60s)
- *   These two changes together save ~8-14 seconds on p95 latency.
  */
 
 const CORS = {
@@ -14,6 +8,9 @@ const CORS = {
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type',
 };
+
+const FULL_TIMEOUT_MS = 285000;
+const QUICK_TIMEOUT_MS = 90000;
 
 module.exports = async function handler(req, res) {
   Object.entries(CORS).forEach(([k, v]) => res.setHeader(k, v));
@@ -27,31 +24,31 @@ module.exports = async function handler(req, res) {
   if (!resume_text?.trim()) return res.status(400).json({ error: 'resume_text is required' });
 
   const isQuick = mode === 'quick';
-  const model   = isQuick ? 'claude-haiku-4-5-20251001' : 'claude-sonnet-4-6';
-  const tool    = isQuick ? QUICK_TOOL : FULL_TOOL;
+  // BUG-001 FIX: correct model strings
+  const model = isQuick ? 'claude-haiku-4-5-20251001' : 'claude-sonnet-4-6';
+  const tool  = isQuick ? QUICK_TOOL : FULL_TOOL;
 
-  // 55s abort — Vercel free kills the function at 60s
+  // Keep just under Vercel Hobby's 300s function limit. Full analysis can exceed
+  // the old 55s ceiling when the upstream AI service is busy.
   const controller = new AbortController();
-  const timeout    = setTimeout(() => controller.abort(), 55000);
+  const timeout = setTimeout(() => controller.abort(), isQuick ? QUICK_TIMEOUT_MS : FULL_TIMEOUT_MS);
 
   try {
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       signal: controller.signal,
       headers: {
-        'Content-Type':      'application/json',
-        'x-api-key':          apiKey,
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
         model,
-        // TIMEOUT FIX: was 6000 for full mode — real output is ~2000-2400 tokens.
-        // Lowering this cuts 8-14 seconds from Anthropic's response time.
-        max_tokens: isQuick ? 2000 : 3000,
+        max_tokens: isQuick ? 2000 : 6000,
         temperature: 0,
-        tools:       [tool],
+        tools: [tool],
         tool_choice: { type: 'tool', name: tool.name },
-        messages:    [{ role: 'user', content: buildPrompt(resume_text.trim(), experience_level, target_role) }],
+        messages: [{ role: 'user', content: buildPrompt(resume_text.trim(), experience_level, target_role) }],
       }),
     });
 
@@ -72,13 +69,13 @@ module.exports = async function handler(req, res) {
   } catch (err) {
     clearTimeout(timeout);
     if (err.name === 'AbortError') {
-      return res.status(504).json({ error: 'Analysis timed out. Try Quick mode for faster results.' });
+      return res.status(504).json({ error: isQuick ? 'Quick analysis timed out. Please try again.' : 'Full analysis timed out. Retrying in quick mode may work.' });
     }
     return res.status(500).json({ error: err.message });
   }
 };
 
-// ── Tool definitions ─────────────────────────────────────────────────────────
+// ── Tool definitions ────────────────────────────────────────────────────────
 
 const SCORE_PROPS = {
   overall:                { type: 'integer', description: 'Weighted overall 0-100' },
@@ -182,40 +179,39 @@ const FULL_TOOL = {
   },
 };
 
-// ── Prompt ───────────────────────────────────────────────────────────────────
-// TIMEOUT FIX: Condensed from ~1,400 → ~700 prompt tokens.
-// All 6 dimensions, all knockout rules, and the formula are preserved.
-// Verbose labels and redundant whitespace removed.
+// ── Prompt ──────────────────────────────────────────────────────────────────
 function buildPrompt(resume, level, role) {
-  return `You are a resume scoring engine. Score precisely using this rubric.
+  return `You are a professional resume scoring engine. Score the resume below using the rubric precisely.
 
 RESUME:
 ${resume}
 
-LEVEL: ${level || 'mid'} | TARGET: ${role || 'Not specified'}
+EXPERIENCE LEVEL: ${level || 'mid'}
+TARGET ROLE: ${role || 'Not specified'}
 
-WEIGHTS: Content 28% | ATS 24% | Skills 22% | Standards 10% | Structure 9% | Narrative 7%
-FORMULA: overall=round(ats×.24 + content×.28 + skills×.22 + structure×.09 + narrative×.07 + standards×.10)
+SCORING WEIGHTS:
+Content Quality 28% | ATS Compatibility 24% | Skills Relevance 22% | Professional Standards 10% | Structure 9% | Career Narrative 7%
+FORMULA: overall = round((ats×0.24)+(content×0.28)+(skills×0.22)+(structure×0.09)+(narrative×0.07)+(professional_standards×0.10))
 
-D1 ATS:
-KNOCKOUT: tables/multi-col→cap 35 critical | non-standard headings→cap 60 major | contact only in header/footer→cap 60 major
-POINTS: no tables/cols:15 | standard headings:10 | no images:10 | consistent dates:8 | contact in body:8 | no special bullets:7 | keywords match role(0-20):20 | clean LinkedIn:5 | "References available":-5 | "Objective Statement":-5
+=== DIMENSION 1: ATS COMPATIBILITY ===
+KNOCKOUT: Tables/multi-column → cap 35 critical | Non-standard headings → cap 60 major | Contact in header/footer only → cap 60 major
+CHECKPOINTS: No tables/columns: 15 | Standard headings: 10 | No images: 10 | Consistent dates: 8 | Contact in body: 8 | No special bullets: 7 | Keywords match role (0-20): 20 | Clean LinkedIn URL: 5 | No "References available": -5 | No "Objective Statement": -5
 
-D2 CONTENT:
-action verb+metric/bullet→8pts (best 5, max 40) | action verb only→2pts/bullet
-filler (responsible for/helped/worked on/assisted):-3 each, max -15 | specific summary:15 | consistent tense:10 | no pronouns:8 | no spelling errors:7
+=== DIMENSION 2: CONTENT QUALITY ===
+Action verb + metric in same bullet → 8pts/bullet (best 5, max 40) | Action verb only → 2pts/bullet
+Filler phrases (responsible for/helped/worked on/assisted): -3 each max -15 | Specific summary: 15 | Consistent tense: 10 | No pronouns: 8 | No spelling errors: 7
 
-D3 SKILLS:
-core technical(0-30):30 | specific not vague:20 | no outdated tools:15 | modern tools:20 | categorised:15
+=== DIMENSION 3: SKILLS RELEVANCE ===
+Core technical skills (0-30): 30 | Specific not vague: 20 | No outdated tools: 15 | Modern tools: 20 | Categorised: 15
 
-D4 STRUCTURE:
-appropriate length:20 | 3-6 bullets/role:20 | avg bullet 12-20 words:15 | correct section order:15 | no walls of text:15 | balance:15
+=== DIMENSION 4: STRUCTURE & READABILITY ===
+Appropriate length: 20 | Bullets per role 3-6: 20 | Avg bullet 12-20 words: 15 | Correct section order: 15 | No walls of text: 15 | Balance: 15
 
-D5 NARRATIVE:
-clear progression:30 | gaps>6mo:-10 each (max 20pts lost) | summary matches experience:25 | roles connect to target:25
+=== DIMENSION 5: CAREER NARRATIVE ===
+Clear progression: 30 | No gaps >6 months (-10 each): 20 | Summary matches experience: 25 | Roles connect to target: 25
 
-D6 STANDARDS:
-professional email:25 | complete contact:25 | no personal data(DOB/religion/marital):20 | consistent dates:15 | no grammar errors:15
+=== DIMENSION 6: PROFESSIONAL STANDARDS ===
+Professional email: 25 | Complete contact: 25 | No personal data (DOB/religion/marital): 20 | Consistent dates: 15 | No grammar errors: 15
 
-Write your own assessments. Do not copy or quote phrases from the resume.`;
+Write your own assessments — do not copy or quote phrases from the resume.`;
 }
