@@ -58,7 +58,7 @@ select option{background:var(--bg-surface);color:var(--text-primary);}
 .btn-ghost:hover{background:var(--purple-light);color:var(--purple);border-color:var(--purple);}
 .upload-zone{border:1px dashed var(--border-medium);border-radius:12px;padding:20px 16px;text-align:center;cursor:pointer;transition:all 0.2s ease;background:var(--bg-surface);margin-bottom:12px;position:relative;}
 .upload-zone:hover,.upload-zone.drag-over{border-color:var(--purple);background:var(--purple-light);}
-.upload-zone input[type="file"]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.upload-zone input[type="file"]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;z-index:2;pointer-events:none;}
 .upload-ico-wrap{width:40px;height:40px;border-radius:12px;background:var(--bg-sidebar);border:1px solid var(--border-light);display:flex;align-items:center;justify-content:center;margin:0 auto 10px;font-size:18px;}
 .upload-title{font-size:13px;font-weight:500;color:var(--text-primary);margin-bottom:4px;}.upload-hint{font-size:11px;color:var(--text-muted);}
 .upload-fname{display:none;align-items:center;justify-content:center;gap:10px;font-size:12px;color:var(--green);font-weight:500;margin-top:8px;}.upload-fname.show{display:flex;}
@@ -241,7 +241,7 @@ select option{background:var(--bg-surface);color:var(--text-primary);}
       </div>
       <div class="field">
         <div class="flabel"><span>Resume</span><span class="char-ct" id="char-count">0 chars</span></div>
-        <div class="upload-zone" id="upload-zone" ondragover="handleDragOver(event)" ondragleave="handleDragLeave()" ondrop="handleDrop(event)">
+        <div class="upload-zone" id="upload-zone" ondragover="handleDragOver(event)" ondragleave="handleDragLeave()" ondrop="handleDrop(event)" onclick="if(event.target.id!=='file-input'&&event.target.className!=='upload-rm')document.getElementById('file-input').click()">
           <input type="file" id="file-input" accept=".pdf,.docx" onchange="handleFileSelect(event)">
           <div id="upload-prompt"><div class="upload-ico-wrap">📎</div><div class="upload-title">Upload PDF or DOCX</div><div class="upload-hint">Drag & drop or click to browse</div></div>
           <div class="upload-fname" id="upload-fname"><span id="upload-fname-label"></span><button class="upload-rm" onclick="removeFile(event)">✕</button></div>
@@ -677,8 +677,7 @@ async function retryDeepAnalysis(){
     while(true){
       const{done,value}=await reader.read();if(done)break;
       lineBuf+=decoder.decode(value,{stream:true});
-      const lines=lineBuf.split('
-');lineBuf=lines.pop();
+      const lines=lineBuf.split('\n');lineBuf=lines.pop();
       for(const line of lines){
         if(line===''){
           if(evtType==='ping'){evtType='';evtData='';continue;}
