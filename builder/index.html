@@ -1600,6 +1600,21 @@ function sanitiseArr(arr) {
   return arr.map(s => sanitise(s));
 }
 
+// Returns blank for non-professional "titles" (Fresher, Student, N/A, etc.)
+// so they never appear on the printed resume.
+function getCleanTitle(raw) {
+  if (!raw) return '';
+  const t = raw.trim();
+  if (!t) return '';
+  const blocked = new Set([
+    'fresher','entry level','entry-level','entry_level',
+    'student','undergraduate','graduate','intern',
+    'n/a','na','none','-','open to work','open to opportunities',
+    'job seeker','actively looking','looking for opportunities'
+  ]);
+  return blocked.has(t.toLowerCase()) ? '' : t;
+}
+
 // ── BUILD PROMPT ───────────────────────────────────────────────────────
 function buildPrompt(data) {
   const marketInstructions = {
@@ -1686,9 +1701,9 @@ async function generateResume() {
 
     updateAILoading('Crafting your content...', 'Enhancing bullet points with AI');
 
-    // Increased to 110s for mobile — slow upload + API time can exceed 55s on 4G
+    // BUG-002 FIX: 55s timeout — Vercel kills at 60s, user sees proper error not infinite spinner
     const genCtrl = new AbortController();
-    const genTimeout = setTimeout(() => genCtrl.abort(), 110000);
+    const genTimeout = setTimeout(() => genCtrl.abort(), 55000);
 
     const response = await fetch('/api/generate', {
       method: 'POST',
@@ -1732,7 +1747,7 @@ async function generateResume() {
   } catch(err) {
     hideAILoading();
     const errMsg = err.name === 'AbortError'
-      ? 'Generation timed out — your connection may be slow. Please check your network and try again.'
+      ? 'Generation timed out (55s). The server may be busy — please try again.'
       : 'Generation failed: ' + err.message;
     showToast(errMsg, 'error');
     // Also show persistent error banner below the generate button
@@ -1910,7 +1925,7 @@ function renderHarvard(d) {
   let h = `<div style="padding:36px 52px;font-family:'Georgia',serif;font-size:13px;line-height:1.5;color:#000;background:#fff;">
   <div style="text-align:center;margin-bottom:14px;">
     <div style="font-size:26px;font-weight:700;letter-spacing:0.02em;text-transform:uppercase;">${sanitise(d.name)}</div>
-    ${d.title ? `<div style="font-size:13px;font-style:italic;margin-top:2px;">${sanitise(d.title)}</div>` : ''}
+    ${getCleanTitle(d.title) ? `<div style="font-size:13px;font-style:italic;margin-top:2px;">${sanitise(getCleanTitle(d.title))}</div>` : ''}
     <div style="font-size:11.5px;color:#222;margin-top:6px;">${contactParts.join(' &nbsp;|&nbsp; ')}</div>
   </div>`;
 
@@ -1952,7 +1967,7 @@ function renderClassic(d) {
 
   let h = `<div style="padding:40px 48px;font-family:'Inter',sans-serif;font-size:13px;line-height:1.6;color:#1a1a1a;">
   <div style="font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:700;color:#0F1B2D;letter-spacing:-0.5px;">${sanitise(d.name)}</div>
-  ${d.title?`<div style="font-size:14px;color:#C9953A;font-weight:500;margin-top:2px;">${sanitise(d.title)}</div>`:''}
+  ${getCleanTitle(d.title)?`<div style="font-size:14px;color:#C9953A;font-weight:500;margin-top:2px;">${sanitise(getCleanTitle(d.title))}</div>`:''}
   <div style="display:flex;flex-wrap:wrap;gap:14px;font-size:12px;color:#4A5568;padding:10px 0 12px;border-bottom:2px solid #0F1B2D;margin-bottom:16px;">
     ${d.email?`<span>&#9993; ${sanitise(d.email)}</span>`:''}${d.phone?`<span>&#128241; ${sanitise(d.phone)}</span>`:''}${d.location?`<span>&#128205; ${sanitise(d.location)}</span>`:''}${d.linkedin?`<span>&#128279; ${sanitise(d.linkedin.replace(/https?:\/\//,''))}</span>`:''}
   </div>`;
@@ -1981,7 +1996,7 @@ function renderModern(d) {
 
   const sidebar = `<div style="width:210px;min-width:210px;background:#1a1a2e;padding:28px 20px;color:#fff;flex-shrink:0;">
     <div style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:700;color:#fff;line-height:1.2;margin-bottom:4px;">${sanitise(d.name)}</div>
-    ${d.title?`<div style="font-size:12px;color:#C9953A;font-weight:500;margin-bottom:14px;">${sanitise(d.title)}</div>`:''}
+    ${getCleanTitle(d.title)?`<div style="font-size:12px;color:#C9953A;font-weight:500;margin-bottom:14px;">${sanitise(getCleanTitle(d.title))}</div>`:''}
     <div style="font-size:11px;color:rgba(255,255,255,0.6);border-bottom:1px solid rgba(255,255,255,0.15);padding-bottom:12px;margin-bottom:14px;">
       ${d.email?`<div style="margin-bottom:4px;word-break:break-all;">&#9993; ${sanitise(d.email)}</div>`:''}
       ${d.phone?`<div style="margin-bottom:4px;">&#128241; ${sanitise(d.phone)}</div>`:''}
@@ -2038,7 +2053,7 @@ function renderCorporate(d) {
   let h = `<div style="padding:40px 48px;font-family:'Inter',sans-serif;font-size:13px;line-height:1.6;color:#1a1a1a;">
   <div style="border-bottom:3px solid #1E3A5F;padding-bottom:14px;margin-bottom:20px;">
     <div style="font-size:26px;font-weight:700;color:#1E3A5F;letter-spacing:-0.3px;">${d.name}</div>
-    ${d.title?`<div style="font-size:13px;color:#1E3A5F;font-weight:500;margin-top:3px;opacity:0.7;">${d.title}</div>`:''}
+    ${getCleanTitle(d.title)?`<div style="font-size:13px;color:#1E3A5F;font-weight:500;margin-top:3px;opacity:0.7;">${sanitise(getCleanTitle(d.title))}</div>`:''}
     <div style="display:flex;flex-wrap:wrap;gap:16px;font-size:11.5px;color:#4A5568;margin-top:8px;">
       ${d.email?`<span>${d.email}</span>`:''}${d.phone?`<span>${d.phone}</span>`:''}${d.location?`<span>${d.location}</span>`:''}${d.linkedin?`<span>${d.linkedin.replace(/https?:\/\//,'')}</span>`:''}
     </div>
@@ -2082,7 +2097,7 @@ function renderExecutive(d) {
   let h = `<div style="font-family:'Inter',sans-serif;font-size:13px;line-height:1.6;color:#1a1a1a;">
   <div style="background:#1a1a2e;padding:28px 48px 24px;">
     <div style="font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:700;color:#fff;letter-spacing:-1px;">${sanitise(d.name)}</div>
-    ${d.title?`<div style="font-size:15px;color:#C9953A;font-weight:500;margin-top:4px;">${sanitise(d.title)}</div>`:''}
+    ${getCleanTitle(d.title)?`<div style="font-size:15px;color:#C9953A;font-weight:500;margin-top:4px;">${sanitise(getCleanTitle(d.title))}</div>`:''}
     <div style="display:flex;flex-wrap:wrap;gap:18px;font-size:12px;color:rgba(255,255,255,0.65);margin-top:12px;">
       ${d.email?`<span>${d.email}</span>`:''}${d.phone?`<span>${d.phone}</span>`:''}${d.location?`<span>${d.location}</span>`:''}${d.linkedin?`<span>${d.linkedin.replace(/https?:\/\//,'')}</span>`:''}
     </div>
@@ -2125,7 +2140,7 @@ function renderFresher(d) {
   let h = `<div style="padding:36px 44px;font-family:'Inter',sans-serif;font-size:13px;line-height:1.6;color:#1a1a1a;">
   <div style="border-left:4px solid #4CAF82;padding-left:16px;margin-bottom:18px;">
     <div style="font-size:28px;font-weight:700;color:#1a1a2e;letter-spacing:-0.3px;">${sanitise(d.name)}</div>
-    ${d.title?`<div style="font-size:13px;color:#4CAF82;font-weight:500;margin-top:2px;">${sanitise(d.title)}</div>`:''}
+    ${getCleanTitle(d.title)?`<div style="font-size:13px;color:#4CAF82;font-weight:500;margin-top:2px;">${sanitise(getCleanTitle(d.title))}</div>`:''}
     <div style="display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:#4A5568;margin-top:8px;">
       ${d.email?`<span>&#9993; ${d.email}</span>`:''}${d.phone?`<span>&#128241; ${d.phone}</span>`:''}${d.location?`<span>&#128205; ${d.location}</span>`:''}${d.linkedin?`<span>&#128279; ${d.linkedin.replace(/https?:\/\//,'')}</span>`:''}
     </div>
@@ -2168,7 +2183,7 @@ function renderCreative(d) {
   let h = `<div style="font-family:'Inter',sans-serif;font-size:13px;line-height:1.6;color:#1a1a1a;">
   <div style="background:linear-gradient(135deg,#5B3E8F,#7B5EA7);padding:28px 44px 24px;">
     <div style="font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:700;color:#fff;letter-spacing:-0.5px;">${sanitise(d.name)}</div>
-    ${d.title?`<div style="font-size:13px;color:rgba(255,210,140,0.95);font-weight:500;margin-top:4px;">${sanitise(d.title)}</div>`:''}
+    ${getCleanTitle(d.title)?`<div style="font-size:13px;color:rgba(255,210,140,0.95);font-weight:500;margin-top:4px;">${sanitise(getCleanTitle(d.title))}</div>`:''}
     <div style="display:flex;flex-wrap:wrap;gap:16px;font-size:11.5px;color:rgba(255,255,255,0.7);margin-top:10px;">
       ${d.email?`<span>${d.email}</span>`:''}${d.phone?`<span>${d.phone}</span>`:''}${d.location?`<span>${d.location}</span>`:''}${d.linkedin?`<span>${d.linkedin.replace(/https?:\/\//,'')}</span>`:''}
     </div>
@@ -2601,7 +2616,7 @@ function exportDOCX() {
 
   // Header
   body += '<h1>' + (d.name || '') + '</h1>' + NL;
-  if (d.title) body += '<div class="rtitle">' + d.title + '</div>' + NL;
+  if (getCleanTitle(d.title)) body += '<div class="rtitle">' + getCleanTitle(d.title) + '</div>' + NL;
   var contactItems = [d.email, d.phone, d.location, d.linkedin, d.portfolio].filter(Boolean);
   body += '<div class="contact">' + contactItems.join(' &nbsp;|&nbsp; ') + '</div>' + NL;
 
@@ -3437,9 +3452,9 @@ async function scoreGeneratedResume() {
   }
 
   try {
-    // Increased to 90s for mobile
+    // BUG-002 FIX: 55s timeout on score call
     const scoreCtrl = new AbortController();
-    const scoreTimeout = setTimeout(() => scoreCtrl.abort(), 90000);
+    const scoreTimeout = setTimeout(() => scoreCtrl.abort(), 55000);
     var res = await fetch('/api/score', {
       method: 'POST',
       signal: scoreCtrl.signal,
