@@ -426,6 +426,21 @@ function validateInput(text, fieldName) {
   return { ok: true, text: stripped };
 }
 
+async function requestAnalysis(payload, mode, timeoutMs){
+  const ctrl=new AbortController();
+  const timer=setTimeout(()=>ctrl.abort(),timeoutMs);
+  try{
+    const res=await fetch('/api/analyse',{method:'POST',signal:ctrl.signal,headers:{'Content-Type':'application/json'},body:JSON.stringify({...payload,mode})});
+    const raw=await res.text();
+    let d;
+    try{d=JSON.parse(raw);}catch{throw new Error('Server returned an unexpected response (HTTP '+res.status+'). Please try again.');}
+    if(d.error)throw new Error(d.error);
+    return d;
+  }finally{
+    clearTimeout(timer);
+  }
+}
+
 async function runAnalysis(){
   const resumeRaw=document.getElementById('resume-input').value.trim();
   if(!resumeRaw){
@@ -447,17 +462,20 @@ async function runAnalysis(){
   const steps=[[1,'Scoring content quality...','Bullets, metrics, filler, verbs'],[2,'Checking ATS compatibility...','Structure, keywords, parsing risks'],[3,'Analysing skills gap...','Role-specific skills, market expectations'],[4,'Reviewing structure...','Length, bullets, section order'],[5,'Evaluating career narrative...','Progression, alignment, consistency'],[6,'Generating section feedback...','Section-by-section detailed review'],[7,'Building HR insights...','What recruiters actually see']];
   let si=0;const iv=setInterval(()=>{if(si<steps.length){if(si>0)setDone(si);setRunning(steps[si][0]);document.getElementById('loading-title').textContent=steps[si][1];document.getElementById('loading-sub').textContent=steps[si][2];si++;}else clearInterval(iv);},900);
 
-  // BUG-002 FIX: AbortController — 55s timeout
-  const ctrl=new AbortController();
-  const timer=setTimeout(()=>ctrl.abort(),55000);
-
+  // Full analysis gets a longer Vercel-safe window, then falls back to quick mode.
   try{
-    const res=await fetch('/api/analyse',{method:'POST',signal:ctrl.signal,headers:{'Content-Type':'application/json'},body:JSON.stringify({resume_text:resume,experience_level:level,target_role:jd,mode:'full'})});
-    clearTimeout(timer);
-    const raw=await res.text();
+    const payload={resume_text:resume,experience_level:level,target_role:jd};
     let d;
-    try{d=JSON.parse(raw);}catch{throw new Error('Server returned an unexpected response (HTTP '+res.status+'). Please try again.');}
-    if(d.error)throw new Error(d.error);
+    try{
+      d=await requestAnalysis(payload,'full',285000);
+    }catch(fullErr){
+      const timedOut=fullErr.name==='AbortError'||/timed out/i.test(fullErr.message);
+      if(!timedOut) throw fullErr;
+      document.getElementById('loading-title').textContent='Full analysis is taking too long...';
+      document.getElementById('loading-sub').textContent='Switching to quick scoring so you still get results';
+      d=await requestAnalysis(payload,'quick',90000);
+      d.quick_fallback=true;
+    }
     clearInterval(iv);for(let i=1;i<=7;i++)setDone(i);
     try{
       renderDashboard(d);
@@ -466,9 +484,8 @@ async function runAnalysis(){
       showRightPanelError('Dashboard render error: '+renderErr.message+'. Please try again or contact support.');
     }
   }catch(err){
-    clearTimeout(timer);
     clearInterval(iv);
-    const msg=err.name==='AbortError'?'Analysis timed out (55s). The server may be busy — please try again.':'Analysis failed: '+err.message;
+    const msg=err.name==='AbortError'?'Analysis timed out. Please try again with a shorter resume or try again in a minute.':'Analysis failed: '+err.message;
     showRightPanelError(msg);
   }
   finally{document.getElementById('analyse-btn').disabled=false;}
