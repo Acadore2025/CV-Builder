@@ -15,7 +15,8 @@
   --border-light:#E9EEF5;--border-medium:#E2E8F0;
   --purple:#6C5CE7;--purple2:#8B7CF6;--purple-light:#F0EDFF;--purple-glow:rgba(108,92,231,0.15);
   --green:#00C896;--green2:#00A87E;--green-light:#E6F9F2;
-  --red:#FF6B6B;--red-light:#FFF0F0;
+  --red:#B45309;--red-light:#FFF7ED;
+  --risk:#B45309;--risk-soft:#FFF7ED;--risk-border:#FED7AA;--risk-text:#7C2D12;--risk-muted:#64748B;
   --amber:#D97706;--amber-bg:#FEF3C7;--amber-border:rgba(217,119,6,0.25);
   --blue:#60A5FA;--teal:#2DD4BF;--pink:#F472B6;
   --shadow-sm:0 1px 2px rgba(0,0,0,0.03),0 1px 1px rgba(0,0,0,0.02);
@@ -103,16 +104,17 @@ select option{background:var(--bg-surface);color:var(--text-primary);}
 .loading-dots span{width:6px;height:6px;border-radius:50%;background:var(--purple);animation:blink 1.2s ease-in-out infinite;}
 .loading-dots span:nth-child(2){animation-delay:0.2s;}.loading-dots span:nth-child(3){animation-delay:0.4s;}
 .dashboard{display:none;}.dashboard.show{display:block;}
-.knockout-banner{background:var(--red-light);border:1px solid rgba(255,107,107,0.3);border-left:4px solid var(--red);border-radius:16px;padding:16px 20px;margin-bottom:24px;}
-.knockout-title{font-size:13px;font-weight:600;color:var(--red);margin-bottom:10px;}
-.knockout-item{font-size:12px;color:var(--red);margin-bottom:6px;padding-left:4px;}
+.knockout-banner{background:var(--risk-soft);border:1px solid var(--risk-border);border-left:4px solid var(--risk);border-radius:16px;padding:16px 20px;margin-bottom:24px;}
+.knockout-title{font-size:13px;font-weight:600;color:var(--risk-text);margin-bottom:10px;}
+.knockout-item{font-size:12px;color:var(--text-secondary);margin-bottom:6px;padding-left:4px;line-height:1.65;}
+.knockout-item strong{color:var(--risk-text);}
 .score-banner{background:var(--bg-surface);border:1px solid var(--border-light);border-radius:20px;padding:28px 32px;margin-bottom:24px;display:grid;grid-template-columns:110px 1fr;gap:28px;align-items:center;box-shadow:var(--shadow-md);}
 .ring-wrap{position:relative;width:100px;height:100px;flex-shrink:0;}
 .ring-svg{transform:rotate(-90deg);}
 .ring-bg{fill:none;stroke:var(--border-light);stroke-width:5;}
 .ring-fill{fill:none;stroke-width:5;stroke-linecap:round;transition:stroke-dashoffset 1.1s cubic-bezier(.4,0,.2,1),stroke 0.4s;}
 .ring-text{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
-.ring-val{font-size:26px;font-weight:700;line-height:1;letter-spacing:-1px;color:var(--text-primary);transition:color 0.4s;}
+.ring-val{font-size:21px;font-weight:700;line-height:1;letter-spacing:0;color:var(--text-primary);transition:color 0.4s;white-space:nowrap;}
 .ring-lbl{font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;margin-top:2px;}
 .score-meta{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;}
 .meta-card{background:var(--bg-surface);border:1px solid var(--border-light);border-radius:12px;padding:12px 10px;cursor:pointer;transition:all 0.2s ease;text-align:center;box-shadow:var(--shadow-sm);}
@@ -135,24 +137,24 @@ select option{background:var(--bg-surface);color:var(--text-primary);}
 .tag-row{display:flex;flex-wrap:wrap;gap:8px;}
 .tag{display:inline-block;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:500;}
 .tg{background:var(--green-light);color:var(--green2);border:1px solid rgba(0,200,150,0.2);}
-.tr{background:var(--red-light);color:var(--red);border:1px solid rgba(255,107,107,0.2);}
+.tr{background:var(--risk-soft);color:var(--risk-text);border:1px solid var(--risk-border);}
 .ti{background:var(--purple-light);color:var(--purple);border:1px solid rgba(108,92,231,0.2);}
 .row{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--border-light);}
 .row:last-child{border-bottom:none;}
 .rb{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:8px;}
-.rb-g{background:var(--green);}.rb-r{background:var(--red);}.rb-a{background:var(--purple);}
+.rb-g{background:var(--green);}.rb-r{background:var(--risk);}.rb-a{background:var(--purple);}
 .row-title{font-size:13px;font-weight:600;color:var(--text-primary);margin-bottom:4px;}
 .row-sub{font-size:12px;color:var(--text-secondary);line-height:1.6;}
 .row-sub-g{font-size:12px;color:var(--green2);line-height:1.6;}
-.row-sub-r{font-size:12px;color:var(--red);line-height:1.6;}
+.row-sub-r{font-size:12px;color:var(--risk-muted);line-height:1.6;}
 .row-sub-a{font-size:12px;color:var(--purple);line-height:1.6;}
 .sec-badge{font-size:10px;font-weight:600;padding:3px 10px;border-radius:20px;}
 .sb-g{background:var(--green-light);color:var(--green2);}
 .sb-a{background:var(--amber-bg);color:var(--amber);}
-.sb-r{background:var(--red-light);color:var(--red);}
+.sb-r{background:var(--risk-soft);color:var(--risk-text);border:1px solid var(--risk-border);}
 .alert{border-radius:12px;padding:14px 16px;font-size:13px;line-height:1.65;margin-bottom:12px;}
 .alert-head{font-weight:600;margin-bottom:6px;font-size:13px;}
-.al-r{background:var(--red-light);border:1px solid rgba(255,107,107,0.2);color:var(--red);}
+.al-r{background:var(--risk-soft);border:1px solid var(--risk-border);color:var(--risk-text);}
 .al-a{background:var(--amber-bg);border:1px solid var(--amber-border);color:var(--amber);}
 .al-i{background:var(--purple-light);border:1px solid rgba(108,92,231,0.2);color:var(--purple);}
 .analysis-status{display:none;align-items:center;gap:14px;background:var(--purple-light);border:1px solid rgba(108,92,231,0.22);border-radius:14px;padding:14px 16px;margin-bottom:16px;}
@@ -167,7 +169,7 @@ select option{background:var(--bg-surface);color:var(--text-primary);}
 .status-body{font-size:12px;color:var(--text-secondary);line-height:1.55;}
 .diff{border-radius:12px;overflow:hidden;margin-bottom:12px;}
 .diff-lbl{font-size:10px;font-weight:600;letter-spacing:0.07em;text-transform:uppercase;padding:6px 12px;}
-.diff-before{background:var(--red-light);color:var(--red);}
+.diff-before{background:var(--risk-soft);color:var(--risk-text);}
 .diff-after{background:var(--green-light);color:var(--green2);}
 .diff-body{background:var(--bg-sidebar);padding:12px;font-size:12.5px;line-height:1.7;color:var(--text-secondary);border:1px solid var(--border-light);border-top:none;}
 .diff-body.after{color:var(--text-primary);border-color:rgba(0,200,150,0.2);background:var(--green-light);}
@@ -178,8 +180,8 @@ select option{background:var(--bg-surface);color:var(--text-primary);}
 .bench-avg{position:absolute;top:-4px;height:13px;width:1.5px;background:var(--text-dim);border-radius:1px;}
 .bench-top{position:absolute;top:-4px;height:13px;width:1.5px;background:var(--teal);border-radius:1px;}
 .bench-val{font-size:11px;font-weight:600;color:var(--text-secondary);min-width:30px;text-align:right;}
-.hr-card{background:var(--red-light);border:1px solid rgba(255,107,107,0.15);border-left:3px solid var(--red);border-radius:12px;padding:14px 16px;margin-bottom:10px;display:flex;gap:14px;}
-.hr-n{font-size:18px;font-weight:700;color:rgba(255,107,107,0.5);min-width:26px;flex-shrink:0;line-height:1.2;}
+.hr-card{background:var(--risk-soft);border:1px solid var(--risk-border);border-left:3px solid var(--risk);border-radius:12px;padding:14px 16px;margin-bottom:10px;display:flex;gap:14px;}
+.hr-n{font-size:18px;font-weight:700;color:rgba(180,83,9,0.45);min-width:26px;flex-shrink:0;line-height:1.2;}
 .hr-title{font-size:13px;font-weight:600;color:var(--text-primary);margin-bottom:5px;}
 .hr-body{font-size:12px;color:var(--text-secondary);line-height:1.65;}
 .hr-fix{font-size:12px;color:var(--green2);margin-top:5px;font-weight:500;}
@@ -368,7 +370,7 @@ select option{background:var(--bg-surface);color:var(--text-primary);}
           <button class="tab-btn active" data-tab="overview" onclick="showTab('overview')">Overview</button>
           <button class="tab-btn" data-tab="skills" onclick="showTab('skills')">Skills Gap</button>
           <button class="tab-btn" data-tab="feedback" onclick="showTab('feedback')">Section Feedback</button>
-          <button class="tab-btn" data-tab="hr" onclick="showTab('hr')">Why HR Ignores You</button>
+          <button class="tab-btn" data-tab="hr" onclick="showTab('hr')">Recruiter Signals</button>
         </div>
         <div class="tab-panel active" id="tab-overview">
           <div class="g2">
@@ -397,7 +399,7 @@ select option{background:var(--bg-surface);color:var(--text-primary);}
 
 
         <div class="tab-panel" id="tab-hr">
-          <div class="alert al-r" style="margin-bottom:14px;"><div class="alert-head">Why HR Is Not Calling You Back</div>Real reasons — every point has a specific fix.</div>
+          <div class="alert al-r" style="margin-bottom:14px;"><div class="alert-head">Recruiter Review Priorities</div>Focused signals — every point has a specific fix.</div>
           <div id="hr-reasons"></div>
           <div class="card" style="margin-top:12px;"><div class="card-head"><div class="card-head-left"><div class="card-ico">◉</div>The HR Mindset — first 6 seconds</div></div><div id="hr-mindset"></div></div>
         </div>
@@ -429,7 +431,7 @@ function showTab(id){document.querySelectorAll('.tab-panel').forEach(p=>p.classL
 function resetProg(){for(let i=1;i<=7;i++){const e=document.getElementById('chk-'+i);e.className='p-dot';e.textContent=i;}}
 function setRunning(n){const e=document.getElementById('chk-'+n);e.className='p-dot running';e.textContent='';}
 function setDone(n){const e=document.getElementById('chk-'+n);e.className='p-dot done';e.textContent='✓';}
-function drawRing(sc){const c=238.8,a=document.getElementById('score-arc'),col=sc>=75?'#00C896':sc>=55?'#FBBF24':'#FF6B6B';a.style.stroke=col;a.style.strokeDashoffset=c-(sc/100)*c;document.getElementById('d-overall').style.color=col;}
+function drawRing(sc){const c=238.8,a=document.getElementById('score-arc'),col=sc>=75?'#00C896':sc>=55?'#D97706':'#B45309';a.style.stroke=col;a.style.strokeDashoffset=c-(sc/100)*c;document.getElementById('d-overall').style.color=col;}
 function countUp(el,to,sf,ms){const t=performance.now();requestAnimationFrame(function s(n){const p=Math.min((n-t)/ms,1);el.textContent=Math.round(to*(1-Math.pow(1-p,3)))+sf;if(p<1)requestAnimationFrame(s);});}
 
 // INPUT-FIX: validate resume text before sending to API
