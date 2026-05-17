@@ -6,6 +6,7 @@
  */
 
 const mammoth = require('mammoth');
+const { checkRateLimit } = require('./_rateLimit');
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
@@ -20,6 +21,9 @@ module.exports = async function handler(req, res) {
   Object.entries(CORS).forEach(([k, v]) => res.setHeader(k, v));
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST')    return res.status(405).json({ error: 'Method not allowed' });
+
+  const rl = await checkRateLimit(req, 'extract');
+  if (!rl.ok) return res.status(rl.status).json({ error: rl.error });
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) return res.status(500).json({ error: 'ANTHROPIC_API_KEY not configured' });
